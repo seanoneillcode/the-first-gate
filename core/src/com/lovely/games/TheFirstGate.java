@@ -2,6 +2,9 @@ package com.lovely.games;
 
 import static com.lovely.games.Level.TILE_SIZE;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -30,12 +33,16 @@ public class TheFirstGate extends ApplicationAdapter {
     private Vector2 moveVector;
     private Vector2 inputVector;
     private float movementValue;
+    private String lastConnection;
+    private List<Level> levels;
+    private String newConnectionTo;
 
 	@Override
 	public void create () {
         assetManager = new AssetManager();
         assetManager.setLoader(TiledMap.class, new TmxMapLoader(new InternalFileHandleResolver()));
         assetManager.load("tower-01.tmx", TiledMap.class);
+        assetManager.load("tower-02.tmx", TiledMap.class);
         assetManager.finishLoading();
 
         camera = new OrthographicCamera();
@@ -43,15 +50,25 @@ public class TheFirstGate extends ApplicationAdapter {
 
 		batch = new SpriteBatch();
 		img = new Texture("wizard.png");
-        TiledMap map = assetManager.get("tower-01.tmx");
-        mapRenderer = new OrthogonalTiledMapRenderer(map, batch);
-        mapRenderer.setView(camera);
 
-        Level firstLevel = Level.loadLevel(map);
-        startLevel(firstLevel, "01");
+        levels = new ArrayList<Level>();
+        levels.add(Level.loadLevel(assetManager, "tower-01.tmx"));
+        levels.add(Level.loadLevel(assetManager, "tower-02.tmx"));
+
+        newConnectionTo = "01";
+
+        // special
+        startLevel(levels.get(0), "01");
 	}
 
+	private void loadLevel(Level level) {
+        TiledMap map = assetManager.get(level.name);
+        mapRenderer = new OrthogonalTiledMapRenderer(map, batch);
+        mapRenderer.setView(camera);
+    }
+
     private void startLevel(Level level, String startConnection) {
+        loadLevel(level);
         currentLevel = level;
         Vector2 startPos = level.getConnectionPosition(startConnection);
         playerPos = startPos;
@@ -59,6 +76,7 @@ public class TheFirstGate extends ApplicationAdapter {
         inputVector = new Vector2();
         moveVector = new Vector2();
         movementValue = 0;
+        lastConnection = startConnection;
     }
 
 	@Override
@@ -91,6 +109,26 @@ public class TheFirstGate extends ApplicationAdapter {
             Vector2 movement = moveVector.cpy().scl(movementDelta * PLAYER_SPEED);
             playerPos.add(movement);
         }
+        if (currentLevel.isDeath(playerPos.cpy().add(8,8))) {
+            newConnectionTo = lastConnection;
+            startLevel(currentLevel, lastConnection);
+        }
+        Connection connection = currentLevel.getConnection(playerPos.cpy().add(8,8));
+        if (connection == null) {
+            newConnectionTo = null;
+        }
+        if (connection != null && !connection.name.equals(newConnectionTo)) {
+            if (connection.to != null) {
+                for (Level level : levels) {
+                    if (level.hasConnection(connection.to)) {
+                        startLevel(level, connection.to);
+                        newConnectionTo = connection.to;
+                        break;
+                    }
+                }
+            }
+        }
+
     }
 
 	private void getInput() {

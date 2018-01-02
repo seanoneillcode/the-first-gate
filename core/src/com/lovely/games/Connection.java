@@ -1,5 +1,7 @@
 package com.lovely.games;
 
+import static com.lovely.games.Level.TILE_SIZE;
+
 import com.badlogic.gdx.math.Vector2;
 
 public class Connection {
@@ -12,5 +14,10 @@ public class Connection {
         this.name = name;
         this.to = to;
         this.pos = pos;
+    }
+
+    public boolean contains(Vector2 other) {
+        return other.x > pos.x && other.x < (pos.x + TILE_SIZE)
+                && other.y > pos.y && other.y < (pos.y + TILE_SIZE);
     }
 }
