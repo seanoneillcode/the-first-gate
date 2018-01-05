@@ -16,23 +16,29 @@ import com.badlogic.gdx.math.Vector2;
 
 class Level {
 
-    public static final int NUM_X_TILES = 15;
-    public static final int NUM_Y_TILES = 10;
-    public static final float TILE_SIZE = 32f;
+    static final float TILE_SIZE = 32f;
+    static final int DEFAULT_DELAY = 1;
 
     List<Connection> connections;
+    List<ArrowSource> arrowSources;
     boolean[][] walls;
     boolean[][] deaths;
     String name;
+    int numXTiles;
+    int numYTiles;
 
-    public Level(List<Connection> connections, boolean[][] walls, boolean[][] deaths, String name) {
+    Level(List<Connection> connections, boolean[][] walls, boolean[][] deaths, String name, int numXTiles,
+                 int numYTiles, List<ArrowSource> arrowSources) {
         this.connections = connections;
         this.walls = walls;
         this.deaths = deaths;
         this.name = name;
+        this.numXTiles = numXTiles;
+        this.numYTiles = numYTiles;
+        this.arrowSources = arrowSources;
     }
 
-    public Vector2 getConnectionPosition(String name) {
+    Vector2 getConnectionPosition(String name) {
         for (Connection connection : connections) {
             if (connection.name.equals(name)) {
                 return connection.pos.cpy();
@@ -41,27 +47,31 @@ class Level {
         return null;
     }
 
-    public boolean canMove(Vector2 pos) {
+    boolean isWall(Vector2 pos) {
         int tilex = MathUtils.floor(pos.x / TILE_SIZE);
         int tiley = MathUtils.floor(pos.y / TILE_SIZE);
 
-        if (tilex < 0 || tiley < 0 || tilex >= NUM_X_TILES || tiley >= NUM_Y_TILES) {
+        if (tilex < 0 || tiley < 0 || tilex >= numXTiles || tiley >= numYTiles) {
             return false;
         }
-        return !walls[tilex][tiley];
+        return walls[tilex][tiley];
     }
 
-    public boolean isDeath(Vector2 pos) {
+    boolean isDeath(Vector2 pos) {
         int tilex = MathUtils.floor(pos.x / TILE_SIZE);
         int tiley = MathUtils.floor(pos.y / TILE_SIZE);
 
-        if (tilex < 0 || tiley < 0 || tilex >= NUM_X_TILES || tiley >= NUM_Y_TILES) {
+        if (tilex < 0 || tiley < 0 || tilex >= numXTiles || tiley >= numYTiles) {
             return false;
         }
         return deaths[tilex][tiley];
     }
 
-    public Connection getConnection(Vector2 pos) {
+    boolean isOutOfBounds(Vector2 pos) {
+        return pos.x > (numXTiles * TILE_SIZE) || pos.x < 0 || pos.y < 0 || pos.y > (numYTiles * TILE_SIZE);
+    }
+
+    Connection getConnection(Vector2 pos) {
         for (Connection connection : connections) {
             if(connection.contains(pos)) {
                 return connection;
@@ -79,14 +89,26 @@ class Level {
         return false;
     }
 
-    private static class Builder {
-        List<Connection> connections = new ArrayList<Connection>();
-        boolean[][] walls = new boolean[NUM_X_TILES][NUM_Y_TILES];
-        boolean[][] deaths = new boolean[NUM_X_TILES][NUM_Y_TILES];
-        String name;
+    public List<ArrowSource> getArrowSources() {
+        return this.arrowSources;
+    }
 
-        Builder(String name) {
+    /**
+     * BUILDEr
+     */
+    private static class Builder {
+        List<Connection> connections = new ArrayList<>();
+        List<ArrowSource> arrowSources = new ArrayList<>();
+        boolean[][] walls;
+        boolean[][] deaths;
+        String name;
+        int numXTiles = 0;
+        int numYTiles = 0;
+
+        Builder(String name, int numXTiles, int numYTiles) {
             this.name = name;
+            this.numXTiles = numXTiles;
+            this.numYTiles = numYTiles;
         }
 
         Builder addConnection(String name, String to, Vector2 pos) {
@@ -104,14 +126,29 @@ class Level {
             return this;
         }
 
+        Builder addArrowSource(Vector2 dir, Vector2 pos, float offset, float delay) {
+            this.arrowSources.add(new ArrowSource(pos, dir, offset, delay));
+            return this;
+        }
+
         Level build() {
-            return new Level(connections, walls, deaths, name);
+            if (walls == null) {
+                walls = new boolean[numXTiles][numYTiles];
+            }
+            if (deaths == null) {
+                deaths = new boolean[numXTiles][numYTiles];
+            }
+            return new Level(connections, walls, deaths, name, numXTiles, numYTiles, arrowSources);
         }
     }
 
     static Level loadLevel(AssetManager assetManager, String name) {
         TiledMap tiledMap = assetManager.get(name);
-        Builder builder = new Builder(name);
+        MapProperties mapProperties = tiledMap.getProperties();
+        int levelWidth = (Integer) mapProperties.get("width");
+        int levelHeight = (Integer) mapProperties.get("height");
+        Builder builder = new Builder(name, levelWidth, levelHeight);
+
         MapLayer objectLayer = tiledMap.getLayers().get("objects");
         MapObjects mapObjects = objectLayer.getObjects();
 
@@ -127,10 +164,30 @@ class Level {
                 }
                 builder.addConnection(objName, to, new Vector2(rectObj.getRectangle().x, rectObj.getRectangle().y));
             }
+            if (properties.containsKey("type") && properties.get("type").equals("arrowSource")) {
+                RectangleMapObject rectObj = (RectangleMapObject) obj;
+                Vector2 dir = new Vector2(0, 0);
+                float offset = 0;
+                float delay = DEFAULT_DELAY;
+                if (properties.containsKey("xdir")) {
+                    dir.x = Integer.parseInt(properties.get("xdir").toString());
+                }
+                if (properties.containsKey("ydir")) {
+                    dir.y = Integer.parseInt(properties.get("ydir").toString());
+                }
+                if (properties.containsKey("offset")) {
+                    offset = Float.parseFloat(properties.get("offset").toString());
+                }
+                if (properties.containsKey("delay")) {
+                    delay = Float.parseFloat(properties.get("delay").toString());
+                }
+                Vector2 midPos = new Vector2(rectObj.getRectangle().x, rectObj.getRectangle().y);
+                builder.addArrowSource(dir, midPos, offset, delay);
+            }
         }
 
         // walls
-        boolean[][] walls = new boolean[NUM_X_TILES][NUM_Y_TILES];
+        boolean[][] walls = new boolean[levelWidth][levelHeight];
         TiledMapTileLayer tiledLayer = (TiledMapTileLayer) tiledMap.getLayers().get("walls");
         for (int y = 0; y < tiledLayer.getHeight(); y++) {
             for (int x = 0; x < tiledLayer.getWidth(); x++) {
@@ -140,7 +197,7 @@ class Level {
         builder.setWalls(walls);
 
         // deaths
-        boolean[][] deaths = new boolean[NUM_X_TILES][NUM_Y_TILES];
+        boolean[][] deaths = new boolean[levelWidth][levelHeight];
         tiledLayer = (TiledMapTileLayer) tiledMap.getLayers().get("death");
         for (int y = 0; y < tiledLayer.getHeight(); y++) {
             for (int x = 0; x < tiledLayer.getWidth(); x++) {

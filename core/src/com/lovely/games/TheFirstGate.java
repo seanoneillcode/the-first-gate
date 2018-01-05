@@ -3,12 +3,15 @@ package com.lovely.games;
 import static com.lovely.games.Level.TILE_SIZE;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.assets.loaders.FileHandleResolver;
+import com.badlogic.gdx.assets.loaders.TextureLoader;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -17,10 +20,11 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 public class TheFirstGate extends ApplicationAdapter {
-    private static final float PLAYER_SPEED = 32f * 6.0f;
+    private static final float PLAYER_SPEED = 32f * 4.0f;
     private SpriteBatch batch;
     private Texture img;
     private OrthogonalTiledMapRenderer mapRenderer;
@@ -36,13 +40,20 @@ public class TheFirstGate extends ApplicationAdapter {
     private String lastConnection;
     private List<Level> levels;
     private String newConnectionTo;
+    private List<Arrow> arrows;
+    private Texture arrowImage;
 
 	@Override
 	public void create () {
         assetManager = new AssetManager();
-        assetManager.setLoader(TiledMap.class, new TmxMapLoader(new InternalFileHandleResolver()));
+        FileHandleResolver fileHandleResolver = new InternalFileHandleResolver();
+        assetManager.setLoader(TiledMap.class, new TmxMapLoader(fileHandleResolver));
+        assetManager.setLoader(Texture.class, new TextureLoader(fileHandleResolver));
         assetManager.load("tower-01.tmx", TiledMap.class);
         assetManager.load("tower-02.tmx", TiledMap.class);
+        assetManager.load("tower-arrow-01.tmx", TiledMap.class);
+        assetManager.load("tower-arrow-02.tmx", TiledMap.class);
+        assetManager.load("arrow.png", Texture.class);
         assetManager.finishLoading();
 
         camera = new OrthographicCamera();
@@ -50,15 +61,18 @@ public class TheFirstGate extends ApplicationAdapter {
 
 		batch = new SpriteBatch();
 		img = new Texture("wizard.png");
+		arrowImage = assetManager.get("arrow.png");
 
-        levels = new ArrayList<Level>();
-        levels.add(Level.loadLevel(assetManager, "tower-01.tmx"));
+        levels = new ArrayList<>();
+        levels.add(Level.loadLevel(assetManager, "tower-01.tmx")); // 01
         levels.add(Level.loadLevel(assetManager, "tower-02.tmx"));
+        levels.add(Level.loadLevel(assetManager, "tower-arrow-01.tmx")); // 05
+        levels.add(Level.loadLevel(assetManager, "tower-arrow-02.tmx")); // 07
 
         newConnectionTo = "01";
 
         // special
-        startLevel(levels.get(0), "01");
+        startLevel(levels.get(3), "07");
 	}
 
 	private void loadLevel(Level level) {
@@ -75,8 +89,12 @@ public class TheFirstGate extends ApplicationAdapter {
         isMoving = false;
         inputVector = new Vector2();
         moveVector = new Vector2();
+        arrows = new ArrayList<>();
         movementValue = 0;
         lastConnection = startConnection;
+        for (ArrowSource arrowSource : currentLevel.getArrowSources()) {
+            arrowSource.start();
+        }
     }
 
 	@Override
@@ -87,7 +105,10 @@ public class TheFirstGate extends ApplicationAdapter {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         mapRenderer.render();
 		batch.begin();
-		batch.draw(img, playerPos.x, playerPos.y + 12);
+		for (Arrow arrow : arrows) {
+		    arrow.draw(batch);
+        }
+        batch.draw(img, playerPos.x, playerPos.y + 8);
 		batch.end();
 	}
 	
@@ -109,10 +130,13 @@ public class TheFirstGate extends ApplicationAdapter {
             Vector2 movement = moveVector.cpy().scl(movementDelta * PLAYER_SPEED);
             playerPos.add(movement);
         }
-        if (currentLevel.isDeath(playerPos.cpy().add(8,8))) {
-            newConnectionTo = lastConnection;
-            startLevel(currentLevel, lastConnection);
+        if (!isMoving) {
+            if (currentLevel.isDeath(playerPos.cpy().add(8,8))) {
+                newConnectionTo = lastConnection;
+                startLevel(currentLevel, lastConnection);
+            }
         }
+
         Connection connection = currentLevel.getConnection(playerPos.cpy().add(8,8));
         if (connection == null) {
             newConnectionTo = null;
@@ -129,6 +153,28 @@ public class TheFirstGate extends ApplicationAdapter {
             }
         }
 
+        for (ArrowSource arrowSource : currentLevel.getArrowSources()) {
+            arrowSource.update(this);
+        }
+
+        Iterator<Arrow> arrowIterator = arrows.iterator();
+        while(arrowIterator.hasNext()) {
+            Arrow arrow = arrowIterator.next();
+            arrow.update(this);
+            if (currentLevel.isWall(arrow.pos) || currentLevel.isOutOfBounds(arrow.pos)) {
+                arrowIterator.remove();
+            }
+            if (getPlayerRect().overlaps(arrow.getRect())) {
+                newConnectionTo = lastConnection;
+                startLevel(currentLevel, lastConnection);
+            }
+        }
+    }
+
+    private Rectangle getPlayerRect() {
+	    float buffer = TILE_SIZE * 0.2f;
+	    float playerSize = TILE_SIZE - buffer - buffer;
+	    return new Rectangle(playerPos.x + buffer, playerPos.y + buffer, playerSize, playerSize);
     }
 
 	private void getInput() {
@@ -153,7 +199,7 @@ public class TheFirstGate extends ApplicationAdapter {
 
         if (!isMoving && !inputVector.isZero()) {
             moveVector = inputVector.cpy();
-            if (currentLevel.canMove(moveVector.cpy().scl(TILE_SIZE).add(playerPos).add(8,8))) {
+            if (!currentLevel.isWall(moveVector.cpy().scl(TILE_SIZE).add(playerPos).add(8,8))) {
                 isMoving = true;
                 movementValue = 32f / PLAYER_SPEED;
             }
@@ -163,5 +209,10 @@ public class TheFirstGate extends ApplicationAdapter {
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
             Gdx.app.exit();
         }
+    }
+
+    void addArrow(Vector2 pos, Vector2 dir) {
+	    System.out.println("adding arrow");
+        arrows.add(new Arrow(arrowImage, pos, dir));
     }
 }
