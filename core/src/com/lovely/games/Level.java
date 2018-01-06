@@ -209,13 +209,17 @@ class Level {
                 RectangleMapObject rectObj = (RectangleMapObject) obj;
                 Vector2 start = new Vector2(rectObj.getRectangle().x, rectObj.getRectangle().y);
                 Vector2 end = start.cpy();
+                float offset = 0;
                 if (properties.containsKey("movex")) {
                     end.x = end.x + (TILE_SIZE * Float.parseFloat(properties.get("movex").toString()));
                 }
                 if (properties.containsKey("movey")) {
                     end.y = end.y + (TILE_SIZE * Float.parseFloat(properties.get("movey").toString()));
                 }
-                builder.addPlatform(new Platform(start, end));
+                if (properties.containsKey("offset")) {
+                    offset = Float.parseFloat(properties.get("offset").toString());
+                }
+                builder.addPlatform(new Platform(start, end, offset));
             }
         }
 

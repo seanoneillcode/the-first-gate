@@ -59,6 +59,9 @@ public class TheFirstGate extends ApplicationAdapter {
         assetManager.load("tower-arrow-03.tmx", TiledMap.class);
         assetManager.load("tower-arrow-04.tmx", TiledMap.class);
         assetManager.load("tower-platform-01.tmx", TiledMap.class);
+        assetManager.load("tower-platform-02.tmx", TiledMap.class);
+        assetManager.load("tower-platform-03.tmx", TiledMap.class);
+        assetManager.load("tower-platform-04.tmx", TiledMap.class);
         assetManager.load("arrow.png", Texture.class);
         assetManager.load("platform.png", Texture.class);
         assetManager.finishLoading();
@@ -79,11 +82,14 @@ public class TheFirstGate extends ApplicationAdapter {
         levels.add(Level.loadLevel(assetManager, "tower-arrow-03.tmx")); // 09
         levels.add(Level.loadLevel(assetManager, "tower-arrow-04.tmx")); // 09
         levels.add(Level.loadLevel(assetManager, "tower-platform-01.tmx")); // 13
+        levels.add(Level.loadLevel(assetManager, "tower-platform-02.tmx")); // 15
+        levels.add(Level.loadLevel(assetManager, "tower-platform-03.tmx")); // 17
+        levels.add(Level.loadLevel(assetManager, "tower-platform-04.tmx")); // 19
 
         newConnectionTo = "01";
 
         // special
-        startLevel(levels.get(6), "13");
+        startLevel(levels.get(0), "01");
 	}
 
 	private void loadLevel(Level level) {
@@ -107,6 +113,9 @@ public class TheFirstGate extends ApplicationAdapter {
         for (ArrowSource arrowSource : currentLevel.getArrowSources()) {
             arrowSource.start();
         }
+        for (Platform platform : currentLevel.getPlatforms()) {
+            platform.start();
+        }
     }
 
 	@Override
@@ -117,11 +126,11 @@ public class TheFirstGate extends ApplicationAdapter {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         mapRenderer.render();
 		batch.begin();
+        for (Platform platform : currentLevel.getPlatforms()) {
+            batch.draw(platformImg, platform.pos.x, platform.pos.y);
+        }
 		for (Arrow arrow : arrows) {
 		    arrow.draw(batch);
-        }
-        for (Platform platform : currentLevel.getPlatforms()) {
-		    batch.draw(platformImg, platform.pos.x, platform.pos.y);
         }
         batch.draw(img, playerPos.x, playerPos.y + 8);
 		batch.end();
@@ -144,6 +153,9 @@ public class TheFirstGate extends ApplicationAdapter {
             }
             Vector2 movement = moveVector.cpy().scl(movementDelta * PLAYER_SPEED);
             playerPos.add(movement);
+            if (currentPlatform != null) {
+                playerPos.add(currentPlatform.getMovement());
+            }
         }
         if (!isMoving) {
             Platform platform = currentLevel.getPlatform(playerPos);
