@@ -258,7 +258,6 @@ public class TheFirstGate extends ApplicationAdapter {
     }
 
     void addArrow(Vector2 pos, Vector2 dir) {
-	    System.out.println("adding arrow");
         arrows.add(new Arrow(arrowImage, pos, dir));
     }
 }
