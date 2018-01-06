@@ -44,7 +44,11 @@
 </data>
  </layer>
  <objectgroup name="objects">
-  <object id="9" name="05" type="connection" x="32" y="128" width="32" height="32"/>
+  <object id="9" name="05" type="connection" x="32" y="128" width="32" height="32">
+   <properties>
+    <property name="to" value="04"/>
+   </properties>
+  </object>
   <object id="10" name="06" type="connection" x="416" y="128" width="32" height="32">
    <properties>
     <property name="to" value="07"/>

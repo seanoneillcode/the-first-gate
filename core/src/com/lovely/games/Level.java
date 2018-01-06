@@ -23,12 +23,13 @@ class Level {
     List<ArrowSource> arrowSources;
     boolean[][] walls;
     boolean[][] deaths;
+    List<Platform> platforms;
     String name;
     int numXTiles;
     int numYTiles;
 
     Level(List<Connection> connections, boolean[][] walls, boolean[][] deaths, String name, int numXTiles,
-                 int numYTiles, List<ArrowSource> arrowSources) {
+                 int numYTiles, List<ArrowSource> arrowSources, List<Platform> platforms) {
         this.connections = connections;
         this.walls = walls;
         this.deaths = deaths;
@@ -36,6 +37,7 @@ class Level {
         this.numXTiles = numXTiles;
         this.numYTiles = numYTiles;
         this.arrowSources = arrowSources;
+        this.platforms = platforms;
     }
 
     Vector2 getConnectionPosition(String name) {
@@ -71,6 +73,19 @@ class Level {
         return pos.x > (numXTiles * TILE_SIZE) || pos.x < 0 || pos.y < 0 || pos.y > (numYTiles * TILE_SIZE);
     }
 
+    List<Platform> getPlatforms() {
+        return platforms;
+    }
+
+    Platform getPlatform(Vector2 pos) {
+        for (Platform platform : platforms) {
+            if (pos.dst2(platform.pos) < 256) {
+                return platform;
+            }
+        }
+        return null;
+    }
+
     Connection getConnection(Vector2 pos) {
         for (Connection connection : connections) {
             if(connection.contains(pos)) {
@@ -80,7 +95,7 @@ class Level {
         return null;
     }
 
-    public boolean hasConnection(String name) {
+    boolean hasConnection(String name) {
         for (Connection connection : connections) {
             if (connection.name.equals(name)) {
                 return true;
@@ -89,7 +104,7 @@ class Level {
         return false;
     }
 
-    public List<ArrowSource> getArrowSources() {
+    List<ArrowSource> getArrowSources() {
         return this.arrowSources;
     }
 
@@ -104,6 +119,7 @@ class Level {
         String name;
         int numXTiles = 0;
         int numYTiles = 0;
+        List<Platform> platforms = new ArrayList<>();
 
         Builder(String name, int numXTiles, int numYTiles) {
             this.name = name;
@@ -131,6 +147,11 @@ class Level {
             return this;
         }
 
+        Builder addPlatform(Platform platform) {
+            this.platforms.add(platform);
+            return this;
+        }
+
         Level build() {
             if (walls == null) {
                 walls = new boolean[numXTiles][numYTiles];
@@ -138,7 +159,7 @@ class Level {
             if (deaths == null) {
                 deaths = new boolean[numXTiles][numYTiles];
             }
-            return new Level(connections, walls, deaths, name, numXTiles, numYTiles, arrowSources);
+            return new Level(connections, walls, deaths, name, numXTiles, numYTiles, arrowSources, platforms);
         }
     }
 
@@ -183,6 +204,18 @@ class Level {
                 }
                 Vector2 midPos = new Vector2(rectObj.getRectangle().x, rectObj.getRectangle().y);
                 builder.addArrowSource(dir, midPos, offset, delay);
+            }
+            if (properties.containsKey("type") && properties.get("type").equals("platform")) {
+                RectangleMapObject rectObj = (RectangleMapObject) obj;
+                Vector2 start = new Vector2(rectObj.getRectangle().x, rectObj.getRectangle().y);
+                Vector2 end = start.cpy();
+                if (properties.containsKey("movex")) {
+                    end.x = end.x + (TILE_SIZE * Float.parseFloat(properties.get("movex").toString()));
+                }
+                if (properties.containsKey("movey")) {
+                    end.y = end.y + (TILE_SIZE * Float.parseFloat(properties.get("movey").toString()));
+                }
+                builder.addPlatform(new Platform(start, end));
             }
         }
 

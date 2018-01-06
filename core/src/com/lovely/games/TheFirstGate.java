@@ -20,6 +20,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
@@ -42,6 +43,8 @@ public class TheFirstGate extends ApplicationAdapter {
     private String newConnectionTo;
     private List<Arrow> arrows;
     private Texture arrowImage;
+    private Texture platformImg;
+    private Platform currentPlatform;
 
 	@Override
 	public void create () {
@@ -53,7 +56,11 @@ public class TheFirstGate extends ApplicationAdapter {
         assetManager.load("tower-02.tmx", TiledMap.class);
         assetManager.load("tower-arrow-01.tmx", TiledMap.class);
         assetManager.load("tower-arrow-02.tmx", TiledMap.class);
+        assetManager.load("tower-arrow-03.tmx", TiledMap.class);
+        assetManager.load("tower-arrow-04.tmx", TiledMap.class);
+        assetManager.load("tower-platform-01.tmx", TiledMap.class);
         assetManager.load("arrow.png", Texture.class);
+        assetManager.load("platform.png", Texture.class);
         assetManager.finishLoading();
 
         camera = new OrthographicCamera();
@@ -62,17 +69,21 @@ public class TheFirstGate extends ApplicationAdapter {
 		batch = new SpriteBatch();
 		img = new Texture("wizard.png");
 		arrowImage = assetManager.get("arrow.png");
+        platformImg = assetManager.get("platform.png");
 
         levels = new ArrayList<>();
         levels.add(Level.loadLevel(assetManager, "tower-01.tmx")); // 01
         levels.add(Level.loadLevel(assetManager, "tower-02.tmx"));
         levels.add(Level.loadLevel(assetManager, "tower-arrow-01.tmx")); // 05
         levels.add(Level.loadLevel(assetManager, "tower-arrow-02.tmx")); // 07
+        levels.add(Level.loadLevel(assetManager, "tower-arrow-03.tmx")); // 09
+        levels.add(Level.loadLevel(assetManager, "tower-arrow-04.tmx")); // 09
+        levels.add(Level.loadLevel(assetManager, "tower-platform-01.tmx")); // 13
 
         newConnectionTo = "01";
 
         // special
-        startLevel(levels.get(3), "07");
+        startLevel(levels.get(6), "13");
 	}
 
 	private void loadLevel(Level level) {
@@ -82,6 +93,7 @@ public class TheFirstGate extends ApplicationAdapter {
     }
 
     private void startLevel(Level level, String startConnection) {
+        currentPlatform = null;
         loadLevel(level);
         currentLevel = level;
         Vector2 startPos = level.getConnectionPosition(startConnection);
@@ -108,6 +120,9 @@ public class TheFirstGate extends ApplicationAdapter {
 		for (Arrow arrow : arrows) {
 		    arrow.draw(batch);
         }
+        for (Platform platform : currentLevel.getPlatforms()) {
+		    batch.draw(platformImg, platform.pos.x, platform.pos.y);
+        }
         batch.draw(img, playerPos.x, playerPos.y + 8);
 		batch.end();
 	}
@@ -131,10 +146,26 @@ public class TheFirstGate extends ApplicationAdapter {
             playerPos.add(movement);
         }
         if (!isMoving) {
-            if (currentLevel.isDeath(playerPos.cpy().add(8,8))) {
+            Platform platform = currentLevel.getPlatform(playerPos);
+            if (platform != null) {
+                currentPlatform = platform;
+            } else {
+                if (currentPlatform != null) {
+
+                }
+                currentPlatform = null;
+            }
+            if (currentPlatform == null && currentLevel.isDeath(playerPos.cpy().add(16,16))) {
                 newConnectionTo = lastConnection;
                 startLevel(currentLevel, lastConnection);
             }
+            playerPos.x = MathUtils.round(playerPos.x / TILE_SIZE) * TILE_SIZE;
+            playerPos.y = MathUtils.round(playerPos.y / TILE_SIZE) * TILE_SIZE;
+
+        }
+
+        if (currentPlatform != null && !isMoving) {
+            playerPos = currentPlatform.pos.cpy();
         }
 
         Connection connection = currentLevel.getConnection(playerPos.cpy().add(8,8));
@@ -169,6 +200,10 @@ public class TheFirstGate extends ApplicationAdapter {
                 startLevel(currentLevel, lastConnection);
             }
         }
+
+        for (Platform platform : currentLevel.getPlatforms()) {
+            platform.update();
+        }
     }
 
     private Rectangle getPlayerRect() {
@@ -187,7 +222,6 @@ public class TheFirstGate extends ApplicationAdapter {
             inputVector.x = inputVector.x - 1;
         }
         if (isRightPressed) {
-
             inputVector.x = inputVector.x + 1;
         }
         if (isUpPressed) {

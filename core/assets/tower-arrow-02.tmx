@@ -32,22 +32,26 @@
  <layer name="death" width="15" height="10">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,4,4,4,0,0,0,0,
+0,0,0,0,4,4,4,0,4,4,4,0,0,0,0,
+0,0,0,0,4,4,4,0,4,4,4,0,0,0,0,
+0,0,0,0,4,4,4,0,4,4,4,0,0,0,0,
+0,0,0,0,4,4,4,0,4,4,4,0,0,0,0,
+0,0,0,0,4,4,4,0,4,4,4,0,0,0,0,
+0,0,0,0,4,4,4,0,4,4,4,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
  <objectgroup name="objects">
-  <object id="9" name="07" type="connection" x="32" y="32" width="32" height="32"/>
+  <object id="9" name="07" type="connection" x="32" y="32" width="32" height="32">
+   <properties>
+    <property name="to" value="06"/>
+   </properties>
+  </object>
   <object id="10" name="08" type="connection" x="224" y="256" width="32" height="32">
    <properties>
-    <property name="to" value=""/>
+    <property name="to" value="09"/>
    </properties>
   </object>
   <object id="13" type="arrowSource" x="352" y="96" width="32" height="32">
