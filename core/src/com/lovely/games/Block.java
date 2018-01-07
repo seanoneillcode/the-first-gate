@@ -12,6 +12,7 @@ class Block {
     Vector2 startPos;
     boolean isMoving;
     float movementValue;
+    boolean isGround;
 
     Block(Vector2 pos) {
         this.startPos = pos.cpy();
@@ -19,9 +20,13 @@ class Block {
         this.isMoving = false;
         this.dir = new Vector2();
         this.movementValue = 0;
+        this.isGround = false;
     }
 
     void move(Vector2 dir) {
+        if (isGround) {
+            return;
+        }
         this.dir = dir.cpy();
         isMoving = true;
         movementValue = 32f / TILE_SPEED;
@@ -29,6 +34,7 @@ class Block {
 
     void start() {
         this.pos = startPos.cpy();
+        this.isGround = false;
     }
 
     void update() {
