@@ -66,6 +66,8 @@ public class TheFirstGate extends ApplicationAdapter {
         assetManager.load("tower-platform-04.tmx", TiledMap.class);
         assetManager.load("tower-block-01.tmx", TiledMap.class);
         assetManager.load("tower-block-02.tmx", TiledMap.class);
+        assetManager.load("tower-block-03.tmx", TiledMap.class);
+        assetManager.load("tower-block-04.tmx", TiledMap.class);
 
         assetManager.load("arrow.png", Texture.class);
         assetManager.load("platform.png", Texture.class);
@@ -94,13 +96,15 @@ public class TheFirstGate extends ApplicationAdapter {
         levels.add(Level.loadLevel(assetManager, "tower-platform-02.tmx")); // 15
         levels.add(Level.loadLevel(assetManager, "tower-platform-03.tmx")); // 17
         levels.add(Level.loadLevel(assetManager, "tower-platform-04.tmx")); // 19
-        levels.add(Level.loadLevel(assetManager, "tower-block-01.tmx")); // 21
+        levels.add(Level.loadLevel(assetManager, "tower-block-01.tmx")); // 21 // 10
         levels.add(Level.loadLevel(assetManager, "tower-block-02.tmx")); // 23
+        levels.add(Level.loadLevel(assetManager, "tower-block-03.tmx")); // 25
+        levels.add(Level.loadLevel(assetManager, "tower-block-04.tmx")); // 27
 
         newConnectionTo = "01";
 
         // special
-        startLevel(levels.get(11), "23");
+        startLevel(levels.get(13), "27");
 	}
 
 	private void loadLevel(Level level) {
@@ -147,22 +151,17 @@ public class TheFirstGate extends ApplicationAdapter {
 		    arrow.draw(batch);
         }
         for (Block block : currentLevel.blocks) {
-            if (block.pos.y >= playerPos.y || block.isGround) {
-                if (block.isGround) {
-                    batch.draw(groundBlockImage, block.pos.x, block.pos.y);
-                } else {
-                    batch.draw(blockImage, block.pos.x, block.pos.y);
-                }
+            if (block.isGround) {
+                batch.draw(groundBlockImage, block.pos.x, block.pos.y);
+            }
+            if (block.pos.y > playerPos.y && !block.isGround) {
+                batch.draw(blockImage, block.pos.x, block.pos.y);
             }
         }
         batch.draw(img, playerPos.x, playerPos.y + 8);
         for (Block block : currentLevel.blocks) {
-            if (block.pos.y < playerPos.y) {
-                if (block.isGround) {
-                    batch.draw(groundBlockImage, block.pos.x, block.pos.y);
-                } else {
-                    batch.draw(blockImage, block.pos.x, block.pos.y);
-                }
+            if (block.pos.y <= playerPos.y && !block.isGround) {
+                batch.draw(blockImage, block.pos.x, block.pos.y);
             }
         }
 		batch.end();
@@ -200,7 +199,7 @@ public class TheFirstGate extends ApplicationAdapter {
                 currentPlatform = null;
             }
             if (currentPlatform == null && currentLevel.isDeath(playerPos.cpy().add(16,16))) {
-                Block block = currentLevel.getBlock(playerPos.cpy().add(8,8));
+                Block block = currentLevel.getBlock(playerPos.cpy().add(8,8), false);
                 if (!(block != null && block.isGround)) {
                     newConnectionTo = lastConnection;
                     startLevel(currentLevel, lastConnection);
@@ -254,9 +253,21 @@ public class TheFirstGate extends ApplicationAdapter {
 
         for (Block block : currentLevel.blocks) {
             block.update();
-            if (!block.isMoving) {
-                if (currentLevel.isDeath(block.pos.cpy().add(16,16))) {
-                    block.isGround = true;
+            if (!block.isMoving && !block.isGround) {
+                block.pos.x = MathUtils.round(block.pos.x / TILE_SIZE) * TILE_SIZE;
+                block.pos.y = MathUtils.round(block.pos.y / TILE_SIZE) * TILE_SIZE;
+                if (currentLevel.isDeath(block.pos.cpy().add(8,8))) {
+                    boolean alreadyGround = false;
+                    for (Block otherBlock : currentLevel.blocks) {
+                        if (otherBlock.isGround) {
+                            if (block.pos.dst2(otherBlock.pos) < 64) {
+                                alreadyGround = true;
+                            }
+                        }
+                    }
+                    if (!alreadyGround) {
+                        block.isGround = true;
+                    }
                 }
             }
         }
@@ -291,10 +302,10 @@ public class TheFirstGate extends ApplicationAdapter {
             boolean blocked = false;
             moveVector = inputVector.cpy();
             Vector2 nextTilePos = moveVector.cpy().scl(TILE_SIZE).add(playerPos).add(8,8);
-            Block block = currentLevel.getBlock(nextTilePos);
-            if (block != null && !block.isGround) {
+            Block block = currentLevel.getBlock(nextTilePos, true);
+            if (block != null) {
                 Vector2 nextTileAgain = moveVector.cpy().scl(TILE_SIZE * 2.0f).add(playerPos).add(8,8);
-                Block nextBlock = currentLevel.getBlock(nextTileAgain);
+                Block nextBlock = currentLevel.getBlock(nextTileAgain, false);
                 if (!currentLevel.isWall(nextTileAgain) && (nextBlock == null || nextBlock.isGround)) {
                     block.move(moveVector);
                 } else {

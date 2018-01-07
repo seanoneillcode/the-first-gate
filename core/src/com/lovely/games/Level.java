@@ -61,10 +61,12 @@ class Level {
         return walls[tilex][tiley];
     }
 
-    Block getBlock(Vector2 pos) {
+    Block getBlock(Vector2 pos, boolean noGround) {
         for (Block block : blocks) {
-            if (pos.dst2(block.pos) < 256) {
-                return block;
+            if (!(noGround && block.isGround)) {
+                if (pos.dst2(block.pos) < 256) {
+                    return block;
+                }
             }
         }
         return null;
