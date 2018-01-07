@@ -21,6 +21,7 @@ class Level {
 
     List<Connection> connections;
     List<ArrowSource> arrowSources;
+    List<Block> blocks;
     boolean[][] walls;
     boolean[][] deaths;
     List<Platform> platforms;
@@ -29,7 +30,7 @@ class Level {
     int numYTiles;
 
     Level(List<Connection> connections, boolean[][] walls, boolean[][] deaths, String name, int numXTiles,
-                 int numYTiles, List<ArrowSource> arrowSources, List<Platform> platforms) {
+                 int numYTiles, List<ArrowSource> arrowSources, List<Platform> platforms, List<Block> blocks) {
         this.connections = connections;
         this.walls = walls;
         this.deaths = deaths;
@@ -38,6 +39,7 @@ class Level {
         this.numYTiles = numYTiles;
         this.arrowSources = arrowSources;
         this.platforms = platforms;
+        this.blocks = blocks;
     }
 
     Vector2 getConnectionPosition(String name) {
@@ -57,6 +59,15 @@ class Level {
             return false;
         }
         return walls[tilex][tiley];
+    }
+
+    Block getBlock(Vector2 pos) {
+        for (Block block : blocks) {
+            if (pos.dst2(block.pos) < 256) {
+                return block;
+            }
+        }
+        return null;
     }
 
     boolean isDeath(Vector2 pos) {
@@ -114,6 +125,7 @@ class Level {
     private static class Builder {
         List<Connection> connections = new ArrayList<>();
         List<ArrowSource> arrowSources = new ArrayList<>();
+        List<Block> blocks = new ArrayList<>();
         boolean[][] walls;
         boolean[][] deaths;
         String name;
@@ -152,6 +164,11 @@ class Level {
             return this;
         }
 
+        Builder addBlock(Block block) {
+            this.blocks.add(block);
+            return this;
+        }
+
         Level build() {
             if (walls == null) {
                 walls = new boolean[numXTiles][numYTiles];
@@ -159,7 +176,7 @@ class Level {
             if (deaths == null) {
                 deaths = new boolean[numXTiles][numYTiles];
             }
-            return new Level(connections, walls, deaths, name, numXTiles, numYTiles, arrowSources, platforms);
+            return new Level(connections, walls, deaths, name, numXTiles, numYTiles, arrowSources, platforms, blocks);
         }
     }
 
@@ -220,6 +237,11 @@ class Level {
                     offset = Float.parseFloat(properties.get("offset").toString());
                 }
                 builder.addPlatform(new Platform(start, end, offset));
+            }
+            if (properties.containsKey("type") && properties.get("type").equals("block")) {
+                RectangleMapObject rectObj = (RectangleMapObject) obj;
+                Vector2 pos = new Vector2(rectObj.getRectangle().x, rectObj.getRectangle().y);
+                builder.addBlock(new Block(pos));
             }
         }
 

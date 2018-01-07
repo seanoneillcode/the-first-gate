@@ -44,6 +44,7 @@ public class TheFirstGate extends ApplicationAdapter {
     private List<Arrow> arrows;
     private Texture arrowImage;
     private Texture platformImg;
+    private Texture blockImage;
     private Platform currentPlatform;
 
 	@Override
@@ -62,8 +63,10 @@ public class TheFirstGate extends ApplicationAdapter {
         assetManager.load("tower-platform-02.tmx", TiledMap.class);
         assetManager.load("tower-platform-03.tmx", TiledMap.class);
         assetManager.load("tower-platform-04.tmx", TiledMap.class);
+        assetManager.load("tower-block-01.tmx", TiledMap.class);
         assetManager.load("arrow.png", Texture.class);
         assetManager.load("platform.png", Texture.class);
+        assetManager.load("block.png", Texture.class);
         assetManager.finishLoading();
 
         camera = new OrthographicCamera();
@@ -73,6 +76,7 @@ public class TheFirstGate extends ApplicationAdapter {
 		img = new Texture("wizard.png");
 		arrowImage = assetManager.get("arrow.png");
         platformImg = assetManager.get("platform.png");
+        blockImage = assetManager.get("block.png");
 
         levels = new ArrayList<>();
         levels.add(Level.loadLevel(assetManager, "tower-01.tmx")); // 01
@@ -85,11 +89,12 @@ public class TheFirstGate extends ApplicationAdapter {
         levels.add(Level.loadLevel(assetManager, "tower-platform-02.tmx")); // 15
         levels.add(Level.loadLevel(assetManager, "tower-platform-03.tmx")); // 17
         levels.add(Level.loadLevel(assetManager, "tower-platform-04.tmx")); // 19
+        levels.add(Level.loadLevel(assetManager, "tower-block-01.tmx")); // 21
 
         newConnectionTo = "01";
 
         // special
-        startLevel(levels.get(0), "01");
+        startLevel(levels.get(10), "21");
 	}
 
 	private void loadLevel(Level level) {
@@ -116,6 +121,9 @@ public class TheFirstGate extends ApplicationAdapter {
         for (Platform platform : currentLevel.getPlatforms()) {
             platform.start();
         }
+        for (Block block : currentLevel.blocks) {
+            block.start();
+        }
     }
 
 	@Override
@@ -132,7 +140,17 @@ public class TheFirstGate extends ApplicationAdapter {
 		for (Arrow arrow : arrows) {
 		    arrow.draw(batch);
         }
+        for (Block block : currentLevel.blocks) {
+            if (block.pos.y > playerPos.y) {
+                batch.draw(blockImage, block.pos.x, block.pos.y);
+            }
+        }
         batch.draw(img, playerPos.x, playerPos.y + 8);
+        for (Block block : currentLevel.blocks) {
+            if (block.pos.y <= playerPos.y) {
+                batch.draw(blockImage, block.pos.x, block.pos.y);
+            }
+        }
 		batch.end();
 	}
 	
@@ -216,6 +234,10 @@ public class TheFirstGate extends ApplicationAdapter {
         for (Platform platform : currentLevel.getPlatforms()) {
             platform.update();
         }
+
+        for (Block block : currentLevel.blocks) {
+            block.update();
+        }
     }
 
     private Rectangle getPlayerRect() {
@@ -244,8 +266,20 @@ public class TheFirstGate extends ApplicationAdapter {
         }
 
         if (!isMoving && !inputVector.isZero()) {
+            boolean blocked = false;
             moveVector = inputVector.cpy();
-            if (!currentLevel.isWall(moveVector.cpy().scl(TILE_SIZE).add(playerPos).add(8,8))) {
+            Vector2 nextTilePos = moveVector.cpy().scl(TILE_SIZE).add(playerPos).add(8,8);
+            Block block = currentLevel.getBlock(nextTilePos);
+            if (block != null) {
+                Vector2 nextTileAgain = moveVector.cpy().scl(TILE_SIZE * 2.0f).add(playerPos).add(8,8);
+                Block nextBlock = currentLevel.getBlock(nextTileAgain);
+                if (!currentLevel.isWall(nextTileAgain) && nextBlock == null) {
+                    block.move(moveVector);
+                } else {
+                    blocked = true;
+                }
+            }
+            if (!blocked && !currentLevel.isWall(nextTilePos)) {
                 isMoving = true;
                 movementValue = 32f / PLAYER_SPEED;
             }
