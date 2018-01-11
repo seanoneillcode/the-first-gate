@@ -23,9 +23,12 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 
 public class TheFirstGate extends ApplicationAdapter {
     private static final float PLAYER_SPEED = 32f * 4.0f;
+    private static final float CAMERA_MARGIN = 0.5f;
+    public static final float CAMERA_CATCHUP_SPEED = 2.0f;
     private SpriteBatch batch;
     private Texture img;
     private OrthogonalTiledMapRenderer mapRenderer;
@@ -79,6 +82,7 @@ public class TheFirstGate extends ApplicationAdapter {
         camera.setToOrtho(false, 480, 320);
 
 		batch = new SpriteBatch();
+
 		img = new Texture("wizard.png");
 		arrowImage = assetManager.get("arrow.png");
         platformImg = assetManager.get("platform.png");
@@ -104,7 +108,7 @@ public class TheFirstGate extends ApplicationAdapter {
         newConnectionTo = "01";
 
         // special
-        startLevel(levels.get(13), "27");
+        startLevel(levels.get(0), "01");
 	}
 
 	private void loadLevel(Level level) {
@@ -117,8 +121,7 @@ public class TheFirstGate extends ApplicationAdapter {
         currentPlatform = null;
         loadLevel(level);
         currentLevel = level;
-        Vector2 startPos = level.getConnectionPosition(startConnection);
-        playerPos = startPos;
+        playerPos = level.getConnectionPosition(startConnection);
         isMoving = false;
         inputVector = new Vector2();
         moveVector = new Vector2();
@@ -136,14 +139,37 @@ public class TheFirstGate extends ApplicationAdapter {
         }
     }
 
+    private Vector3 getCameraPosition() {
+        Vector2 pos = playerPos.cpy();
+        Vector3 target = new Vector3(pos.x, pos.y, 0);
+        final float speed = CAMERA_CATCHUP_SPEED * Gdx.graphics.getDeltaTime();
+        float ispeed = 1.0f - speed;
+        Vector3 cameraPosition = camera.position.cpy();
+        cameraPosition.scl(ispeed);
+        target.scl(speed);
+        cameraPosition.add(target);
+        if (Math.abs(cameraPosition.x - pos.x) < CAMERA_MARGIN) {
+            cameraPosition.x = pos.x;
+        }
+        if (Math.abs(cameraPosition.y - pos.y) < CAMERA_MARGIN) {
+            cameraPosition.y = pos.y;
+        }
+        return cameraPosition;
+    }
+
 	@Override
 	public void render () {
+        camera.position.set(getCameraPosition());
+        camera.update();
+        batch.setProjectionMatrix(camera.combined);
+        mapRenderer.setView(camera);
 	    getInput();
 	    update();
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         mapRenderer.render();
 		batch.begin();
+
         for (Platform platform : currentLevel.getPlatforms()) {
             batch.draw(platformImg, platform.pos.x, platform.pos.y);
         }
