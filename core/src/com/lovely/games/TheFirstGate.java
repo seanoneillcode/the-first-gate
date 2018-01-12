@@ -73,6 +73,8 @@ public class TheFirstGate extends ApplicationAdapter {
         assetManager.load("tower-block-03.tmx", TiledMap.class);
         assetManager.load("tower-block-04.tmx", TiledMap.class);
         assetManager.load("tower-switch-01.tmx", TiledMap.class);
+        assetManager.load("tower-switch-02.tmx", TiledMap.class);
+        assetManager.load("tower-switch-03.tmx", TiledMap.class);
 
         assetManager.load("arrow.png", Texture.class);
         assetManager.load("platform.png", Texture.class);
@@ -109,11 +111,13 @@ public class TheFirstGate extends ApplicationAdapter {
         levels.add(Level.loadLevel(assetManager, "tower-block-03.tmx")); // 25
         levels.add(Level.loadLevel(assetManager, "tower-block-04.tmx")); // 27
         levels.add(Level.loadLevel(assetManager, "tower-switch-01.tmx")); // 29
+        levels.add(Level.loadLevel(assetManager, "tower-switch-02.tmx")); // 31
+        levels.add(Level.loadLevel(assetManager, "tower-switch-03.tmx")); // 33
 
         newConnectionTo = "01";
 
         // special
-        startLevel(levels.get(14), "29");
+        startLevel(levels.get(16), "33");
 	}
 
 	private void loadLevel(Level level) {
@@ -143,7 +147,7 @@ public class TheFirstGate extends ApplicationAdapter {
             block.start();
         }
         for (PressureTile pressureTile : currentLevel.pressureTiles) {
-            pressureTile.reset();
+            pressureTile.start();
         }
     }
 
@@ -178,14 +182,14 @@ public class TheFirstGate extends ApplicationAdapter {
         mapRenderer.render();
 		batch.begin();
 
+        for (PressureTile pressureTile : currentLevel.pressureTiles) {
+            batch.draw(pressureImage, pressureTile.pos.x, pressureTile.pos.y);
+        }
         for (Platform platform : currentLevel.getPlatforms()) {
             batch.draw(platformImg, platform.pos.x, platform.pos.y);
         }
 		for (Arrow arrow : arrows) {
 		    arrow.draw(batch);
-        }
-        for (PressureTile pressureTile : currentLevel.pressureTiles) {
-            batch.draw(pressureImage, pressureTile.pos.x, pressureTile.pos.y);
         }
         for (Block block : currentLevel.blocks) {
             if (block.isGround) {
@@ -255,7 +259,14 @@ public class TheFirstGate extends ApplicationAdapter {
             if (playerPos.dst2(pressureTile.pos) < 64) {
                 pressureTile.handleAction();
             } else {
-                pressureTile.reset();
+                pressureTile.handlePressureOff();
+            }
+            for (Block block : currentLevel.blocks) {
+                if (block.pos.dst2(pressureTile.pos) < 64) {
+                    pressureTile.handleAction();
+                } else {
+                    pressureTile.handlePressureOff();
+                }
             }
         }
 

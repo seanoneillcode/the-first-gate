@@ -1,9 +1,7 @@
 package com.lovely.games;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.maps.MapLayer;
@@ -163,8 +161,12 @@ class Level {
             return this;
         }
 
-        Builder addArrowSource(Vector2 dir, Vector2 pos, float offset, float delay) {
-            this.arrowSources.add(new ArrowSource(pos, dir, offset, delay));
+        Builder addArrowSource(Vector2 dir, Vector2 pos, float offset, float delay, boolean isActive, String switchId) {
+            ArrowSource arrowSource = new ArrowSource(pos, dir, offset, delay, isActive, switchId);
+            if (switchId != null) {
+                trunk.addListener(arrowSource);
+            }
+            this.arrowSources.add(arrowSource);
             return this;
         }
 
@@ -243,8 +245,16 @@ class Level {
                 if (properties.containsKey("delay")) {
                     delay = Float.parseFloat(properties.get("delay").toString());
                 }
+                boolean isActive = true;
+                if (properties.containsKey("isActive")) {
+                    isActive = Boolean.parseBoolean(properties.get("isActive").toString());
+                }
+                String switchId = null;
+                if (properties.containsKey("switch")) {
+                    switchId = properties.get("switch").toString();
+                }
                 Vector2 midPos = new Vector2(rectObj.getRectangle().x, rectObj.getRectangle().y);
-                builder.addArrowSource(dir, midPos, offset, delay);
+                builder.addArrowSource(dir, midPos, offset, delay, isActive, switchId);
             }
             if (properties.containsKey("type") && properties.get("type").equals("platform")) {
                 RectangleMapObject rectObj = (RectangleMapObject) obj;
@@ -285,7 +295,11 @@ class Level {
                 } else {
                     System.out.println("found pressure tile missing switchlink x, y: " + pos.x + ", " + pos.y);
                 }
-                builder.addPressureTile(new PressureTile(pos, switchId));
+                boolean isSwitch = false;
+                if (properties.containsKey("isSwitch")) {
+                    isSwitch = Boolean.parseBoolean(properties.get("isSwitch").toString());
+                }
+                builder.addPressureTile(new PressureTile(pos, switchId, isSwitch));
             }
         }
 
