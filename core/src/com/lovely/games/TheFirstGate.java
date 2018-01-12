@@ -49,6 +49,7 @@ public class TheFirstGate extends ApplicationAdapter {
     private Texture platformImg;
     private Texture blockImage;
     private Texture groundBlockImage;
+    private Texture pressureImage;
     private Platform currentPlatform;
 
 	@Override
@@ -71,10 +72,12 @@ public class TheFirstGate extends ApplicationAdapter {
         assetManager.load("tower-block-02.tmx", TiledMap.class);
         assetManager.load("tower-block-03.tmx", TiledMap.class);
         assetManager.load("tower-block-04.tmx", TiledMap.class);
+        assetManager.load("tower-switch-01.tmx", TiledMap.class);
 
         assetManager.load("arrow.png", Texture.class);
         assetManager.load("platform.png", Texture.class);
         assetManager.load("block.png", Texture.class);
+        assetManager.load("pressure.png", Texture.class);
         assetManager.load("ground-block.png", Texture.class);
         assetManager.finishLoading();
 
@@ -87,6 +90,7 @@ public class TheFirstGate extends ApplicationAdapter {
 		arrowImage = assetManager.get("arrow.png");
         platformImg = assetManager.get("platform.png");
         blockImage = assetManager.get("block.png");
+        pressureImage = assetManager.get("pressure.png");
         groundBlockImage = assetManager.get("ground-block.png");
 
         levels = new ArrayList<>();
@@ -104,11 +108,12 @@ public class TheFirstGate extends ApplicationAdapter {
         levels.add(Level.loadLevel(assetManager, "tower-block-02.tmx")); // 23
         levels.add(Level.loadLevel(assetManager, "tower-block-03.tmx")); // 25
         levels.add(Level.loadLevel(assetManager, "tower-block-04.tmx")); // 27
+        levels.add(Level.loadLevel(assetManager, "tower-switch-01.tmx")); // 29
 
         newConnectionTo = "01";
 
         // special
-        startLevel(levels.get(0), "01");
+        startLevel(levels.get(14), "29");
 	}
 
 	private void loadLevel(Level level) {
@@ -136,6 +141,9 @@ public class TheFirstGate extends ApplicationAdapter {
         }
         for (Block block : currentLevel.blocks) {
             block.start();
+        }
+        for (PressureTile pressureTile : currentLevel.pressureTiles) {
+            pressureTile.reset();
         }
     }
 
@@ -175,6 +183,9 @@ public class TheFirstGate extends ApplicationAdapter {
         }
 		for (Arrow arrow : arrows) {
 		    arrow.draw(batch);
+        }
+        for (PressureTile pressureTile : currentLevel.pressureTiles) {
+            batch.draw(pressureImage, pressureTile.pos.x, pressureTile.pos.y);
         }
         for (Block block : currentLevel.blocks) {
             if (block.isGround) {
@@ -238,6 +249,14 @@ public class TheFirstGate extends ApplicationAdapter {
 
         if (currentPlatform != null && !isMoving) {
             playerPos = currentPlatform.pos.cpy();
+        }
+
+        for (PressureTile pressureTile : currentLevel.pressureTiles) {
+            if (playerPos.dst2(pressureTile.pos) < 64) {
+                pressureTile.handleAction();
+            } else {
+                pressureTile.reset();
+            }
         }
 
         Connection connection = currentLevel.getConnection(playerPos.cpy().add(8,8));

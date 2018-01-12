@@ -1,7 +1,9 @@
 package com.lovely.games;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.maps.MapLayer;
@@ -28,9 +30,11 @@ class Level {
     String name;
     int numXTiles;
     int numYTiles;
+    List<PressureTile> pressureTiles = new ArrayList<>();
 
     Level(List<Connection> connections, boolean[][] walls, boolean[][] deaths, String name, int numXTiles,
-                 int numYTiles, List<ArrowSource> arrowSources, List<Platform> platforms, List<Block> blocks) {
+                 int numYTiles, List<ArrowSource> arrowSources, List<Platform> platforms, List<Block> blocks,
+          List<PressureTile> pressureTiles) {
         this.connections = connections;
         this.walls = walls;
         this.deaths = deaths;
@@ -40,6 +44,7 @@ class Level {
         this.arrowSources = arrowSources;
         this.platforms = platforms;
         this.blocks = blocks;
+        this.pressureTiles = pressureTiles;
     }
 
     Vector2 getConnectionPosition(String name) {
@@ -128,12 +133,14 @@ class Level {
         List<Connection> connections = new ArrayList<>();
         List<ArrowSource> arrowSources = new ArrayList<>();
         List<Block> blocks = new ArrayList<>();
+        List<PressureTile> pressureTiles = new ArrayList<>();
         boolean[][] walls;
         boolean[][] deaths;
         String name;
         int numXTiles = 0;
         int numYTiles = 0;
         List<Platform> platforms = new ArrayList<>();
+        Trunk trunk = new Trunk();
 
         Builder(String name, int numXTiles, int numYTiles) {
             this.name = name;
@@ -163,12 +170,27 @@ class Level {
 
         Builder addPlatform(Platform platform) {
             this.platforms.add(platform);
+            if (platform.switchId != null) {
+                trunk.addListener(platform);
+            }
             return this;
         }
 
         Builder addBlock(Block block) {
             this.blocks.add(block);
             return this;
+        }
+
+        Builder addPressureTile(PressureTile pressureTile) {
+            this.pressureTiles.add(pressureTile);
+            if (pressureTile.switchId != null) {
+                pressureTile.setTrunk(trunk);
+            }
+            return this;
+        }
+
+        Trunk getTrunk() {
+            return this.trunk;
         }
 
         Level build() {
@@ -178,7 +200,7 @@ class Level {
             if (deaths == null) {
                 deaths = new boolean[numXTiles][numYTiles];
             }
-            return new Level(connections, walls, deaths, name, numXTiles, numYTiles, arrowSources, platforms, blocks);
+            return new Level(connections, walls, deaths, name, numXTiles, numYTiles, arrowSources, platforms, blocks, pressureTiles);
         }
     }
 
@@ -229,6 +251,7 @@ class Level {
                 Vector2 start = new Vector2(rectObj.getRectangle().x, rectObj.getRectangle().y);
                 Vector2 end = start.cpy();
                 float offset = 0;
+                boolean isActive = true;
                 if (properties.containsKey("movex")) {
                     end.x = end.x + (TILE_SIZE * Float.parseFloat(properties.get("movex").toString()));
                 }
@@ -238,12 +261,31 @@ class Level {
                 if (properties.containsKey("offset")) {
                     offset = Float.parseFloat(properties.get("offset").toString());
                 }
-                builder.addPlatform(new Platform(start, end, offset));
+                if (properties.containsKey("isActive")) {
+                    isActive = Boolean.parseBoolean(properties.get("isActive").toString());
+                }
+                String switchId = null;
+                if (properties.containsKey("switch")) {
+                    switchId = properties.get("switch").toString();
+                }
+                Platform platform = new Platform(start, end, offset, isActive, switchId);
+                builder.addPlatform(platform);
             }
             if (properties.containsKey("type") && properties.get("type").equals("block")) {
                 RectangleMapObject rectObj = (RectangleMapObject) obj;
                 Vector2 pos = new Vector2(rectObj.getRectangle().x, rectObj.getRectangle().y);
                 builder.addBlock(new Block(pos));
+            }
+            if (properties.containsKey("type") && properties.get("type").equals("pressure")) {
+                RectangleMapObject rectObj = (RectangleMapObject) obj;
+                Vector2 pos = new Vector2(rectObj.getRectangle().x, rectObj.getRectangle().y);
+                String switchId = null;
+                if (properties.containsKey("switch")) {
+                    switchId = properties.get("switch").toString();
+                } else {
+                    System.out.println("found pressure tile missing switchlink x, y: " + pos.x + ", " + pos.y);
+                }
+                builder.addPressureTile(new PressureTile(pos, switchId));
             }
         }
 
