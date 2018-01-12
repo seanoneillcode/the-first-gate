@@ -75,6 +75,8 @@ public class TheFirstGate extends ApplicationAdapter {
         assetManager.load("tower-switch-01.tmx", TiledMap.class);
         assetManager.load("tower-switch-02.tmx", TiledMap.class);
         assetManager.load("tower-switch-03.tmx", TiledMap.class);
+        assetManager.load("tower-arrow-05.tmx", TiledMap.class);
+        assetManager.load("tower-switch-04.tmx", TiledMap.class);
 
         assetManager.load("arrow.png", Texture.class);
         assetManager.load("platform.png", Texture.class);
@@ -113,11 +115,13 @@ public class TheFirstGate extends ApplicationAdapter {
         levels.add(Level.loadLevel(assetManager, "tower-switch-01.tmx")); // 29
         levels.add(Level.loadLevel(assetManager, "tower-switch-02.tmx")); // 31
         levels.add(Level.loadLevel(assetManager, "tower-switch-03.tmx")); // 33
+        levels.add(Level.loadLevel(assetManager, "tower-arrow-05.tmx")); // 35
+        levels.add(Level.loadLevel(assetManager, "tower-switch-04.tmx")); // 37
 
         newConnectionTo = "01";
 
         // special
-        startLevel(levels.get(16), "33");
+        startLevel(levels.get(18), "37");
 	}
 
 	private void loadLevel(Level level) {
@@ -229,6 +233,22 @@ public class TheFirstGate extends ApplicationAdapter {
                 playerPos.add(currentPlatform.getMovement());
             }
         }
+        for (PressureTile pressureTile : currentLevel.pressureTiles) {
+            boolean handled = false;
+            if (playerPos.dst2(pressureTile.pos) < 64) {
+                pressureTile.handleAction();
+                handled = true;
+            }
+            for (Block block : currentLevel.blocks) {
+                if (block.pos.dst2(pressureTile.pos) < 64) {
+                    pressureTile.handleAction();
+                    handled = true;
+                }
+            }
+            if (!handled) {
+                pressureTile.handlePressureOff();
+            }
+        }
         if (!isMoving) {
             Platform platform = currentLevel.getPlatform(playerPos);
             if (platform != null) {
@@ -253,23 +273,6 @@ public class TheFirstGate extends ApplicationAdapter {
 
         if (currentPlatform != null && !isMoving) {
             playerPos = currentPlatform.pos.cpy();
-        }
-
-        for (PressureTile pressureTile : currentLevel.pressureTiles) {
-            boolean handled = false;
-            if (playerPos.dst2(pressureTile.pos) < 64) {
-                pressureTile.handleAction();
-                handled = true;
-            }
-            for (Block block : currentLevel.blocks) {
-                if (block.pos.dst2(pressureTile.pos) < 64) {
-                    pressureTile.handleAction();
-                    handled = true;
-                }
-            }
-            if (!handled) {
-                pressureTile.handlePressureOff();
-            }
         }
 
         Connection connection = currentLevel.getConnection(playerPos.cpy().add(8,8));
