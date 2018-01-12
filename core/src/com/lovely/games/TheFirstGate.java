@@ -256,17 +256,19 @@ public class TheFirstGate extends ApplicationAdapter {
         }
 
         for (PressureTile pressureTile : currentLevel.pressureTiles) {
+            boolean handled = false;
             if (playerPos.dst2(pressureTile.pos) < 64) {
                 pressureTile.handleAction();
-            } else {
-                pressureTile.handlePressureOff();
+                handled = true;
             }
             for (Block block : currentLevel.blocks) {
                 if (block.pos.dst2(pressureTile.pos) < 64) {
                     pressureTile.handleAction();
-                } else {
-                    pressureTile.handlePressureOff();
+                    handled = true;
                 }
+            }
+            if (!handled) {
+                pressureTile.handlePressureOff();
             }
         }
 
