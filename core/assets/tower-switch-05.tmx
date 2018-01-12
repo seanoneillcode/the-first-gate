@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" tiledversion="1.0.3" orientation="orthogonal" renderorder="right-down" width="15" height="10" tilewidth="32" tileheight="32" nextobjectid="26">
+ <tileset firstgid="1" source="tower-tileset.tsx"/>
+ <layer name="walls" width="15" height="10">
+  <data encoding="csv">
+0,0,14,12,12,12,12,12,15,0,0,0,0,0,0,
+0,0,14,0,0,0,0,0,15,0,0,0,0,0,0,
+0,0,14,0,0,0,0,0,15,0,0,0,0,0,0,
+0,0,14,0,0,0,0,0,15,0,0,0,0,0,0,
+12,12,12,0,0,0,0,0,12,12,12,12,12,12,12,
+2,0,0,0,0,0,0,0,0,0,0,0,0,0,2,
+12,12,23,0,0,0,0,0,22,12,12,12,12,12,12,
+0,0,24,12,12,12,12,12,21,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <layer name="ground" width="15" height="10">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,2,2,2,2,2,0,0,0,0,0,0,0,
+0,0,0,2,2,2,2,2,0,0,0,0,0,0,0,
+0,0,0,2,2,2,2,2,0,0,0,0,0,0,0,
+0,0,0,2,2,2,2,2,0,0,0,0,0,0,0,
+0,2,2,2,2,2,2,2,2,2,2,2,2,2,0,
+0,0,0,2,2,2,2,2,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <layer name="death" width="15" height="10">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <objectgroup name="objects">
+  <object id="9" name="39" type="connection" x="32" y="160" width="32" height="32">
+   <properties>
+    <property name="to" value="38"/>
+   </properties>
+  </object>
+  <object id="10" name="40" type="connection" x="416" y="160" width="32" height="32">
+   <properties>
+    <property name="to" value="41"/>
+   </properties>
+  </object>
+  <object id="21" type="pressure" x="160" y="64" width="32" height="32">
+   <properties>
+    <property name="isSwitch" value="true"/>
+    <property name="switch" value="a"/>
+   </properties>
+  </object>
+  <object id="25" type="door" x="256" y="160" width="32" height="32">
+   <properties>
+    <property name="switch" value="a"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>

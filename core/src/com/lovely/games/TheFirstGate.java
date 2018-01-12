@@ -51,6 +51,8 @@ public class TheFirstGate extends ApplicationAdapter {
     private Texture groundBlockImage;
     private Texture pressureImage;
     private Platform currentPlatform;
+    private Texture doorImage;
+    private Texture openDoorImage;
 
 	@Override
 	public void create () {
@@ -77,12 +79,16 @@ public class TheFirstGate extends ApplicationAdapter {
         assetManager.load("tower-switch-03.tmx", TiledMap.class);
         assetManager.load("tower-arrow-05.tmx", TiledMap.class);
         assetManager.load("tower-switch-04.tmx", TiledMap.class);
+        assetManager.load("tower-switch-05.tmx", TiledMap.class);
 
         assetManager.load("arrow.png", Texture.class);
         assetManager.load("platform.png", Texture.class);
         assetManager.load("block.png", Texture.class);
         assetManager.load("pressure.png", Texture.class);
         assetManager.load("ground-block.png", Texture.class);
+        assetManager.load("door.png", Texture.class);
+        assetManager.load("open-door.png", Texture.class);
+
         assetManager.finishLoading();
 
         camera = new OrthographicCamera();
@@ -96,6 +102,8 @@ public class TheFirstGate extends ApplicationAdapter {
         blockImage = assetManager.get("block.png");
         pressureImage = assetManager.get("pressure.png");
         groundBlockImage = assetManager.get("ground-block.png");
+        doorImage = assetManager.get("door.png");
+        openDoorImage = assetManager.get("open-door.png");
 
         levels = new ArrayList<>();
         levels.add(Level.loadLevel(assetManager, "tower-01.tmx")); // 01
@@ -117,11 +125,12 @@ public class TheFirstGate extends ApplicationAdapter {
         levels.add(Level.loadLevel(assetManager, "tower-switch-03.tmx")); // 33
         levels.add(Level.loadLevel(assetManager, "tower-arrow-05.tmx")); // 35
         levels.add(Level.loadLevel(assetManager, "tower-switch-04.tmx")); // 37
+        levels.add(Level.loadLevel(assetManager, "tower-switch-05.tmx")); // 39
 
         newConnectionTo = "01";
 
         // special
-        startLevel(levels.get(18), "37");
+        startLevel(levels.get(0), "01");
 	}
 
 	private void loadLevel(Level level) {
@@ -203,10 +212,23 @@ public class TheFirstGate extends ApplicationAdapter {
                 batch.draw(blockImage, block.pos.x, block.pos.y);
             }
         }
+        for (Door door : currentLevel.doors) {
+            if (door.isOpen && door.pos.y >= playerPos.y) {
+                batch.draw(openDoorImage, door.pos.x, door.pos.y);
+            }
+            if (!door.isOpen) {
+                batch.draw(doorImage, door.pos.x, door.pos.y);
+            }
+        }
         batch.draw(img, playerPos.x, playerPos.y + 8);
         for (Block block : currentLevel.blocks) {
             if (block.pos.y <= playerPos.y && !block.isGround) {
                 batch.draw(blockImage, block.pos.x, block.pos.y);
+            }
+        }
+        for (Door door : currentLevel.doors) {
+            if (door.pos.y < playerPos.y && door.isOpen) {
+                batch.draw(openDoorImage, door.pos.x, door.pos.y);
             }
         }
 		batch.end();
@@ -363,17 +385,20 @@ public class TheFirstGate extends ApplicationAdapter {
             boolean blocked = false;
             moveVector = inputVector.cpy();
             Vector2 nextTilePos = moveVector.cpy().scl(TILE_SIZE).add(playerPos).add(8,8);
-            Block block = currentLevel.getBlock(nextTilePos, true);
-            if (block != null) {
-                Vector2 nextTileAgain = moveVector.cpy().scl(TILE_SIZE * 2.0f).add(playerPos).add(8,8);
-                Block nextBlock = currentLevel.getBlock(nextTileAgain, false);
-                if (!currentLevel.isWall(nextTileAgain) && (nextBlock == null || nextBlock.isGround)) {
-                    block.move(moveVector);
-                } else {
+            if (currentLevel.isTileBlocked(nextTilePos)) {
+                Block block = currentLevel.getBlock(nextTilePos, true);
+                if (block == null) {
                     blocked = true;
+                } else {
+                    Vector2 nextTileAgain = moveVector.cpy().scl(TILE_SIZE * 2.0f).add(playerPos).add(8,8);
+                    if (currentLevel.isTileBlocked(nextTileAgain)) {
+                        blocked = true;
+                    } else {
+                        block.move(moveVector);
+                    }
                 }
             }
-            if (!blocked && !currentLevel.isWall(nextTilePos)) {
+            if (!blocked) {
                 isMoving = true;
                 movementValue = 32f / PLAYER_SPEED;
             }

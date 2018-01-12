@@ -28,11 +28,12 @@ class Level {
     String name;
     int numXTiles;
     int numYTiles;
-    List<PressureTile> pressureTiles = new ArrayList<>();
+    List<PressureTile> pressureTiles;
+    List<Door> doors;
 
     Level(List<Connection> connections, boolean[][] walls, boolean[][] deaths, String name, int numXTiles,
                  int numYTiles, List<ArrowSource> arrowSources, List<Platform> platforms, List<Block> blocks,
-          List<PressureTile> pressureTiles) {
+          List<PressureTile> pressureTiles, List<Door> doors) {
         this.connections = connections;
         this.walls = walls;
         this.deaths = deaths;
@@ -43,6 +44,7 @@ class Level {
         this.platforms = platforms;
         this.blocks = blocks;
         this.pressureTiles = pressureTiles;
+        this.doors = doors;
     }
 
     Vector2 getConnectionPosition(String name) {
@@ -73,6 +75,23 @@ class Level {
             }
         }
         return null;
+    }
+
+    Door getDoor(Vector2 pos, boolean isOpen) {
+        for (Door door : doors) {
+            if (door.isOpen == isOpen) {
+                if (pos.dst2(door.pos) < 256) {
+                    return door;
+                }
+            }
+        }
+        return null;
+    }
+
+    boolean isTileBlocked(Vector2 pos) {
+        Block block = getBlock(pos, true);
+        Door door = getDoor(pos, false);
+        return isWall(pos) || block != null || door != null;
     }
 
     boolean isDeath(Vector2 pos) {
@@ -139,6 +158,7 @@ class Level {
         int numYTiles = 0;
         List<Platform> platforms = new ArrayList<>();
         Trunk trunk = new Trunk();
+        List<Door> doors = new ArrayList<>();
 
         Builder(String name, int numXTiles, int numYTiles) {
             this.name = name;
@@ -183,6 +203,14 @@ class Level {
             return this;
         }
 
+        Builder addDoor(Door door) {
+            doors.add(door);
+            if (door.switchId != null) {
+                trunk.addListener(door);
+            }
+            return this;
+        }
+
         Builder addPressureTile(PressureTile pressureTile) {
             this.pressureTiles.add(pressureTile);
             if (pressureTile.switchId != null) {
@@ -202,7 +230,8 @@ class Level {
             if (deaths == null) {
                 deaths = new boolean[numXTiles][numYTiles];
             }
-            return new Level(connections, walls, deaths, name, numXTiles, numYTiles, arrowSources, platforms, blocks, pressureTiles);
+            return new Level(connections, walls, deaths, name, numXTiles, numYTiles, arrowSources, platforms, blocks,
+                    pressureTiles, doors);
         }
     }
 
@@ -285,6 +314,19 @@ class Level {
                 RectangleMapObject rectObj = (RectangleMapObject) obj;
                 Vector2 pos = new Vector2(rectObj.getRectangle().x, rectObj.getRectangle().y);
                 builder.addBlock(new Block(pos));
+            }
+            if (properties.containsKey("type") && properties.get("type").equals("door")) {
+                RectangleMapObject rectObj = (RectangleMapObject) obj;
+                Vector2 pos = new Vector2(rectObj.getRectangle().x, rectObj.getRectangle().y);
+                String switchId = null;
+                if (properties.containsKey("switch")) {
+                    switchId = properties.get("switch").toString();
+                }
+                boolean isOpen = false;
+                if (properties.containsKey("isOpen")) {
+                    isOpen = Boolean.parseBoolean(properties.get("isOpen").toString());
+                }
+                builder.addDoor(new Door(pos, isOpen, switchId));
             }
             if (properties.containsKey("type") && properties.get("type").equals("pressure")) {
                 RectangleMapObject rectObj = (RectangleMapObject) obj;
