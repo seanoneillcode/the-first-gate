@@ -14,7 +14,9 @@ import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
@@ -22,6 +24,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
 
 public class TheFirstGate extends ApplicationAdapter {
 
@@ -59,6 +62,8 @@ public class TheFirstGate extends ApplicationAdapter {
     private Platform currentPlatform;
     private Texture doorImage;
     private Texture openDoorImage;
+    private Animation<TextureRegion> walkanim;
+    float animationDelta = 0;
 
 	@Override
 	public void create () {
@@ -94,6 +99,7 @@ public class TheFirstGate extends ApplicationAdapter {
         assetManager.load("ground-block.png", Texture.class);
         assetManager.load("door.png", Texture.class);
         assetManager.load("open-door.png", Texture.class);
+        assetManager.load("wizard-sheet.png", Texture.class);
 
         assetManager.finishLoading();
 
@@ -133,11 +139,22 @@ public class TheFirstGate extends ApplicationAdapter {
         levels.add(Level.loadLevel(assetManager, "tower-switch-04.tmx")); // 37
         levels.add(Level.loadLevel(assetManager, "tower-switch-05.tmx")); // 39
 
+        walkanim = loadAnimation(assetManager.get("wizard-sheet.png"), 2, 0.25f);
+
         newConnectionTo = "01";
 
         // special
-        startLevel(levels.get(0), "01");
+        startLevel(levels.get(10), "21");
 	}
+
+    private Animation<TextureRegion> loadAnimation(Texture sheet, int numberOfFrames, float frameDelay) {
+        TextureRegion[][] tmp = TextureRegion.split(sheet, sheet.getWidth() / numberOfFrames, sheet.getHeight());
+        Array<TextureRegion> frames = new Array<>(numberOfFrames);
+        for (int i = 0; i < numberOfFrames; i++) {
+            frames.add(tmp[0][i]);
+        }
+        return new Animation<>(frameDelay, frames);
+    }
 
 	private void loadLevel(Level level) {
         TiledMap map = assetManager.get(level.name);
@@ -196,6 +213,7 @@ public class TheFirstGate extends ApplicationAdapter {
         mapRenderer.setView(camera);
 	    getInput();
 	    update();
+	    animationDelta = animationDelta + Gdx.graphics.getDeltaTime();
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         mapRenderer.render();
@@ -226,7 +244,9 @@ public class TheFirstGate extends ApplicationAdapter {
                 batch.draw(doorImage, door.pos.x, door.pos.y);
             }
         }
-        batch.draw(img, playerPos.x, playerPos.y + QUARTER_TILE_SIZE);
+        TextureRegion currentFrame = walkanim.getKeyFrame(animationDelta, true);
+        batch.draw(currentFrame, playerPos.x, playerPos.y + QUARTER_TILE_SIZE);
+
         for (Block block : currentLevel.blocks) {
             if (block.pos.y <= playerPos.y && !block.isGround) {
                 batch.draw(blockImage, block.pos.x, block.pos.y);
