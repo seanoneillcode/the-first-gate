@@ -1,6 +1,7 @@
 package com.lovely.games;
 
-import static com.lovely.games.Level.TILE_SIZE;
+
+import static com.lovely.games.TheFirstGate.TILE_SIZE;
 
 import com.badlogic.gdx.math.Vector2;
 

@@ -1,11 +1,13 @@
 package com.lovely.games;
 
+import static com.lovely.games.TheFirstGate.TILE_SIZE;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 
 class Block {
 
-    static final float TILE_SPEED = 32.0f * 4.0f;
+    static final float TILE_SPEED = TILE_SIZE * 4.0f;
 
     Vector2 pos;
     Vector2 dir;
@@ -29,7 +31,7 @@ class Block {
         }
         this.dir = dir.cpy();
         isMoving = true;
-        movementValue = 32f / TILE_SPEED;
+        movementValue = TILE_SIZE / TILE_SPEED;
     }
 
     void start() {

@@ -1,6 +1,6 @@
 package com.lovely.games;
 
-import static com.lovely.games.Level.TILE_SIZE;
+import static com.lovely.games.TheFirstGate.TILE_SIZE;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -10,7 +10,7 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Arrow {
 
-    public static final float ARROW_SPD = 32 * 2.0f;
+    public static final float ARROW_SPD = TILE_SIZE * 2.0f;
     Texture img;
     Vector2 pos;
     Vector2 dir;

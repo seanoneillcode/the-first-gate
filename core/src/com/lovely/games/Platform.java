@@ -1,11 +1,13 @@
 package com.lovely.games;
 
+import static com.lovely.games.TheFirstGate.TILE_SIZE;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 
 public class Platform implements Switchable {
 
-    public static final float SPEED = 32f * 2.0f;
+    public static final float SPEED = TILE_SIZE * 2.0f;
 
     Vector2 pos;
     Vector2 start;

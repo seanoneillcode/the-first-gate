@@ -1,5 +1,8 @@
 package com.lovely.games;
 
+
+import static com.lovely.games.TheFirstGate.TILE_SIZE;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +19,6 @@ import com.badlogic.gdx.math.Vector2;
 
 class Level {
 
-    static final float TILE_SIZE = 32f;
     static final int DEFAULT_DELAY = 1;
 
     List<Connection> connections;

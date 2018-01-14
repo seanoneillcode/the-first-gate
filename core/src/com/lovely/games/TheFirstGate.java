@@ -1,7 +1,5 @@
 package com.lovely.games;
 
-import static com.lovely.games.Level.TILE_SIZE;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -26,9 +24,17 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
 public class TheFirstGate extends ApplicationAdapter {
-    private static final float PLAYER_SPEED = 32f * 4.0f;
+
+    static final float TILE_SIZE = 32f;
+
+    private static final float HALF_TILE_SIZE = 16f;
+    private static final float QUARTER_TILE_SIZE = 8f;
+    private static final float PLAYER_SPEED = TILE_SIZE * 4.0f;
     private static final float CAMERA_MARGIN = 0.5f;
-    public static final float CAMERA_CATCHUP_SPEED = 2.0f;
+    private static final float CAMERA_CATCHUP_SPEED = 2.0f;
+    public static final int VIEWPORT_WIDTH = 480;
+    public static final int VIEWPORT_HEIGHT = 320;
+
     private SpriteBatch batch;
     private Texture img;
     private OrthogonalTiledMapRenderer mapRenderer;
@@ -92,7 +98,7 @@ public class TheFirstGate extends ApplicationAdapter {
         assetManager.finishLoading();
 
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, 480, 320);
+        camera.setToOrtho(false, VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
 
 		batch = new SpriteBatch();
 
@@ -220,7 +226,7 @@ public class TheFirstGate extends ApplicationAdapter {
                 batch.draw(doorImage, door.pos.x, door.pos.y);
             }
         }
-        batch.draw(img, playerPos.x, playerPos.y + 8);
+        batch.draw(img, playerPos.x, playerPos.y + QUARTER_TILE_SIZE);
         for (Block block : currentLevel.blocks) {
             if (block.pos.y <= playerPos.y && !block.isGround) {
                 batch.draw(blockImage, block.pos.x, block.pos.y);
@@ -281,11 +287,10 @@ public class TheFirstGate extends ApplicationAdapter {
                 }
                 currentPlatform = null;
             }
-            if (currentPlatform == null && currentLevel.isDeath(playerPos.cpy().add(16,16))) {
-                Block block = currentLevel.getBlock(playerPos.cpy().add(8,8), false);
+            if (currentPlatform == null && currentLevel.isDeath(playerPos.cpy().add(HALF_TILE_SIZE,HALF_TILE_SIZE))) {
+                Block block = currentLevel.getBlock(playerPos.cpy().add(QUARTER_TILE_SIZE,QUARTER_TILE_SIZE), false);
                 if (!(block != null && block.isGround)) {
-                    newConnectionTo = lastConnection;
-                    startLevel(currentLevel, lastConnection);
+                    restartLevel();
                 }
             }
             playerPos.x = MathUtils.round(playerPos.x / TILE_SIZE) * TILE_SIZE;
@@ -297,7 +302,7 @@ public class TheFirstGate extends ApplicationAdapter {
             playerPos = currentPlatform.pos.cpy();
         }
 
-        Connection connection = currentLevel.getConnection(playerPos.cpy().add(8,8));
+        Connection connection = currentLevel.getConnection(playerPos.cpy().add(QUARTER_TILE_SIZE,QUARTER_TILE_SIZE));
         if (connection == null) {
             newConnectionTo = null;
         }
@@ -325,8 +330,7 @@ public class TheFirstGate extends ApplicationAdapter {
                 arrowIterator.remove();
             }
             if (getPlayerRect().overlaps(arrow.getRect())) {
-                newConnectionTo = lastConnection;
-                startLevel(currentLevel, lastConnection);
+                restartLevel();
             }
         }
 
@@ -339,7 +343,7 @@ public class TheFirstGate extends ApplicationAdapter {
             if (!block.isMoving && !block.isGround) {
                 block.pos.x = MathUtils.round(block.pos.x / TILE_SIZE) * TILE_SIZE;
                 block.pos.y = MathUtils.round(block.pos.y / TILE_SIZE) * TILE_SIZE;
-                if (currentLevel.isDeath(block.pos.cpy().add(8,8))) {
+                if (currentLevel.isDeath(block.pos.cpy().add(QUARTER_TILE_SIZE,QUARTER_TILE_SIZE))) {
                     boolean alreadyGround = false;
                     for (Block otherBlock : currentLevel.blocks) {
                         if (otherBlock.isGround) {
@@ -354,6 +358,11 @@ public class TheFirstGate extends ApplicationAdapter {
                 }
             }
         }
+    }
+
+    private void restartLevel() {
+        newConnectionTo = lastConnection;
+        startLevel(currentLevel, lastConnection);
     }
 
     private Rectangle getPlayerRect() {
@@ -384,13 +393,13 @@ public class TheFirstGate extends ApplicationAdapter {
         if (!isMoving && !inputVector.isZero()) {
             boolean blocked = false;
             moveVector = inputVector.cpy();
-            Vector2 nextTilePos = moveVector.cpy().scl(TILE_SIZE).add(playerPos).add(8,8);
+            Vector2 nextTilePos = moveVector.cpy().scl(TILE_SIZE).add(playerPos).add(QUARTER_TILE_SIZE,QUARTER_TILE_SIZE);
             if (currentLevel.isTileBlocked(nextTilePos)) {
                 Block block = currentLevel.getBlock(nextTilePos, true);
                 if (block == null) {
                     blocked = true;
                 } else {
-                    Vector2 nextTileAgain = moveVector.cpy().scl(TILE_SIZE * 2.0f).add(playerPos).add(8,8);
+                    Vector2 nextTileAgain = moveVector.cpy().scl(TILE_SIZE * 2.0f).add(playerPos).add(QUARTER_TILE_SIZE,QUARTER_TILE_SIZE);
                     if (currentLevel.isTileBlocked(nextTileAgain)) {
                         blocked = true;
                     } else {
@@ -400,13 +409,16 @@ public class TheFirstGate extends ApplicationAdapter {
             }
             if (!blocked) {
                 isMoving = true;
-                movementValue = 32f / PLAYER_SPEED;
+                movementValue = TILE_SIZE / PLAYER_SPEED;
             }
         }
         inputVector = new Vector2();
 
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
             Gdx.app.exit();
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.R)) {
+            restartLevel();
         }
     }
 
