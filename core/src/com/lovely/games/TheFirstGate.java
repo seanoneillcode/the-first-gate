@@ -39,7 +39,6 @@ public class TheFirstGate extends ApplicationAdapter {
     public static final int VIEWPORT_HEIGHT = 320;
 
     private SpriteBatch batch;
-    private Texture img;
     private OrthogonalTiledMapRenderer mapRenderer;
     private AssetManager assetManager;
     private OrthographicCamera camera;
@@ -63,6 +62,7 @@ public class TheFirstGate extends ApplicationAdapter {
     private Texture doorImage;
     private Texture openDoorImage;
     private Animation<TextureRegion> walkanim;
+    private Animation<TextureRegion> assholeAnim;
     float animationDelta = 0;
     DialogContainer dialogContainer;
     Conversation conversation;
@@ -74,27 +74,27 @@ public class TheFirstGate extends ApplicationAdapter {
         FileHandleResolver fileHandleResolver = new InternalFileHandleResolver();
         assetManager.setLoader(TiledMap.class, new TmxMapLoader(fileHandleResolver));
         assetManager.setLoader(Texture.class, new TextureLoader(fileHandleResolver));
-        assetManager.load("tower-01.tmx", TiledMap.class);
-        assetManager.load("tower-02.tmx", TiledMap.class);
-        assetManager.load("tower-arrow-01.tmx", TiledMap.class);
-        assetManager.load("tower-arrow-02.tmx", TiledMap.class);
-        assetManager.load("tower-arrow-03.tmx", TiledMap.class);
-        assetManager.load("tower-arrow-04.tmx", TiledMap.class);
-        assetManager.load("tower-platform-01.tmx", TiledMap.class);
-        assetManager.load("tower-platform-02.tmx", TiledMap.class);
-        assetManager.load("tower-platform-03.tmx", TiledMap.class);
-        assetManager.load("tower-platform-04.tmx", TiledMap.class);
-        assetManager.load("tower-block-01.tmx", TiledMap.class);
-        assetManager.load("tower-block-02.tmx", TiledMap.class);
-        assetManager.load("tower-block-03.tmx", TiledMap.class);
-        assetManager.load("tower-block-04.tmx", TiledMap.class);
-        assetManager.load("tower-switch-01.tmx", TiledMap.class);
-        assetManager.load("tower-switch-02.tmx", TiledMap.class);
-        assetManager.load("tower-switch-03.tmx", TiledMap.class);
-        assetManager.load("tower-arrow-05.tmx", TiledMap.class);
-        assetManager.load("tower-switch-04.tmx", TiledMap.class);
-        assetManager.load("tower-switch-05.tmx", TiledMap.class);
-        assetManager.load("dialog-test.tmx", TiledMap.class);
+        assetManager.load("levels/tower-01.tmx", TiledMap.class);
+        assetManager.load("levels/tower-02.tmx", TiledMap.class);
+        assetManager.load("levels/tower-arrow-01.tmx", TiledMap.class);
+        assetManager.load("levels/tower-arrow-02.tmx", TiledMap.class);
+        assetManager.load("levels/tower-arrow-03.tmx", TiledMap.class);
+        assetManager.load("levels/tower-arrow-04.tmx", TiledMap.class);
+        assetManager.load("levels/tower-platform-01.tmx", TiledMap.class);
+        assetManager.load("levels/tower-platform-02.tmx", TiledMap.class);
+        assetManager.load("levels/tower-platform-03.tmx", TiledMap.class);
+        assetManager.load("levels/tower-platform-04.tmx", TiledMap.class);
+        assetManager.load("levels/tower-block-01.tmx", TiledMap.class);
+        assetManager.load("levels/tower-block-02.tmx", TiledMap.class);
+        assetManager.load("levels/tower-block-03.tmx", TiledMap.class);
+        assetManager.load("levels/tower-block-04.tmx", TiledMap.class);
+        assetManager.load("levels/tower-switch-01.tmx", TiledMap.class);
+        assetManager.load("levels/tower-switch-02.tmx", TiledMap.class);
+        assetManager.load("levels/tower-switch-03.tmx", TiledMap.class);
+        assetManager.load("levels/tower-arrow-05.tmx", TiledMap.class);
+        assetManager.load("levels/tower-switch-04.tmx", TiledMap.class);
+        assetManager.load("levels/tower-switch-05.tmx", TiledMap.class);
+        assetManager.load("levels/dialog-test.tmx", TiledMap.class);
 
         assetManager.load("arrow.png", Texture.class);
         assetManager.load("platform.png", Texture.class);
@@ -104,6 +104,7 @@ public class TheFirstGate extends ApplicationAdapter {
         assetManager.load("door.png", Texture.class);
         assetManager.load("open-door.png", Texture.class);
         assetManager.load("wizard-sheet.png", Texture.class);
+        assetManager.load("asshole-sheet.png", Texture.class);
         assetManager.load("dialog-box.png", Texture.class);
         assetManager.finishLoading();
 
@@ -114,7 +115,6 @@ public class TheFirstGate extends ApplicationAdapter {
 
 		batch = new SpriteBatch();
 
-		img = new Texture("wizard.png");
 		arrowImage = assetManager.get("arrow.png");
         platformImg = assetManager.get("platform.png");
         blockImage = assetManager.get("block.png");
@@ -124,34 +124,35 @@ public class TheFirstGate extends ApplicationAdapter {
         openDoorImage = assetManager.get("open-door.png");
 
         levels = new ArrayList<>();
-        levels.add(Level.loadLevel(assetManager, "tower-01.tmx")); // 01
-        levels.add(Level.loadLevel(assetManager, "tower-02.tmx"));
-        levels.add(Level.loadLevel(assetManager, "tower-arrow-01.tmx")); // 05
-        levels.add(Level.loadLevel(assetManager, "tower-arrow-02.tmx")); // 07
-        levels.add(Level.loadLevel(assetManager, "tower-arrow-03.tmx")); // 09
-        levels.add(Level.loadLevel(assetManager, "tower-arrow-04.tmx")); // 09
-        levels.add(Level.loadLevel(assetManager, "tower-platform-01.tmx")); // 13
-        levels.add(Level.loadLevel(assetManager, "tower-platform-02.tmx")); // 15
-        levels.add(Level.loadLevel(assetManager, "tower-platform-03.tmx")); // 17
-        levels.add(Level.loadLevel(assetManager, "tower-platform-04.tmx")); // 19
-        levels.add(Level.loadLevel(assetManager, "tower-block-01.tmx")); // 21 // 10
-        levels.add(Level.loadLevel(assetManager, "tower-block-02.tmx")); // 23
-        levels.add(Level.loadLevel(assetManager, "tower-block-03.tmx")); // 25
-        levels.add(Level.loadLevel(assetManager, "tower-block-04.tmx")); // 27
-        levels.add(Level.loadLevel(assetManager, "tower-switch-01.tmx")); // 29
-        levels.add(Level.loadLevel(assetManager, "tower-switch-02.tmx")); // 31
-        levels.add(Level.loadLevel(assetManager, "tower-switch-03.tmx")); // 33
-        levels.add(Level.loadLevel(assetManager, "tower-arrow-05.tmx")); // 35
-        levels.add(Level.loadLevel(assetManager, "tower-switch-04.tmx")); // 37
-        levels.add(Level.loadLevel(assetManager, "tower-switch-05.tmx")); // 39
-        levels.add(Level.loadLevel(assetManager, "dialog-test.tmx")); // 01
+        levels.add(Level.loadLevel(assetManager, "levels/tower-01.tmx")); // 01
+        levels.add(Level.loadLevel(assetManager, "levels/tower-02.tmx"));
+        levels.add(Level.loadLevel(assetManager, "levels/tower-arrow-01.tmx")); // 05
+        levels.add(Level.loadLevel(assetManager, "levels/tower-arrow-02.tmx")); // 07
+        levels.add(Level.loadLevel(assetManager, "levels/tower-arrow-03.tmx")); // 09
+        levels.add(Level.loadLevel(assetManager, "levels/tower-arrow-04.tmx")); // 09
+        levels.add(Level.loadLevel(assetManager, "levels/tower-platform-01.tmx")); // 13
+        levels.add(Level.loadLevel(assetManager, "levels/tower-platform-02.tmx")); // 15
+        levels.add(Level.loadLevel(assetManager, "levels/tower-platform-03.tmx")); // 17
+        levels.add(Level.loadLevel(assetManager, "levels/tower-platform-04.tmx")); // 19
+        levels.add(Level.loadLevel(assetManager, "levels/tower-block-01.tmx")); // 21 // 10
+        levels.add(Level.loadLevel(assetManager, "levels/tower-block-02.tmx")); // 23
+        levels.add(Level.loadLevel(assetManager, "levels/tower-block-03.tmx")); // 25
+        levels.add(Level.loadLevel(assetManager, "levels/tower-block-04.tmx")); // 27
+        levels.add(Level.loadLevel(assetManager, "levels/tower-switch-01.tmx")); // 29
+        levels.add(Level.loadLevel(assetManager, "levels/tower-switch-02.tmx")); // 31
+        levels.add(Level.loadLevel(assetManager, "levels/tower-switch-03.tmx")); // 33
+        levels.add(Level.loadLevel(assetManager, "levels/tower-arrow-05.tmx")); // 35
+        levels.add(Level.loadLevel(assetManager, "levels/tower-switch-04.tmx")); // 37
+        levels.add(Level.loadLevel(assetManager, "levels/tower-switch-05.tmx")); // 39
+        levels.add(Level.loadLevel(assetManager, "levels/dialog-test.tmx")); // 01 // 20
 
         walkanim = loadAnimation(assetManager.get("wizard-sheet.png"), 2, 0.25f);
+        assholeAnim = loadAnimation(assetManager.get("asshole-sheet.png"), 2, 0.25f);
 
         newConnectionTo = "01";
 
         // special
-        startLevel(levels.get(levels.size() - 1), "1");
+        startLevel(levels.get(18), "37");
 	}
 
     private Animation<TextureRegion> loadAnimation(Texture sheet, int numberOfFrames, float frameDelay) {
@@ -274,7 +275,6 @@ public class TheFirstGate extends ApplicationAdapter {
 	@Override
 	public void dispose () {
 		batch.dispose();
-		img.dispose();
 		assetManager.dispose();
 	}
 

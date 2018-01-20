@@ -27,9 +27,20 @@ public class DialogContainer {
 
     {
         dialogs.put("1", Arrays.asList(
-                line(tom, "You are an IDIOT!"),
-                line(tom, "Lots of long dialog like this to get started, who knows how long it goes on for ? max line"),
-                line(paul, "Where am I?")
+                line(tom, "I hope that idiot doesn't catch up"),
+                line(paul, "... I think I can hear him. I better push on, the sooner this is over the better.")
+        ));
+        dialogs.put("2", Arrays.asList(
+                line(tom, "What kind of trial is this? A child could cross it.")
+        ));
+        dialogs.put("3", Arrays.asList(
+                line(tom, "!? I've never seen a flying ball of green fire before. Magic!")
+        ));
+        dialogs.put("4", Arrays.asList(
+                line(tom, "(press 'R' to restart a level)")
+        ));
+        dialogs.put("5", Arrays.asList(
+                line(tom, "Here we are, the prize!")
         ));
     }
 

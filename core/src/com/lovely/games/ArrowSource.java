@@ -13,6 +13,7 @@ public class ArrowSource implements Switchable {
     float delay;
     float timer;
     boolean isActive;
+    boolean originalIsActive;
     String switchId;
 
     public ArrowSource(Vector2 pos, Vector2 dir, float offset, float delay, boolean isActive, String switchId) {
@@ -22,11 +23,13 @@ public class ArrowSource implements Switchable {
         this.delay = delay;
         this.timer = 0;
         this.isActive = isActive;
+        this.originalIsActive = isActive;
         this.switchId = switchId;
     }
 
     public void start() {
         this.timer = delay - offset;
+        this.isActive = originalIsActive;
     }
 
     public void update(TheFirstGate theFirstGate) {
