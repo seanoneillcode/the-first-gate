@@ -32,10 +32,11 @@ class Level {
     int numYTiles;
     List<PressureTile> pressureTiles;
     List<Door> doors;
+    List<DialogSource> dialogSources;
 
     Level(List<Connection> connections, boolean[][] walls, boolean[][] deaths, String name, int numXTiles,
                  int numYTiles, List<ArrowSource> arrowSources, List<Platform> platforms, List<Block> blocks,
-          List<PressureTile> pressureTiles, List<Door> doors) {
+          List<PressureTile> pressureTiles, List<Door> doors, List<DialogSource> dialogSources) {
         this.connections = connections;
         this.walls = walls;
         this.deaths = deaths;
@@ -47,6 +48,7 @@ class Level {
         this.blocks = blocks;
         this.pressureTiles = pressureTiles;
         this.doors = doors;
+        this.dialogSources = dialogSources;
     }
 
     Vector2 getConnectionPosition(String name) {
@@ -74,6 +76,15 @@ class Level {
                 if (pos.dst2(block.pos) < 256) {
                     return block;
                 }
+            }
+        }
+        return null;
+    }
+
+    DialogSource getDialogSource(Vector2 pos) {
+        for (DialogSource dialogSource : dialogSources) {
+            if (!dialogSource.done && pos.dst2(dialogSource.pos) < 256) {
+                return dialogSource;
             }
         }
         return null;
@@ -161,6 +172,7 @@ class Level {
         List<Platform> platforms = new ArrayList<>();
         Trunk trunk = new Trunk();
         List<Door> doors = new ArrayList<>();
+        List<DialogSource> dialogSources = new ArrayList<>();
 
         Builder(String name, int numXTiles, int numYTiles) {
             this.name = name;
@@ -221,6 +233,11 @@ class Level {
             return this;
         }
 
+        Builder addDialogSource(DialogSource dialogSource) {
+            this.dialogSources.add(dialogSource);
+            return this;
+        }
+
         Trunk getTrunk() {
             return this.trunk;
         }
@@ -233,7 +250,7 @@ class Level {
                 deaths = new boolean[numXTiles][numYTiles];
             }
             return new Level(connections, walls, deaths, name, numXTiles, numYTiles, arrowSources, platforms, blocks,
-                    pressureTiles, doors);
+                    pressureTiles, doors, dialogSources);
         }
     }
 
@@ -345,6 +362,12 @@ class Level {
                 }
                 builder.addPressureTile(new PressureTile(pos, switchId, isSwitch));
             }
+            if (properties.containsKey("type") && properties.get("type").equals("dialog")) {
+                RectangleMapObject rectObj = (RectangleMapObject) obj;
+                Vector2 pos = new Vector2(rectObj.getRectangle().x, rectObj.getRectangle().y);
+                String id = obj.getName();
+                builder.addDialogSource(new DialogSource(pos, id));
+            }
         }
 
         // walls
@@ -360,12 +383,14 @@ class Level {
         // deaths
         boolean[][] deaths = new boolean[levelWidth][levelHeight];
         tiledLayer = (TiledMapTileLayer) tiledMap.getLayers().get("death");
-        for (int y = 0; y < tiledLayer.getHeight(); y++) {
-            for (int x = 0; x < tiledLayer.getWidth(); x++) {
-                deaths[x][y] = tiledLayer.getCell(x,y) != null;
+        if (tiledLayer != null) {
+            for (int y = 0; y < tiledLayer.getHeight(); y++) {
+                for (int x = 0; x < tiledLayer.getWidth(); x++) {
+                    deaths[x][y] = tiledLayer.getCell(x,y) != null;
+                }
             }
+            builder.setDeaths(deaths);
         }
-        builder.setDeaths(deaths);
 
         return builder.build();
     }

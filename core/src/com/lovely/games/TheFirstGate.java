@@ -64,6 +64,9 @@ public class TheFirstGate extends ApplicationAdapter {
     private Texture openDoorImage;
     private Animation<TextureRegion> walkanim;
     float animationDelta = 0;
+    DialogContainer dialogContainer;
+    Conversation conversation;
+    boolean dialogLock = false;
 
 	@Override
 	public void create () {
@@ -91,6 +94,7 @@ public class TheFirstGate extends ApplicationAdapter {
         assetManager.load("tower-arrow-05.tmx", TiledMap.class);
         assetManager.load("tower-switch-04.tmx", TiledMap.class);
         assetManager.load("tower-switch-05.tmx", TiledMap.class);
+        assetManager.load("dialog-test.tmx", TiledMap.class);
 
         assetManager.load("arrow.png", Texture.class);
         assetManager.load("platform.png", Texture.class);
@@ -100,8 +104,10 @@ public class TheFirstGate extends ApplicationAdapter {
         assetManager.load("door.png", Texture.class);
         assetManager.load("open-door.png", Texture.class);
         assetManager.load("wizard-sheet.png", Texture.class);
-
+        assetManager.load("dialog-box.png", Texture.class);
         assetManager.finishLoading();
+
+        dialogContainer = new DialogContainer(assetManager.get("dialog-box.png"));
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
@@ -138,13 +144,14 @@ public class TheFirstGate extends ApplicationAdapter {
         levels.add(Level.loadLevel(assetManager, "tower-arrow-05.tmx")); // 35
         levels.add(Level.loadLevel(assetManager, "tower-switch-04.tmx")); // 37
         levels.add(Level.loadLevel(assetManager, "tower-switch-05.tmx")); // 39
+        levels.add(Level.loadLevel(assetManager, "dialog-test.tmx")); // 01
 
         walkanim = loadAnimation(assetManager.get("wizard-sheet.png"), 2, 0.25f);
 
         newConnectionTo = "01";
 
         // special
-        startLevel(levels.get(10), "21");
+        startLevel(levels.get(levels.size() - 1), "1");
 	}
 
     private Animation<TextureRegion> loadAnimation(Texture sheet, int numberOfFrames, float frameDelay) {
@@ -257,6 +264,10 @@ public class TheFirstGate extends ApplicationAdapter {
                 batch.draw(openDoorImage, door.pos.x, door.pos.y);
             }
         }
+        if (conversation != null) {
+            DialogLine currentDialog = conversation.getCurrentDialog();
+            dialogContainer.render(batch, new Vector2(camera.position.x, camera.position.y), currentDialog);
+        }
 		batch.end();
 	}
 	
@@ -338,6 +349,17 @@ public class TheFirstGate extends ApplicationAdapter {
             }
         }
 
+        DialogSource dialogSource = currentLevel.getDialogSource(playerPos);
+        if (dialogSource != null) {
+            System.out.println("hit dialog " + dialogSource.id);
+            conversation = new Conversation(dialogContainer.dialogs.get(dialogSource.id));
+            conversation.reset();
+            dialogLock = true;
+            dialogSource.done = true;
+        }
+        if (conversation != null) {
+            conversation.update();
+        }
         for (ArrowSource arrowSource : currentLevel.getArrowSources()) {
             arrowSource.update(this);
         }
@@ -410,27 +432,43 @@ public class TheFirstGate extends ApplicationAdapter {
             inputVector.y = inputVector.y - 1;
         }
 
-        if (!isMoving && !inputVector.isZero()) {
-            boolean blocked = false;
-            moveVector = inputVector.cpy();
-            Vector2 nextTilePos = moveVector.cpy().scl(TILE_SIZE).add(playerPos).add(QUARTER_TILE_SIZE,QUARTER_TILE_SIZE);
-            if (currentLevel.isTileBlocked(nextTilePos)) {
-                Block block = currentLevel.getBlock(nextTilePos, true);
-                if (block == null) {
-                    blocked = true;
+
+        if (conversation != null) {
+            if ((inputVector.x != 0 || inputVector.y != 0) && !dialogLock) {
+                if (conversation.isFinished()) {
+                    conversation = null;
                 } else {
-                    Vector2 nextTileAgain = moveVector.cpy().scl(TILE_SIZE * 2.0f).add(playerPos).add(QUARTER_TILE_SIZE,QUARTER_TILE_SIZE);
-                    if (currentLevel.isTileBlocked(nextTileAgain)) {
-                        blocked = true;
-                    } else {
-                        block.move(moveVector);
-                    }
+                    conversation.handleInput();
                 }
             }
-            if (!blocked) {
-                isMoving = true;
-                movementValue = TILE_SIZE / PLAYER_SPEED;
+        } else {
+            if (!isMoving && !inputVector.isZero()) {
+                boolean blocked = false;
+                moveVector = inputVector.cpy();
+                Vector2 nextTilePos = moveVector.cpy().scl(TILE_SIZE).add(playerPos).add(QUARTER_TILE_SIZE, QUARTER_TILE_SIZE);
+                if (currentLevel.isTileBlocked(nextTilePos)) {
+                    Block block = currentLevel.getBlock(nextTilePos, true);
+                    if (block == null) {
+                        blocked = true;
+                    } else {
+                        Vector2 nextTileAgain = moveVector.cpy().scl(TILE_SIZE * 2.0f).add(playerPos).add(QUARTER_TILE_SIZE, QUARTER_TILE_SIZE);
+                        if (currentLevel.isTileBlocked(nextTileAgain)) {
+                            blocked = true;
+                        } else {
+                            block.move(moveVector);
+                        }
+                    }
+                }
+                if (!blocked) {
+                    isMoving = true;
+                    movementValue = TILE_SIZE / PLAYER_SPEED;
+                }
             }
+        }
+        if ((inputVector.x != 0 || inputVector.y != 0)) {
+            dialogLock = true;
+        } else {
+            dialogLock = false;
         }
         inputVector = new Vector2();
 
