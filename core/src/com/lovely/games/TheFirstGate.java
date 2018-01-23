@@ -15,6 +15,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -63,10 +64,13 @@ public class TheFirstGate extends ApplicationAdapter {
     private Texture openDoorImage;
     private Animation<TextureRegion> walkanim;
     private Animation<TextureRegion> assholeAnim;
+    private Animation<TextureRegion> lightAnim;
     float animationDelta = 0;
     DialogContainer dialogContainer;
     Conversation conversation;
     boolean dialogLock = false;
+    Sprite lightSprite;
+    boolean isLevelDirty = false;
 
 	@Override
 	public void create () {
@@ -94,7 +98,8 @@ public class TheFirstGate extends ApplicationAdapter {
         assetManager.load("levels/tower-arrow-05.tmx", TiledMap.class);
         assetManager.load("levels/tower-switch-04.tmx", TiledMap.class);
         assetManager.load("levels/tower-switch-05.tmx", TiledMap.class);
-        assetManager.load("levels/dialog-test.tmx", TiledMap.class);
+        assetManager.load("levels/start-room.tmx", TiledMap.class);
+        assetManager.load("levels/end-room.tmx", TiledMap.class);
 
         assetManager.load("arrow.png", Texture.class);
         assetManager.load("platform.png", Texture.class);
@@ -106,6 +111,7 @@ public class TheFirstGate extends ApplicationAdapter {
         assetManager.load("wizard-sheet.png", Texture.class);
         assetManager.load("asshole-sheet.png", Texture.class);
         assetManager.load("dialog-box.png", Texture.class);
+        assetManager.load("light.png", Texture.class);
         assetManager.finishLoading();
 
         dialogContainer = new DialogContainer(assetManager.get("dialog-box.png"));
@@ -122,6 +128,9 @@ public class TheFirstGate extends ApplicationAdapter {
         groundBlockImage = assetManager.get("ground-block.png");
         doorImage = assetManager.get("door.png");
         openDoorImage = assetManager.get("open-door.png");
+        lightSprite = new Sprite((Texture) assetManager.get("light.png"));
+        lightSprite.setScale(1.0f, 6.0f);
+
 
         levels = new ArrayList<>();
         levels.add(Level.loadLevel(assetManager, "levels/tower-01.tmx")); // 01
@@ -144,15 +153,17 @@ public class TheFirstGate extends ApplicationAdapter {
         levels.add(Level.loadLevel(assetManager, "levels/tower-arrow-05.tmx")); // 35
         levels.add(Level.loadLevel(assetManager, "levels/tower-switch-04.tmx")); // 37
         levels.add(Level.loadLevel(assetManager, "levels/tower-switch-05.tmx")); // 39
-        levels.add(Level.loadLevel(assetManager, "levels/dialog-test.tmx")); // 01 // 20
+        levels.add(Level.loadLevel(assetManager, "levels/start-room.tmx")); // 1 // 20
+        levels.add(Level.loadLevel(assetManager, "levels/end-room.tmx")); // 41 // 21
 
         walkanim = loadAnimation(assetManager.get("wizard-sheet.png"), 2, 0.25f);
         assholeAnim = loadAnimation(assetManager.get("asshole-sheet.png"), 2, 0.25f);
+        lightAnim = loadAnimation(assetManager.get("light.png"), 6, 0.1f);
 
         newConnectionTo = "01";
 
         // special
-        startLevel(levels.get(18), "37");
+        startLevel(levels.get(20), "1");
 	}
 
     private Animation<TextureRegion> loadAnimation(Texture sheet, int numberOfFrames, float frameDelay) {
@@ -193,6 +204,7 @@ public class TheFirstGate extends ApplicationAdapter {
         for (PressureTile pressureTile : currentLevel.pressureTiles) {
             pressureTile.start();
         }
+        isLevelDirty = true;
     }
 
     private Vector3 getCameraPosition() {
@@ -210,6 +222,10 @@ public class TheFirstGate extends ApplicationAdapter {
         if (Math.abs(cameraPosition.y - pos.y) < CAMERA_MARGIN) {
             cameraPosition.y = pos.y;
         }
+        float cameraTrailLimit = 100.0f;
+        cameraPosition.x = MathUtils.clamp(cameraPosition.x, -cameraTrailLimit + playerPos.x, cameraTrailLimit + playerPos.x);
+        cameraPosition.y = MathUtils.clamp(cameraPosition.y, -cameraTrailLimit + playerPos.y, cameraTrailLimit + playerPos.y);
+
         return cameraPosition;
     }
 
@@ -224,52 +240,62 @@ public class TheFirstGate extends ApplicationAdapter {
 	    animationDelta = animationDelta + Gdx.graphics.getDeltaTime();
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        mapRenderer.render();
-		batch.begin();
+        if (!isLevelDirty) {
+            mapRenderer.render();
+            batch.begin();
 
-        for (PressureTile pressureTile : currentLevel.pressureTiles) {
-            batch.draw(pressureImage, pressureTile.pos.x, pressureTile.pos.y);
-        }
-        for (Platform platform : currentLevel.getPlatforms()) {
-            batch.draw(platformImg, platform.pos.x, platform.pos.y);
-        }
-		for (Arrow arrow : arrows) {
-		    arrow.draw(batch);
-        }
-        for (Block block : currentLevel.blocks) {
-            if (block.isGround) {
-                batch.draw(groundBlockImage, block.pos.x, block.pos.y);
+            for (PressureTile pressureTile : currentLevel.pressureTiles) {
+                batch.draw(pressureImage, pressureTile.pos.x, pressureTile.pos.y);
             }
-            if (block.pos.y > playerPos.y && !block.isGround) {
-                batch.draw(blockImage, block.pos.x, block.pos.y);
+            for (Platform platform : currentLevel.getPlatforms()) {
+                batch.draw(platformImg, platform.pos.x, platform.pos.y);
             }
-        }
-        for (Door door : currentLevel.doors) {
-            if (door.isOpen && door.pos.y >= playerPos.y) {
-                batch.draw(openDoorImage, door.pos.x, door.pos.y);
+            for (Arrow arrow : arrows) {
+                arrow.draw(batch);
             }
-            if (!door.isOpen) {
-                batch.draw(doorImage, door.pos.x, door.pos.y);
+            for (Block block : currentLevel.blocks) {
+                if (block.isGround) {
+                    batch.draw(groundBlockImage, block.pos.x, block.pos.y);
+                }
+                if (block.pos.y > playerPos.y && !block.isGround) {
+                    batch.draw(blockImage, block.pos.x, block.pos.y);
+                }
             }
-        }
-        TextureRegion currentFrame = walkanim.getKeyFrame(animationDelta, true);
-        batch.draw(currentFrame, playerPos.x, playerPos.y + QUARTER_TILE_SIZE);
+            for (Door door : currentLevel.doors) {
+                if (door.isOpen && door.pos.y >= playerPos.y) {
+                    batch.draw(openDoorImage, door.pos.x, door.pos.y);
+                }
+                if (!door.isOpen) {
+                    batch.draw(doorImage, door.pos.x, door.pos.y);
+                }
+            }
+            TextureRegion currentFrame = walkanim.getKeyFrame(animationDelta, true);
+            batch.draw(currentFrame, playerPos.x, playerPos.y + QUARTER_TILE_SIZE);
 
-        for (Block block : currentLevel.blocks) {
-            if (block.pos.y <= playerPos.y && !block.isGround) {
-                batch.draw(blockImage, block.pos.x, block.pos.y);
+            for (Block block : currentLevel.blocks) {
+                if (block.pos.y <= playerPos.y && !block.isGround) {
+                    batch.draw(blockImage, block.pos.x, block.pos.y);
+                }
             }
-        }
-        for (Door door : currentLevel.doors) {
-            if (door.pos.y < playerPos.y && door.isOpen) {
-                batch.draw(openDoorImage, door.pos.x, door.pos.y);
+            for (Door door : currentLevel.doors) {
+                if (door.pos.y < playerPos.y && door.isOpen) {
+                    batch.draw(openDoorImage, door.pos.x, door.pos.y);
+                }
             }
+
+            batch.setBlendFunction(GL20.GL_DST_COLOR, GL20.GL_SRC_ALPHA);
+            lightSprite.setRegion(lightAnim.getKeyFrame(animationDelta, true));
+            lightSprite.setPosition(playerPos.x - 300, playerPos.y - 40);
+            lightSprite.draw(batch, 0.1f);
+            batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
+            if (conversation != null) {
+                DialogLine currentDialog = conversation.getCurrentDialog();
+                dialogContainer.render(batch, new Vector2(camera.position.x, camera.position.y), currentDialog);
+            }
+            batch.end();
         }
-        if (conversation != null) {
-            DialogLine currentDialog = conversation.getCurrentDialog();
-            dialogContainer.render(batch, new Vector2(camera.position.x, camera.position.y), currentDialog);
-        }
-		batch.end();
+        isLevelDirty = false;
 	}
 	
 	@Override
