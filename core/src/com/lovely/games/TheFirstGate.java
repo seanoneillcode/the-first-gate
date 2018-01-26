@@ -13,15 +13,18 @@ import com.badlogic.gdx.assets.loaders.TextureLoader;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -36,10 +39,11 @@ public class TheFirstGate extends ApplicationAdapter {
     private static final float PLAYER_SPEED = TILE_SIZE * 4.0f;
     private static final float CAMERA_MARGIN = 0.5f;
     private static final float CAMERA_CATCHUP_SPEED = 2.0f;
-    public static final int VIEWPORT_WIDTH = 480;
-    public static final int VIEWPORT_HEIGHT = 320;
+    public static final int VIEWPORT_WIDTH = 600;
+    public static final int VIEWPORT_HEIGHT = 480;
 
     private SpriteBatch batch;
+    private SpriteBatch bufferBatch;
     private OrthogonalTiledMapRenderer mapRenderer;
     private AssetManager assetManager;
     private OrthographicCamera camera;
@@ -62,6 +66,8 @@ public class TheFirstGate extends ApplicationAdapter {
     private Platform currentPlatform;
     private Texture doorImage;
     private Texture openDoorImage;
+    private Sprite mask;
+    private Sprite lightHole;
     private Animation<TextureRegion> walkanim;
     private Animation<TextureRegion> assholeAnim;
     private Animation<TextureRegion> lightAnim;
@@ -71,6 +77,11 @@ public class TheFirstGate extends ApplicationAdapter {
     boolean dialogLock = false;
     Sprite lightSprite;
     boolean isLevelDirty = false;
+    Texture bufferLight;
+    FrameBuffer buffer;
+    float X_C;
+    float Y_C;
+    OrthographicCamera cam;
 
 	@Override
 	public void create () {
@@ -112,6 +123,9 @@ public class TheFirstGate extends ApplicationAdapter {
         assetManager.load("asshole-sheet.png", Texture.class);
         assetManager.load("dialog-box.png", Texture.class);
         assetManager.load("light.png", Texture.class);
+        assetManager.load("light-mask.png", Texture.class);
+        assetManager.load("light-hole.png", Texture.class);
+        assetManager.load("light-magic.png", Texture.class);
         assetManager.finishLoading();
 
         dialogContainer = new DialogContainer(assetManager.get("dialog-box.png"));
@@ -120,6 +134,7 @@ public class TheFirstGate extends ApplicationAdapter {
         camera.setToOrtho(false, VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
 
 		batch = new SpriteBatch();
+        bufferBatch = new SpriteBatch();
 
 		arrowImage = assetManager.get("arrow.png");
         platformImg = assetManager.get("platform.png");
@@ -130,7 +145,19 @@ public class TheFirstGate extends ApplicationAdapter {
         openDoorImage = assetManager.get("open-door.png");
         lightSprite = new Sprite((Texture) assetManager.get("light.png"));
         lightSprite.setScale(1.0f, 6.0f);
+        mask = new Sprite((Texture) assetManager.get("light-mask.png"));
+        mask.setScale(6.0f);
+        lightHole = new Sprite((Texture) assetManager.get("light-hole.png"));
+        bufferLight = assetManager.get("light-hole.png");
+        lightHole.setScale(6.0f);
 
+        buffer = FrameBuffer.createFrameBuffer(Pixmap.Format.RGBA8888, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, false);
+        cam = new OrthographicCamera(buffer.getWidth(), buffer.getHeight());
+        cam.position.set(buffer.getWidth() / 2, buffer.getWidth() / 2, 0);
+        cam.update();
+//        Matrix4 projectionMatrix = new Matrix4();
+//        projectionMatrix.setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+//        bufferBatch.setProjectionMatrix(projectionMatrix);
 
         levels = new ArrayList<>();
         levels.add(Level.loadLevel(assetManager, "levels/tower-01.tmx")); // 01
@@ -158,12 +185,12 @@ public class TheFirstGate extends ApplicationAdapter {
 
         walkanim = loadAnimation(assetManager.get("wizard-sheet.png"), 2, 0.25f);
         assholeAnim = loadAnimation(assetManager.get("asshole-sheet.png"), 2, 0.25f);
-        lightAnim = loadAnimation(assetManager.get("light.png"), 6, 0.1f);
+        lightAnim = loadAnimation(assetManager.get("light-magic.png"), 4, 0.6f);
 
         newConnectionTo = "01";
 
         // special
-        startLevel(levels.get(20), "1");
+        startLevel(levels.get(3), "07");
 	}
 
     private Animation<TextureRegion> loadAnimation(Texture sheet, int numberOfFrames, float frameDelay) {
@@ -225,8 +252,48 @@ public class TheFirstGate extends ApplicationAdapter {
         float cameraTrailLimit = 100.0f;
         cameraPosition.x = MathUtils.clamp(cameraPosition.x, -cameraTrailLimit + playerPos.x, cameraTrailLimit + playerPos.x);
         cameraPosition.y = MathUtils.clamp(cameraPosition.y, -cameraTrailLimit + playerPos.y, cameraTrailLimit + playerPos.y);
-
+        resize(0,0);
         return cameraPosition;
+    }
+
+    private float toScreenX(float view) {
+	    return view * X_C;
+    }
+
+    private float toScreenY(float view) {
+	    return view * Y_C;
+    }
+
+    public void resize (int width, int height) {
+//        X_C = (float)Gdx.graphics.getWidth() / (float) VIEWPORT_WIDTH;
+//        Y_C = (float)Gdx.graphics.getHeight() / (float) VIEWPORT_HEIGHT;
+        X_C = (float) VIEWPORT_WIDTH / (float)Gdx.graphics.getWidth();
+        Y_C = (float) VIEWPORT_HEIGHT / (float)Gdx.graphics.getHeight();
+    }
+
+    private void renderLightMasks() {
+        buffer.begin();
+
+        Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 1);
+        Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        bufferBatch.setProjectionMatrix(camera.combined);
+        bufferBatch.begin();
+        bufferBatch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_DST_ALPHA);
+
+        Vector2 offset = new Vector2((playerPos.x), (playerPos.y) );
+        lightHole.setPosition( offset.x, offset.y);
+        lightHole.draw(bufferBatch);
+        for (Arrow arrow : arrows) {
+            TextureRegion tr = lightAnim.getKeyFrame(animationDelta, true);
+
+            lightHole.setRegion(tr);
+            lightHole.setPosition((arrow.pos.x), (arrow.pos.y));
+            lightHole.draw(bufferBatch);
+        }
+//        bufferBatch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        bufferBatch.end();
+        buffer.end();
     }
 
 	@Override
@@ -234,14 +301,20 @@ public class TheFirstGate extends ApplicationAdapter {
         camera.position.set(getCameraPosition());
         camera.update();
         batch.setProjectionMatrix(camera.combined);
+//        bufferBatch.setProjectionMatrix(camera.combined);
         mapRenderer.setView(camera);
 	    getInput();
 	    update();
 	    animationDelta = animationDelta + Gdx.graphics.getDeltaTime();
+
+	    renderLightMasks();
+
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
         if (!isLevelDirty) {
             mapRenderer.render();
+            batch.setProjectionMatrix(camera.combined);
             batch.begin();
 
             for (PressureTile pressureTile : currentLevel.pressureTiles) {
@@ -283,10 +356,11 @@ public class TheFirstGate extends ApplicationAdapter {
                 }
             }
 
-            batch.setBlendFunction(GL20.GL_DST_COLOR, GL20.GL_SRC_ALPHA);
-            lightSprite.setRegion(lightAnim.getKeyFrame(animationDelta, true));
-            lightSprite.setPosition(playerPos.x - 300, playerPos.y - 40);
-            lightSprite.draw(batch, 0.1f);
+            batch.setBlendFunction(GL20.GL_ZERO, GL20.GL_SRC_COLOR);
+            TextureRegion tr = new TextureRegion(buffer.getColorBufferTexture());
+            tr.flip(false,true);
+
+            batch.draw(tr, camera.position.x - (VIEWPORT_WIDTH / 2.0f), camera.position.y - (VIEWPORT_HEIGHT / 2.0f));
             batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
             if (conversation != null) {
@@ -294,6 +368,7 @@ public class TheFirstGate extends ApplicationAdapter {
                 dialogContainer.render(batch, new Vector2(camera.position.x, camera.position.y), currentDialog);
             }
             batch.end();
+
         }
         isLevelDirty = false;
 	}
@@ -302,6 +377,8 @@ public class TheFirstGate extends ApplicationAdapter {
 	public void dispose () {
 		batch.dispose();
 		assetManager.dispose();
+		bufferBatch.dispose();
+		buffer.dispose();
 	}
 
 	private void update() {
