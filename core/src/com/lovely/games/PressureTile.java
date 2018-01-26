@@ -1,5 +1,8 @@
 package com.lovely.games;
 
+import static com.badlogic.gdx.math.MathUtils.random;
+
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 
 class PressureTile {
@@ -9,6 +12,7 @@ class PressureTile {
     private boolean handledAction;
     String switchId;
     private boolean isSwitch;
+    Color color;
 
     PressureTile(Vector2 pos, String switchId, boolean isSwitch) {
         this.pos = pos;
@@ -16,6 +20,7 @@ class PressureTile {
         this.switchId = switchId;
         this.trunk = null;
         this.isSwitch = isSwitch;
+        this.color = new Color(random(0.8f, 1.0f), random(0.2f, 0.4f), random(0.3f, 0.5f), 1.0f);
     }
 
     void setTrunk(Trunk trunk) {

@@ -70,17 +70,15 @@ public class TheFirstGate extends ApplicationAdapter {
     private Sprite lightHole;
     private Animation<TextureRegion> walkanim;
     private Animation<TextureRegion> assholeAnim;
-    private Animation<TextureRegion> lightAnim;
+    private Animation<TextureRegion> lightAnim, playerLightAnim;
     float animationDelta = 0;
     DialogContainer dialogContainer;
     Conversation conversation;
     boolean dialogLock = false;
-    Sprite lightSprite;
+    Sprite lightSprite, playerLight;
     boolean isLevelDirty = false;
     Texture bufferLight;
     FrameBuffer buffer;
-    float X_C;
-    float Y_C;
     OrthographicCamera cam;
 
 	@Override
@@ -126,6 +124,7 @@ public class TheFirstGate extends ApplicationAdapter {
         assetManager.load("light-mask.png", Texture.class);
         assetManager.load("light-hole.png", Texture.class);
         assetManager.load("light-magic.png", Texture.class);
+        assetManager.load("player-light.png", Texture.class);
         assetManager.finishLoading();
 
         dialogContainer = new DialogContainer(assetManager.get("dialog-box.png"));
@@ -150,14 +149,14 @@ public class TheFirstGate extends ApplicationAdapter {
         lightHole = new Sprite((Texture) assetManager.get("light-hole.png"));
         bufferLight = assetManager.get("light-hole.png");
         lightHole.setScale(6.0f);
+        playerLight = new Sprite((Texture) assetManager.get("player-light.png"));
+        playerLight.setScale(1.0f, 4.0f);
+
 
         buffer = FrameBuffer.createFrameBuffer(Pixmap.Format.RGBA8888, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, false);
         cam = new OrthographicCamera(buffer.getWidth(), buffer.getHeight());
         cam.position.set(buffer.getWidth() / 2, buffer.getWidth() / 2, 0);
         cam.update();
-//        Matrix4 projectionMatrix = new Matrix4();
-//        projectionMatrix.setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-//        bufferBatch.setProjectionMatrix(projectionMatrix);
 
         levels = new ArrayList<>();
         levels.add(Level.loadLevel(assetManager, "levels/tower-01.tmx")); // 01
@@ -186,11 +185,12 @@ public class TheFirstGate extends ApplicationAdapter {
         walkanim = loadAnimation(assetManager.get("wizard-sheet.png"), 2, 0.25f);
         assholeAnim = loadAnimation(assetManager.get("asshole-sheet.png"), 2, 0.25f);
         lightAnim = loadAnimation(assetManager.get("light-magic.png"), 4, 0.6f);
+        playerLightAnim = loadAnimation(assetManager.get("player-light.png"), 4, 0.5f);
 
         newConnectionTo = "01";
 
         // special
-        startLevel(levels.get(3), "07");
+        startLevel(levels.get(10), "21");
 	}
 
     private Animation<TextureRegion> loadAnimation(Texture sheet, int numberOfFrames, float frameDelay) {
@@ -256,42 +256,51 @@ public class TheFirstGate extends ApplicationAdapter {
         return cameraPosition;
     }
 
-    private float toScreenX(float view) {
-	    return view * X_C;
-    }
-
-    private float toScreenY(float view) {
-	    return view * Y_C;
-    }
-
-    public void resize (int width, int height) {
-//        X_C = (float)Gdx.graphics.getWidth() / (float) VIEWPORT_WIDTH;
-//        Y_C = (float)Gdx.graphics.getHeight() / (float) VIEWPORT_HEIGHT;
-        X_C = (float) VIEWPORT_WIDTH / (float)Gdx.graphics.getWidth();
-        Y_C = (float) VIEWPORT_HEIGHT / (float)Gdx.graphics.getHeight();
-    }
-
     private void renderLightMasks() {
         buffer.begin();
-
-        Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 1);
+        Gdx.gl.glClearColor(0.1f, 0.0f, 0.0f, 1);
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
         bufferBatch.setProjectionMatrix(camera.combined);
         bufferBatch.begin();
+
         bufferBatch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_DST_ALPHA);
 
         Vector2 offset = new Vector2((playerPos.x), (playerPos.y) );
-        lightHole.setPosition( offset.x, offset.y);
-        lightHole.draw(bufferBatch);
-        for (Arrow arrow : arrows) {
-            TextureRegion tr = lightAnim.getKeyFrame(animationDelta, true);
+        TextureRegion playerRegion = playerLightAnim.getKeyFrame(animationDelta, true);
+        playerLight.setRegion(playerRegion);
+        playerLight.setColor(1.0f, 0.8f, 0.5f, 1.0f);
+        playerLight.setPosition( offset.x - 60, offset.y);
+        playerLight.draw(bufferBatch);
 
+
+        TextureRegion tr = lightAnim.getKeyFrame(animationDelta, true);
+        for (Arrow arrow : arrows) {
+
+            lightHole.setColor(arrow.color);
             lightHole.setRegion(tr);
             lightHole.setPosition((arrow.pos.x), (arrow.pos.y));
             lightHole.draw(bufferBatch);
         }
-//        bufferBatch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
+        for (PressureTile tile : currentLevel.pressureTiles) {
+            lightHole.setColor(tile.color);
+            lightHole.setRegion(tr);
+            lightHole.setPosition((tile.pos.x), (tile.pos.y));
+            lightHole.draw(bufferBatch);
+        }
+        for (Platform platform : currentLevel.platforms) {
+            lightHole.setColor(platform.color);
+            lightHole.setRegion(tr);
+            lightHole.setPosition((platform.pos.x), (platform.pos.y));
+            lightHole.draw(bufferBatch);
+        }
+        for (Block block : currentLevel.blocks) {
+            lightHole.setColor(block.color);
+            lightHole.setRegion(tr);
+            lightHole.setPosition((block.pos.x), (block.pos.y));
+            lightHole.draw(bufferBatch);
+        }
+
         bufferBatch.end();
         buffer.end();
     }

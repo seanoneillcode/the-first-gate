@@ -1,8 +1,10 @@
 package com.lovely.games;
 
+import static com.badlogic.gdx.math.MathUtils.random;
 import static com.lovely.games.TheFirstGate.TILE_SIZE;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 
 public class Platform implements Switchable {
@@ -18,6 +20,7 @@ public class Platform implements Switchable {
     boolean isActive;
     String switchId;
     boolean initialIsActive;
+    Color color;
 
     public Platform(Vector2 start, Vector2 end, float offset, boolean isActive, String switchId) {
         this.pos = start.cpy();
@@ -29,6 +32,7 @@ public class Platform implements Switchable {
         this.isActive = isActive;
         this.initialIsActive = isActive;
         this.switchId = switchId;
+        this.color = new Color(random(0.8f, 1.0f), random(0.2f, 0.4f), random(0.8f, 1.0f), 1.0f);
     }
 
     void start() {

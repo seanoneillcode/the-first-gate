@@ -1,10 +1,13 @@
 package com.lovely.games;
 
+import static com.badlogic.gdx.math.MathUtils.random;
 import static com.lovely.games.TheFirstGate.TILE_SIZE;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
@@ -14,11 +17,13 @@ public class Arrow {
     Texture img;
     Vector2 pos;
     Vector2 dir;
+    Color color;
 
     public Arrow(Texture img, Vector2 pos, Vector2 dir) {
         this.img = img;
         this.pos = pos;
         this.dir = dir;
+        this.color = new Color(random(0.2f, 0.4f), random(0.7f, 1.0f) , random(0.5f, 0.8f), 1.0f);
     }
 
     public void update(TheFirstGate theFirstGate) {

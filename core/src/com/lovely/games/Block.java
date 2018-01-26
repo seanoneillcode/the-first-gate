@@ -1,8 +1,10 @@
 package com.lovely.games;
 
+import static com.badlogic.gdx.math.MathUtils.random;
 import static com.lovely.games.TheFirstGate.TILE_SIZE;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 
 class Block {
@@ -15,6 +17,7 @@ class Block {
     boolean isMoving;
     float movementValue;
     boolean isGround;
+    Color color;
 
     Block(Vector2 pos) {
         this.startPos = pos.cpy();
@@ -23,6 +26,7 @@ class Block {
         this.dir = new Vector2();
         this.movementValue = 0;
         this.isGround = false;
+        this.color = new Color(random(0.2f, 0.4f), random(0.2f, 0.4f), random(0.8f, 1.0f), 1.0f);
     }
 
     void move(Vector2 dir) {
