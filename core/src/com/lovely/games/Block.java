@@ -26,7 +26,7 @@ class Block {
         this.dir = new Vector2();
         this.movementValue = 0;
         this.isGround = false;
-        this.color = new Color(random(0.2f, 0.4f), random(0.2f, 0.4f), random(0.8f, 1.0f), 1.0f);
+        this.color = new Color(random(0.8f, 1.0f), random(0.1f, 0.2f), random(0.1f, 0.2f), 1.0f);
     }
 
     void move(Vector2 dir) {

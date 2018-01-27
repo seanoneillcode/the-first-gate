@@ -69,13 +69,12 @@ public class TheFirstGate extends ApplicationAdapter {
     private Sprite mask;
     private Sprite lightHole;
     private Animation<TextureRegion> walkanim;
-    private Animation<TextureRegion> assholeAnim;
-    private Animation<TextureRegion> lightAnim, playerLightAnim;
+    private Animation<TextureRegion> lightAnim, playerLightAnim, arrowAnim;
     float animationDelta = 0;
     DialogContainer dialogContainer;
     Conversation conversation;
     boolean dialogLock = false;
-    Sprite lightSprite, playerLight;
+    Sprite playerLight, arrowSprite;
     boolean isLevelDirty = false;
     Texture bufferLight;
     FrameBuffer buffer;
@@ -122,6 +121,7 @@ public class TheFirstGate extends ApplicationAdapter {
         assetManager.load("light-hole.png", Texture.class);
         assetManager.load("light-magic.png", Texture.class);
         assetManager.load("player-light.png", Texture.class);
+        assetManager.load("arrow-sheet.png", Texture.class);
         assetManager.finishLoading();
 
         dialogContainer = new DialogContainer(assetManager.get("dialog-box.png"));
@@ -178,11 +178,13 @@ public class TheFirstGate extends ApplicationAdapter {
         walkanim = loadAnimation(assetManager.get("wizard-sheet.png"), 4, 0.5f);
         lightAnim = loadAnimation(assetManager.get("light-magic.png"), 4, 0.6f);
         playerLightAnim = loadAnimation(assetManager.get("player-light.png"), 4, 0.5f);
-
+        arrowAnim = loadAnimation(assetManager.get("arrow-sheet.png"), 8, 0.05f);
+        arrowSprite = new Sprite();
+        arrowSprite.setBounds(0,0,32,32);
         newConnectionTo = "01";
 
         // special
-        startLevel(levels.get(20), "1");
+        startLevel(levels.get(10), "21");
 	}
 
     private Animation<TextureRegion> loadAnimation(Texture sheet, int numberOfFrames, float frameDelay) {
@@ -292,6 +294,12 @@ public class TheFirstGate extends ApplicationAdapter {
             lightHole.setPosition((block.pos.x), (block.pos.y));
             lightHole.draw(bufferBatch);
         }
+        for (Door door : currentLevel.doors) {
+            lightHole.setColor(door.color);
+            lightHole.setRegion(tr);
+            lightHole.setPosition((door.pos.x), (door.pos.y));
+            lightHole.draw(bufferBatch);
+        }
 
         bufferBatch.end();
         buffer.end();
@@ -325,7 +333,11 @@ public class TheFirstGate extends ApplicationAdapter {
                 batch.draw(platformImg, platform.pos.x, platform.pos.y);
             }
             for (Arrow arrow : arrows) {
-                arrow.draw(batch);
+                TextureRegion currentFrame = arrowAnim.getKeyFrame(animationDelta, true);
+                arrowSprite.setPosition(arrow.pos.x, arrow.pos.y);
+                arrowSprite.setRegion(currentFrame);
+                arrowSprite.draw(batch);
+//                arrow.draw(batch);
             }
             for (Block block : currentLevel.blocks) {
                 if (block.isGround) {
