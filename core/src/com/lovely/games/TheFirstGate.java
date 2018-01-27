@@ -118,10 +118,7 @@ public class TheFirstGate extends ApplicationAdapter {
         assetManager.load("door.png", Texture.class);
         assetManager.load("open-door.png", Texture.class);
         assetManager.load("wizard-sheet.png", Texture.class);
-        assetManager.load("asshole-sheet.png", Texture.class);
         assetManager.load("dialog-box.png", Texture.class);
-        assetManager.load("light.png", Texture.class);
-        assetManager.load("light-mask.png", Texture.class);
         assetManager.load("light-hole.png", Texture.class);
         assetManager.load("light-magic.png", Texture.class);
         assetManager.load("player-light.png", Texture.class);
@@ -142,10 +139,6 @@ public class TheFirstGate extends ApplicationAdapter {
         groundBlockImage = assetManager.get("ground-block.png");
         doorImage = assetManager.get("door.png");
         openDoorImage = assetManager.get("open-door.png");
-        lightSprite = new Sprite((Texture) assetManager.get("light.png"));
-        lightSprite.setScale(1.0f, 6.0f);
-        mask = new Sprite((Texture) assetManager.get("light-mask.png"));
-        mask.setScale(6.0f);
         lightHole = new Sprite((Texture) assetManager.get("light-hole.png"));
         bufferLight = assetManager.get("light-hole.png");
         lightHole.setScale(6.0f);
@@ -182,15 +175,14 @@ public class TheFirstGate extends ApplicationAdapter {
         levels.add(Level.loadLevel(assetManager, "levels/start-room.tmx")); // 1 // 20
         levels.add(Level.loadLevel(assetManager, "levels/end-room.tmx")); // 41 // 21
 
-        walkanim = loadAnimation(assetManager.get("wizard-sheet.png"), 2, 0.25f);
-        assholeAnim = loadAnimation(assetManager.get("asshole-sheet.png"), 2, 0.25f);
+        walkanim = loadAnimation(assetManager.get("wizard-sheet.png"), 4, 0.5f);
         lightAnim = loadAnimation(assetManager.get("light-magic.png"), 4, 0.6f);
         playerLightAnim = loadAnimation(assetManager.get("player-light.png"), 4, 0.5f);
 
         newConnectionTo = "01";
 
         // special
-        startLevel(levels.get(10), "21");
+        startLevel(levels.get(20), "1");
 	}
 
     private Animation<TextureRegion> loadAnimation(Texture sheet, int numberOfFrames, float frameDelay) {
@@ -258,7 +250,7 @@ public class TheFirstGate extends ApplicationAdapter {
 
     private void renderLightMasks() {
         buffer.begin();
-        Gdx.gl.glClearColor(0.1f, 0.0f, 0.0f, 1);
+        Gdx.gl.glClearColor(0.3f, 0.3f, 0.15f, 1);
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
         bufferBatch.setProjectionMatrix(camera.combined);
         bufferBatch.begin();
