@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
@@ -32,11 +33,13 @@ class Level {
     int numYTiles;
     List<PressureTile> pressureTiles;
     List<Door> doors;
+    List<LevelLight> lights;
     List<DialogSource> dialogSources;
 
     Level(List<Connection> connections, boolean[][] walls, boolean[][] deaths, String name, int numXTiles,
                  int numYTiles, List<ArrowSource> arrowSources, List<Platform> platforms, List<Block> blocks,
-          List<PressureTile> pressureTiles, List<Door> doors, List<DialogSource> dialogSources) {
+          List<PressureTile> pressureTiles, List<Door> doors, List<DialogSource> dialogSources,
+          List<LevelLight> lights) {
         this.connections = connections;
         this.walls = walls;
         this.deaths = deaths;
@@ -49,6 +52,7 @@ class Level {
         this.pressureTiles = pressureTiles;
         this.doors = doors;
         this.dialogSources = dialogSources;
+        this.lights = lights;
     }
 
     Vector2 getConnectionPosition(String name) {
@@ -173,6 +177,7 @@ class Level {
         Trunk trunk = new Trunk();
         List<Door> doors = new ArrayList<>();
         List<DialogSource> dialogSources = new ArrayList<>();
+        List<LevelLight> lights = new ArrayList<>();
 
         Builder(String name, int numXTiles, int numYTiles) {
             this.name = name;
@@ -238,6 +243,11 @@ class Level {
             return this;
         }
 
+        Builder addLight(LevelLight levelLight) {
+            lights.add(levelLight);
+            return this;
+        }
+
         Trunk getTrunk() {
             return this.trunk;
         }
@@ -250,7 +260,7 @@ class Level {
                 deaths = new boolean[numXTiles][numYTiles];
             }
             return new Level(connections, walls, deaths, name, numXTiles, numYTiles, arrowSources, platforms, blocks,
-                    pressureTiles, doors, dialogSources);
+                    pressureTiles, doors, dialogSources, lights);
         }
     }
 
@@ -346,6 +356,21 @@ class Level {
                     isOpen = Boolean.parseBoolean(properties.get("isOpen").toString());
                 }
                 builder.addDoor(new Door(pos, isOpen, switchId));
+            }
+            if (properties.containsKey("type") && properties.get("type").equals("light")) {
+                RectangleMapObject rectObj = (RectangleMapObject) obj;
+                Vector2 pos = new Vector2(rectObj.getRectangle().x, rectObj.getRectangle().y);
+                Vector2 size = new Vector2(rectObj.getRectangle().width, rectObj.getRectangle().height);
+
+                Color color = null;
+                if (properties.containsKey("r")) {
+                    float r = Float.valueOf(properties.get("r").toString());
+                    float g = Float.valueOf(properties.get("g").toString());
+                    float b = Float.valueOf(properties.get("b").toString());
+                    float a = Float.valueOf(properties.get("a").toString());
+                    color = new Color(r, g, b, a);
+                }
+                builder.addLight(new LevelLight(pos, size, color));
             }
             if (properties.containsKey("type") && properties.get("type").equals("pressure")) {
                 RectangleMapObject rectObj = (RectangleMapObject) obj;

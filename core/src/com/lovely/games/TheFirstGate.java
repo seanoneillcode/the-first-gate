@@ -74,7 +74,7 @@ public class TheFirstGate extends ApplicationAdapter {
     DialogContainer dialogContainer;
     Conversation conversation;
     boolean dialogLock = false;
-    Sprite playerLight, arrowSprite;
+    Sprite playerLight, arrowSprite, levelLight;
     boolean isLevelDirty = false;
     Texture bufferLight;
     FrameBuffer buffer;
@@ -122,6 +122,7 @@ public class TheFirstGate extends ApplicationAdapter {
         assetManager.load("light-magic.png", Texture.class);
         assetManager.load("player-light.png", Texture.class);
         assetManager.load("arrow-sheet.png", Texture.class);
+        assetManager.load("level-light.png", Texture.class);
         assetManager.finishLoading();
 
         dialogContainer = new DialogContainer(assetManager.get("dialog-box.png"));
@@ -144,6 +145,8 @@ public class TheFirstGate extends ApplicationAdapter {
         lightHole.setScale(6.0f);
         playerLight = new Sprite((Texture) assetManager.get("player-light.png"));
         playerLight.setScale(1.0f, 4.0f);
+        levelLight = new Sprite((Texture) assetManager.get("level-light.png"));
+
 
 
         buffer = FrameBuffer.createFrameBuffer(Pixmap.Format.RGBA8888, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, false);
@@ -184,7 +187,7 @@ public class TheFirstGate extends ApplicationAdapter {
         newConnectionTo = "01";
 
         // special
-        startLevel(levels.get(10), "21");
+        startLevel(levels.get(21), "41");
 	}
 
     private Animation<TextureRegion> loadAnimation(Texture sheet, int numberOfFrames, float frameDelay) {
@@ -299,6 +302,11 @@ public class TheFirstGate extends ApplicationAdapter {
             lightHole.setRegion(tr);
             lightHole.setPosition((door.pos.x), (door.pos.y));
             lightHole.draw(bufferBatch);
+        }
+        for (LevelLight light : currentLevel.lights) {
+            levelLight.setColor(light.color);
+            levelLight.setBounds(light.pos.x, light.pos.y, light.size.x, light.size.y);
+            levelLight.draw(bufferBatch);
         }
 
         bufferBatch.end();
