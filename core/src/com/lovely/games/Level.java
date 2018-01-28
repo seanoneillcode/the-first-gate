@@ -35,11 +35,12 @@ class Level {
     List<Door> doors;
     List<LevelLight> lights;
     List<DialogSource> dialogSources;
+    List<Torch> torches;
 
     Level(List<Connection> connections, boolean[][] walls, boolean[][] deaths, String name, int numXTiles,
                  int numYTiles, List<ArrowSource> arrowSources, List<Platform> platforms, List<Block> blocks,
           List<PressureTile> pressureTiles, List<Door> doors, List<DialogSource> dialogSources,
-          List<LevelLight> lights) {
+          List<LevelLight> lights, List<Torch> torches) {
         this.connections = connections;
         this.walls = walls;
         this.deaths = deaths;
@@ -53,6 +54,7 @@ class Level {
         this.doors = doors;
         this.dialogSources = dialogSources;
         this.lights = lights;
+        this.torches = torches;
     }
 
     Vector2 getConnectionPosition(String name) {
@@ -178,6 +180,7 @@ class Level {
         List<Door> doors = new ArrayList<>();
         List<DialogSource> dialogSources = new ArrayList<>();
         List<LevelLight> lights = new ArrayList<>();
+        List<Torch> torches = new ArrayList<>();
 
         Builder(String name, int numXTiles, int numYTiles) {
             this.name = name;
@@ -230,6 +233,11 @@ class Level {
             return this;
         }
 
+        Builder addTorch(Vector2 pos, Color color) {
+            this.torches.add(new Torch(pos, color));
+            return this;
+        }
+
         Builder addPressureTile(PressureTile pressureTile) {
             this.pressureTiles.add(pressureTile);
             if (pressureTile.switchId != null) {
@@ -260,7 +268,7 @@ class Level {
                 deaths = new boolean[numXTiles][numYTiles];
             }
             return new Level(connections, walls, deaths, name, numXTiles, numYTiles, arrowSources, platforms, blocks,
-                    pressureTiles, doors, dialogSources, lights);
+                    pressureTiles, doors, dialogSources, lights, torches);
         }
     }
 
@@ -343,6 +351,11 @@ class Level {
                 RectangleMapObject rectObj = (RectangleMapObject) obj;
                 Vector2 pos = new Vector2(rectObj.getRectangle().x, rectObj.getRectangle().y);
                 builder.addBlock(new Block(pos));
+            }
+            if (properties.containsKey("type") && properties.get("type").equals("torch")) {
+                RectangleMapObject rectObj = (RectangleMapObject) obj;
+                Vector2 pos = new Vector2(rectObj.getRectangle().x, rectObj.getRectangle().y);
+                builder.addTorch(pos, new Color(1.0f,0.75f,0.25f,1.0f));
             }
             if (properties.containsKey("type") && properties.get("type").equals("door")) {
                 RectangleMapObject rectObj = (RectangleMapObject) obj;

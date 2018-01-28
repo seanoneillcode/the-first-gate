@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="1.0.3" orientation="orthogonal" renderorder="right-down" width="15" height="10" tilewidth="32" tileheight="32" nextobjectid="18">
+<map version="1.0" tiledversion="1.0.3" orientation="orthogonal" renderorder="right-down" width="15" height="10" tilewidth="32" tileheight="32" nextobjectid="19">
  <tileset firstgid="1" source="tower-tileset.tsx"/>
  <layer name="walls" width="15" height="10">
   <data encoding="csv">
@@ -69,5 +69,6 @@
     <property name="movey" value="-4"/>
    </properties>
   </object>
+  <object id="18" type="torch" x="416" y="224" width="32" height="32"/>
  </objectgroup>
 </map>

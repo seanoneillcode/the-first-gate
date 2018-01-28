@@ -69,7 +69,7 @@ public class TheFirstGate extends ApplicationAdapter {
     private Sprite mask;
     private Sprite lightHole;
     private Animation<TextureRegion> walkanim;
-    private Animation<TextureRegion> lightAnim, playerLightAnim, arrowAnim;
+    private Animation<TextureRegion> lightAnim, playerLightAnim, arrowAnim, torchAnim;
     float animationDelta = 0;
     DialogContainer dialogContainer;
     Conversation conversation;
@@ -123,6 +123,7 @@ public class TheFirstGate extends ApplicationAdapter {
         assetManager.load("player-light.png", Texture.class);
         assetManager.load("arrow-sheet.png", Texture.class);
         assetManager.load("level-light.png", Texture.class);
+        assetManager.load("torch-sheet.png", Texture.class);
         assetManager.finishLoading();
 
         dialogContainer = new DialogContainer(assetManager.get("dialog-box.png"));
@@ -182,12 +183,13 @@ public class TheFirstGate extends ApplicationAdapter {
         lightAnim = loadAnimation(assetManager.get("light-magic.png"), 4, 0.6f);
         playerLightAnim = loadAnimation(assetManager.get("player-light.png"), 4, 0.5f);
         arrowAnim = loadAnimation(assetManager.get("arrow-sheet.png"), 8, 0.05f);
+        torchAnim = loadAnimation(assetManager.get("torch-sheet.png"), 2, 0.5f);
         arrowSprite = new Sprite();
         arrowSprite.setBounds(0,0,32,32);
         newConnectionTo = "01";
 
         // special
-        startLevel(levels.get(21), "41");
+        startLevel(levels.get(0), "01");
 	}
 
     private Animation<TextureRegion> loadAnimation(Texture sheet, int numberOfFrames, float frameDelay) {
@@ -308,6 +310,12 @@ public class TheFirstGate extends ApplicationAdapter {
             levelLight.setBounds(light.pos.x, light.pos.y, light.size.x, light.size.y);
             levelLight.draw(bufferBatch);
         }
+        for (Torch torch : currentLevel.torches) {
+            lightHole.setColor(torch.color);
+            lightHole.setRegion(tr);
+            lightHole.setPosition((torch.pos.x), (torch.pos.y));
+            lightHole.draw(bufferBatch);
+        }
 
         bufferBatch.end();
         buffer.end();
@@ -375,6 +383,10 @@ public class TheFirstGate extends ApplicationAdapter {
                 if (door.pos.y < playerPos.y && door.isOpen) {
                     batch.draw(openDoorImage, door.pos.x, door.pos.y);
                 }
+            }
+            for (Torch torch : currentLevel.torches) {
+                TextureRegion torchFrame = torchAnim.getKeyFrame(animationDelta, true);
+                batch.draw(torchFrame, torch.pos.x, torch.pos.y);
             }
 
             batch.setBlendFunction(GL20.GL_ZERO, GL20.GL_SRC_COLOR);
