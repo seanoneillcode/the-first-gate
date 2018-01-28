@@ -24,7 +24,6 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -67,7 +66,7 @@ public class TheFirstGate extends ApplicationAdapter {
     private Texture doorImage;
     private Texture openDoorImage;
     private Sprite mask;
-    private Sprite lightHole;
+    private Sprite lightHole, portrait;
     private Animation<TextureRegion> walkanim;
     private Animation<TextureRegion> lightAnim, playerLightAnim, arrowAnim, torchAnim;
     float animationDelta = 0;
@@ -124,6 +123,7 @@ public class TheFirstGate extends ApplicationAdapter {
         assetManager.load("arrow-sheet.png", Texture.class);
         assetManager.load("level-light.png", Texture.class);
         assetManager.load("torch-sheet.png", Texture.class);
+        assetManager.load("portrait-test-sml.png", Texture.class);
         assetManager.finishLoading();
 
         dialogContainer = new DialogContainer(assetManager.get("dialog-box.png"));
@@ -147,7 +147,8 @@ public class TheFirstGate extends ApplicationAdapter {
         playerLight = new Sprite((Texture) assetManager.get("player-light.png"));
         playerLight.setScale(1.0f, 4.0f);
         levelLight = new Sprite((Texture) assetManager.get("level-light.png"));
-
+        portrait = new Sprite((Texture) assetManager.get("portrait-test-sml.png"));
+//        portrait.setScale(2);
 
 
         buffer = FrameBuffer.createFrameBuffer(Pixmap.Format.RGBA8888, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, false);
@@ -398,7 +399,9 @@ public class TheFirstGate extends ApplicationAdapter {
 
             if (conversation != null) {
                 DialogLine currentDialog = conversation.getCurrentDialog();
-                dialogContainer.render(batch, new Vector2(camera.position.x, camera.position.y), currentDialog);
+                dialogContainer.render(batch, new Vector2(camera.position.x + 48, camera.position.y), currentDialog);
+                portrait.setPosition(camera.position.x - (VIEWPORT_WIDTH / 2.0f), camera.position.y + 64 - (VIEWPORT_HEIGHT / 2.0f));
+                portrait.draw(batch);
             }
             batch.end();
 
