@@ -28,10 +28,14 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import com.lovely.games.scene.DialogVerb;
+import com.lovely.games.scene.Scene;
+import com.lovely.games.scene.SceneContainer;
+import com.lovely.games.scene.SceneSource;
 
-public class TheFirstGate extends ApplicationAdapter {
+public class TheFirstGate extends ApplicationAdapter implements Stage {
 
-    static final float TILE_SIZE = 32f;
+    public static final float TILE_SIZE = 32f;
 
     private static final float HALF_TILE_SIZE = 16f;
     private static final float QUARTER_TILE_SIZE = 8f;
@@ -78,6 +82,10 @@ public class TheFirstGate extends ApplicationAdapter {
     Texture bufferLight;
     FrameBuffer buffer;
     OrthographicCamera cam;
+    Vector2 cameraTargetPos;
+    SceneContainer sceneContainer;
+    Scene currentScene;
+    DialogVerb activeDialogVerb;
 
 	@Override
 	public void create () {
@@ -107,6 +115,7 @@ public class TheFirstGate extends ApplicationAdapter {
         assetManager.load("levels/tower-switch-05.tmx", TiledMap.class);
         assetManager.load("levels/start-room.tmx", TiledMap.class);
         assetManager.load("levels/end-room.tmx", TiledMap.class);
+        assetManager.load("levels/scene-test.tmx", TiledMap.class);
 
         assetManager.load("arrow.png", Texture.class);
         assetManager.load("platform.png", Texture.class);
@@ -123,7 +132,7 @@ public class TheFirstGate extends ApplicationAdapter {
         assetManager.load("arrow-sheet.png", Texture.class);
         assetManager.load("level-light.png", Texture.class);
         assetManager.load("torch-sheet.png", Texture.class);
-        assetManager.load("portrait-test-sml.png", Texture.class);
+        assetManager.load("portrait-1.png", Texture.class);
         assetManager.finishLoading();
 
         dialogContainer = new DialogContainer(assetManager.get("dialog-box.png"));
@@ -147,7 +156,7 @@ public class TheFirstGate extends ApplicationAdapter {
         playerLight = new Sprite((Texture) assetManager.get("player-light.png"));
         playerLight.setScale(1.0f, 4.0f);
         levelLight = new Sprite((Texture) assetManager.get("level-light.png"));
-        portrait = new Sprite((Texture) assetManager.get("portrait-test-sml.png"));
+        portrait = new Sprite((Texture) assetManager.get("portrait-1.png"));
 //        portrait.setScale(2);
 
 
@@ -179,6 +188,7 @@ public class TheFirstGate extends ApplicationAdapter {
         levels.add(Level.loadLevel(assetManager, "levels/tower-switch-05.tmx")); // 39
         levels.add(Level.loadLevel(assetManager, "levels/start-room.tmx")); // 1 // 20
         levels.add(Level.loadLevel(assetManager, "levels/end-room.tmx")); // 41 // 21
+        levels.add(Level.loadLevel(assetManager, "levels/scene-test.tmx")); // 1 // 22
 
         walkanim = loadAnimation(assetManager.get("wizard-sheet.png"), 4, 0.5f);
         lightAnim = loadAnimation(assetManager.get("light-magic.png"), 4, 0.6f);
@@ -189,8 +199,10 @@ public class TheFirstGate extends ApplicationAdapter {
         arrowSprite.setBounds(0,0,32,32);
         newConnectionTo = "01";
 
+        sceneContainer = new SceneContainer();
+
         // special
-        startLevel(levels.get(0), "01");
+        startLevel(levels.get(22), "1");
 	}
 
     private Animation<TextureRegion> loadAnimation(Texture sheet, int numberOfFrames, float frameDelay) {
@@ -206,6 +218,7 @@ public class TheFirstGate extends ApplicationAdapter {
         TiledMap map = assetManager.get(level.name);
         mapRenderer = new OrthogonalTiledMapRenderer(map, batch);
         mapRenderer.setView(camera);
+
     }
 
     private void startLevel(Level level, String startConnection) {
@@ -232,10 +245,11 @@ public class TheFirstGate extends ApplicationAdapter {
             pressureTile.start();
         }
         isLevelDirty = true;
+        cameraTargetPos = playerPos;
     }
 
     private Vector3 getCameraPosition() {
-        Vector2 pos = playerPos.cpy();
+        Vector2 pos = cameraTargetPos;
         Vector3 target = new Vector3(pos.x, pos.y, 0);
         final float speed = CAMERA_CATCHUP_SPEED * Gdx.graphics.getDeltaTime();
         float ispeed = 1.0f - speed;
@@ -249,10 +263,11 @@ public class TheFirstGate extends ApplicationAdapter {
         if (Math.abs(cameraPosition.y - pos.y) < CAMERA_MARGIN) {
             cameraPosition.y = pos.y;
         }
-        float cameraTrailLimit = 100.0f;
-        cameraPosition.x = MathUtils.clamp(cameraPosition.x, -cameraTrailLimit + playerPos.x, cameraTrailLimit + playerPos.x);
-        cameraPosition.y = MathUtils.clamp(cameraPosition.y, -cameraTrailLimit + playerPos.y, cameraTrailLimit + playerPos.y);
-        resize(0,0);
+        if (cameraTargetPos == playerPos) {
+            float cameraTrailLimit = 100.0f;
+            cameraPosition.x = MathUtils.clamp(cameraPosition.x, -cameraTrailLimit + cameraTargetPos.x, cameraTrailLimit + cameraTargetPos.x);
+            cameraPosition.y = MathUtils.clamp(cameraPosition.y, -cameraTrailLimit + cameraTargetPos.y, cameraTrailLimit + cameraTargetPos.y);
+        }
         return cameraPosition;
     }
 
@@ -354,7 +369,6 @@ public class TheFirstGate extends ApplicationAdapter {
                 arrowSprite.setPosition(arrow.pos.x, arrow.pos.y);
                 arrowSprite.setRegion(currentFrame);
                 arrowSprite.draw(batch);
-//                arrow.draw(batch);
             }
             for (Block block : currentLevel.blocks) {
                 if (block.isGround) {
@@ -491,13 +505,21 @@ public class TheFirstGate extends ApplicationAdapter {
         DialogSource dialogSource = currentLevel.getDialogSource(playerPos);
         if (dialogSource != null) {
             System.out.println("hit dialog " + dialogSource.id);
-            conversation = new Conversation(dialogContainer.dialogs.get(dialogSource.id));
-            conversation.reset();
-            dialogLock = true;
+            startDialog(dialogSource.id, null);
             dialogSource.done = true;
         }
         if (conversation != null) {
             conversation.update();
+        }
+        SceneSource sceneSource = currentLevel.getSceneSource(playerPos);
+        if (sceneSource != null && sceneContainer.scenes.containsKey(sceneSource.id)) {
+            currentScene = sceneContainer.scenes.get(sceneSource.id);
+        }
+        if (currentScene != null) {
+            currentScene.update(this);
+            if (currentScene.isDone()) {
+                currentScene = null;
+            }
         }
         for (ArrowSource arrowSource : currentLevel.getArrowSources()) {
             arrowSource.update(this);
@@ -575,13 +597,17 @@ public class TheFirstGate extends ApplicationAdapter {
         if (conversation != null) {
             if ((inputVector.x != 0 || inputVector.y != 0) && !dialogLock) {
                 if (conversation.isFinished()) {
+                    if (activeDialogVerb != null) {
+                        activeDialogVerb.finish();
+                        activeDialogVerb = null;
+                    }
                     conversation = null;
                 } else {
                     conversation.handleInput();
                 }
             }
         } else {
-            if (!isMoving && !inputVector.isZero()) {
+            if (currentScene == null && !isMoving && !inputVector.isZero()) {
                 boolean blocked = false;
                 moveVector = inputVector.cpy();
                 Vector2 nextTilePos = moveVector.cpy().scl(TILE_SIZE).add(playerPos).add(QUARTER_TILE_SIZE, QUARTER_TILE_SIZE);
@@ -617,6 +643,25 @@ public class TheFirstGate extends ApplicationAdapter {
         if (Gdx.input.isKeyPressed(Input.Keys.R)) {
             restartLevel();
         }
+    }
+
+    public void startDialog(String id, DialogVerb dialogVerb) {
+        conversation = new Conversation(dialogContainer.dialogs.get(id));
+        activeDialogVerb = dialogVerb;
+        conversation.reset();
+        dialogLock = true;
+    }
+
+    public void moveActor(String actor, Vector2 pos) {
+
+    }
+
+    public void moveCamera(Vector2 pos) {
+        cameraTargetPos = pos.cpy();
+    }
+
+    public void resetCamera() {
+        cameraTargetPos = playerPos;
     }
 
     void addArrow(Vector2 pos, Vector2 dir) {

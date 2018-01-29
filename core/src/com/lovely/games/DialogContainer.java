@@ -42,6 +42,9 @@ public class DialogContainer {
         dialogs.put("5", Arrays.asList(
                 line(tom, "Here we are, the prize!")
         ));
+        dialogs.put("6", Arrays.asList(
+                line(tom, "This is a lovely room. Maire has a lovely bum.")
+        ));
     }
 
     String currentDialog;

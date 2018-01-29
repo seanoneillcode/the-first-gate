@@ -16,7 +16,10 @@ import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.lovely.games.scene.Scene;
+import com.lovely.games.scene.SceneSource;
 
 class Level {
 
@@ -36,11 +39,12 @@ class Level {
     List<LevelLight> lights;
     List<DialogSource> dialogSources;
     List<Torch> torches;
+    List<SceneSource> scenes;
 
     Level(List<Connection> connections, boolean[][] walls, boolean[][] deaths, String name, int numXTiles,
                  int numYTiles, List<ArrowSource> arrowSources, List<Platform> platforms, List<Block> blocks,
           List<PressureTile> pressureTiles, List<Door> doors, List<DialogSource> dialogSources,
-          List<LevelLight> lights, List<Torch> torches) {
+          List<LevelLight> lights, List<Torch> torches, List<SceneSource> scenes) {
         this.connections = connections;
         this.walls = walls;
         this.deaths = deaths;
@@ -55,6 +59,7 @@ class Level {
         this.dialogSources = dialogSources;
         this.lights = lights;
         this.torches = torches;
+        this.scenes = scenes;
     }
 
     Vector2 getConnectionPosition(String name) {
@@ -91,6 +96,20 @@ class Level {
         for (DialogSource dialogSource : dialogSources) {
             if (!dialogSource.done && pos.dst2(dialogSource.pos) < 256) {
                 return dialogSource;
+            }
+        }
+        return null;
+    }
+
+    SceneSource getSceneSource(Vector2 pos) {
+        for (SceneSource sceneSource : scenes) {
+            if (!sceneSource.isDone) {
+                Rectangle playerRect = new Rectangle(pos.x - 10, pos.y - 10, 20, 20);
+                if (playerRect.overlaps(new Rectangle(sceneSource.pos.x, sceneSource.pos.y, sceneSource.size.x, sceneSource.size.y))) {
+                    System.out.println("layer ovralps scne " + sceneSource.id);
+                    sceneSource.isDone = true;
+                    return sceneSource;
+                }
             }
         }
         return null;
@@ -181,6 +200,7 @@ class Level {
         List<DialogSource> dialogSources = new ArrayList<>();
         List<LevelLight> lights = new ArrayList<>();
         List<Torch> torches = new ArrayList<>();
+        List<SceneSource> scenes = new ArrayList<>();
 
         Builder(String name, int numXTiles, int numYTiles) {
             this.name = name;
@@ -256,6 +276,11 @@ class Level {
             return this;
         }
 
+        Builder addScene(String id, Vector2 pos, Vector2 size) {
+            this.scenes.add(new SceneSource(pos, id, size));
+            return this;
+        }
+
         Trunk getTrunk() {
             return this.trunk;
         }
@@ -268,7 +293,7 @@ class Level {
                 deaths = new boolean[numXTiles][numYTiles];
             }
             return new Level(connections, walls, deaths, name, numXTiles, numYTiles, arrowSources, platforms, blocks,
-                    pressureTiles, doors, dialogSources, lights, torches);
+                    pressureTiles, doors, dialogSources, lights, torches, scenes);
         }
     }
 
@@ -384,6 +409,13 @@ class Level {
                     color = new Color(r, g, b, a);
                 }
                 builder.addLight(new LevelLight(pos, size, color));
+            }
+            if (properties.containsKey("type") && properties.get("type").equals("scene")) {
+                RectangleMapObject rectObj = (RectangleMapObject) obj;
+                Vector2 pos = new Vector2(rectObj.getRectangle().x, rectObj.getRectangle().y);
+                Vector2 size = new Vector2(rectObj.getRectangle().width, rectObj.getRectangle().height);
+
+                builder.addScene(obj.getName(), pos, size);
             }
             if (properties.containsKey("type") && properties.get("type").equals("pressure")) {
                 RectangleMapObject rectObj = (RectangleMapObject) obj;
