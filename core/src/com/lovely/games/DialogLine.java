@@ -8,7 +8,7 @@ import com.badlogic.gdx.Gdx;
 public class DialogLine {
 
     private static final float TIME_PER_CHAR = 20f;
-    private static final int CHAR_PER_LINE = 40;
+    private static final int CHAR_PER_LINE = 36;
 
     float charTimer;
     int charIndex;

@@ -86,6 +86,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     SceneContainer sceneContainer;
     Scene currentScene;
     DialogVerb activeDialogVerb;
+    boolean moveLock, snaplock;
 
 	@Override
 	public void create () {
@@ -157,7 +158,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         playerLight.setScale(1.0f, 4.0f);
         levelLight = new Sprite((Texture) assetManager.get("level-light.png"));
         portrait = new Sprite((Texture) assetManager.get("portrait-1.png"));
-//        portrait.setScale(2);
 
 
         buffer = FrameBuffer.createFrameBuffer(Pixmap.Format.RGBA8888, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, false);
@@ -198,11 +198,12 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         arrowSprite = new Sprite();
         arrowSprite.setBounds(0,0,32,32);
         newConnectionTo = "01";
+        moveLock = false;
 
         sceneContainer = new SceneContainer();
 
         // special
-        startLevel(levels.get(22), "1");
+        startLevel(levels.get(22), "start");
 	}
 
     private Animation<TextureRegion> loadAnimation(Texture sheet, int numberOfFrames, float frameDelay) {
@@ -245,6 +246,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             pressureTile.start();
         }
         isLevelDirty = true;
+        moveLock = false;
         cameraTargetPos = playerPos;
     }
 
@@ -263,7 +265,10 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         if (Math.abs(cameraPosition.y - pos.y) < CAMERA_MARGIN) {
             cameraPosition.y = pos.y;
         }
-        if (cameraTargetPos == playerPos) {
+        if (snaplock && pos.dst2(new Vector2(cameraPosition.x, cameraPosition.y)) < 10000) {
+            snaplock = false;
+        }
+        if (!snaplock) {
             float cameraTrailLimit = 100.0f;
             cameraPosition.x = MathUtils.clamp(cameraPosition.x, -cameraTrailLimit + cameraTargetPos.x, cameraTrailLimit + cameraTargetPos.x);
             cameraPosition.y = MathUtils.clamp(cameraPosition.y, -cameraTrailLimit + cameraTargetPos.y, cameraTrailLimit + cameraTargetPos.y);
@@ -342,7 +347,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         camera.position.set(getCameraPosition());
         camera.update();
         batch.setProjectionMatrix(camera.combined);
-//        bufferBatch.setProjectionMatrix(camera.combined);
         mapRenderer.setView(camera);
 	    getInput();
 	    update();
@@ -600,6 +604,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                     if (activeDialogVerb != null) {
                         activeDialogVerb.finish();
                         activeDialogVerb = null;
+                        moveLock = true;
                     }
                     conversation = null;
                 } else {
@@ -607,7 +612,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 }
             }
         } else {
-            if (currentScene == null && !isMoving && !inputVector.isZero()) {
+            if (!moveLock && currentScene == null && !isMoving && !inputVector.isZero()) {
                 boolean blocked = false;
                 moveVector = inputVector.cpy();
                 Vector2 nextTilePos = moveVector.cpy().scl(TILE_SIZE).add(playerPos).add(QUARTER_TILE_SIZE, QUARTER_TILE_SIZE);
@@ -634,6 +639,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             dialogLock = true;
         } else {
             dialogLock = false;
+            moveLock = false;
         }
         inputVector = new Vector2();
 
@@ -658,10 +664,16 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
     public void moveCamera(Vector2 pos) {
         cameraTargetPos = pos.cpy();
+        snaplock = true;
     }
 
     public void resetCamera() {
+        snaplock = true;
         cameraTargetPos = playerPos;
+    }
+
+    public Trunk getTrunk() {
+	    return currentLevel.trunk;
     }
 
     void addArrow(Vector2 pos, Vector2 dir) {

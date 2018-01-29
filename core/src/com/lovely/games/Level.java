@@ -40,11 +40,12 @@ class Level {
     List<DialogSource> dialogSources;
     List<Torch> torches;
     List<SceneSource> scenes;
+    Trunk trunk;
 
     Level(List<Connection> connections, boolean[][] walls, boolean[][] deaths, String name, int numXTiles,
                  int numYTiles, List<ArrowSource> arrowSources, List<Platform> platforms, List<Block> blocks,
           List<PressureTile> pressureTiles, List<Door> doors, List<DialogSource> dialogSources,
-          List<LevelLight> lights, List<Torch> torches, List<SceneSource> scenes) {
+          List<LevelLight> lights, List<Torch> torches, List<SceneSource> scenes, Trunk trunk) {
         this.connections = connections;
         this.walls = walls;
         this.deaths = deaths;
@@ -60,6 +61,7 @@ class Level {
         this.lights = lights;
         this.torches = torches;
         this.scenes = scenes;
+        this.trunk = trunk;
     }
 
     Vector2 getConnectionPosition(String name) {
@@ -293,7 +295,7 @@ class Level {
                 deaths = new boolean[numXTiles][numYTiles];
             }
             return new Level(connections, walls, deaths, name, numXTiles, numYTiles, arrowSources, platforms, blocks,
-                    pressureTiles, doors, dialogSources, lights, torches, scenes);
+                    pressureTiles, doors, dialogSources, lights, torches, scenes, trunk);
         }
     }
 
