@@ -16,4 +16,6 @@ public interface Stage {
     Trunk getTrunk();
 
     void moveActor(String actor, Vector2 value);
+
+    void hideActor(String actor);
 }

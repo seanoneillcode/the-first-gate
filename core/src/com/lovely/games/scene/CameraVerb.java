@@ -25,4 +25,9 @@ public class CameraVerb implements SceneVerb {
     public boolean isDone() {
         return isDone;
     }
+
+    @Override
+    public boolean isBlocking() {
+        return true;
+    }
 }

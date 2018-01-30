@@ -13,6 +13,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
@@ -21,32 +22,45 @@ import com.badlogic.gdx.math.Vector2;
 public class DialogContainer {
 
     Map<String, List<DialogLine>> dialogs = new HashMap<>();
-    String tom = "tom";
-    String paul = "paul";
-    Map<String, TextureRegion> portraits;
+    String pro = "pro";
+    String ant = "ant";
+    private Sprite portrait;
 
     {
         dialogs.put("1", Arrays.asList(
-                line(tom, "I must push on with all haste, perhaps I can catch him")
+                line(pro, "I must push on with all haste, perhaps I can catch him")
         ));
         dialogs.put("2", Arrays.asList(
-                line(tom, "( press 'R' to restart a level )")
+                line(pro, "( press 'R' to restart a level )")
         ));
         dialogs.put("3", Arrays.asList(
-                line(tom, "!? I've never seen a flying ball of green fire before. Magic!")
+                line(pro, "!? I've never seen a flying ball of green fire before. Magic!")
         ));
         dialogs.put("4", Arrays.asList(
-                line(tom, "( press 'R' to restart a level )")
+                line(pro, "( press 'R' to restart a level )")
         ));
         dialogs.put("5", Arrays.asList(
-                line(tom, "There it is. The magic stone.")
+                line(pro, "There it is. The magic stone.")
         ));
         dialogs.put("6", Arrays.asList(
-                line(tom, "That looks like the way forward. There must be a lever or something about...")
+                line(pro, "Okay I got you here. I'm leaving now."),
+                line(ant, "Hold!"),
+                line(ant, "You must to stand on the other switch, it takes two to open the door."),
+                line(pro, "I'm only here to carry the gear"),
+                line(ant, "Just stand there to open the door. I will face the trials alone.")
         ));
         dialogs.put("7", Arrays.asList(
-                line(tom, "damn!"),
-                line(tom, "now I can't go back")
+                line(pro, "Damn!"),
+                line(pro, "Now I can't leave")
+        ));
+        dialogs.put("8", Arrays.asList(
+                line(pro, "What does it say..."),
+                line(pro, "\"Two must enter, but only one can gain power. Power comes from sacrifice.\"")
+        ));
+        dialogs.put("9", Arrays.asList(
+                line(pro, "Stand on the switch, I can't leave."),
+                line(ant, "Back off you filthy peasant, you will demand nothing of me."),
+                line(ant, "You will remain here. I will complete the trials and return.")
         ));
     }
 
@@ -57,21 +71,31 @@ public class DialogContainer {
     private Texture dialogBox;
     private Color fontColorMain = new Color(202.0f / 256.0f, 253.0f  / 256.0f, 255.0f / 256.0f, 1);
     private Color fontColorSecondary = new Color(7.0f / 256.0f, 0.0f  / 256.0f, 7.0f / 256.0f, 1);
+    private Map<String, Texture> portraits;
 
-    public DialogContainer(Texture dialogBox) {
+    public DialogContainer(Texture dialogBox, Texture proPortrait, Texture antPortrait) {
         currentDialog = null;
         dialogIndex = 0;
         font = loadFonts();
         timer = 0;
         this.dialogBox = dialogBox;
+        portraits = new HashMap<>();
+        portraits.put("ant", antPortrait);
+        portraits.put("pro", proPortrait);
+        this.portrait = new Sprite(portraits.get("pro"));
     }
 
     void render(SpriteBatch batch, Vector2 offset, DialogLine dialogLine) {
-            batch.draw(dialogBox, offset.x - 240, offset.y - 160);
-            font.setColor(fontColorSecondary);
-            font.draw(batch, dialogLine.getLine(), offset.x - 230, offset.y - 96);
-            font.setColor(fontColorMain);
-            font.draw(batch, dialogLine.getLine(), offset.x - 230, offset.y - 94);
+        Vector2 dialogPos = offset.cpy().add(64, 32);
+        batch.draw(dialogBox, dialogPos.x, dialogPos.y);
+        font.setColor(fontColorSecondary);
+        font.draw(batch, dialogLine.getLine(), dialogPos.x + 10, dialogPos.y + 64);
+        font.setColor(fontColorMain);
+        font.draw(batch, dialogLine.getLine(), dialogPos.x + 10, dialogPos.y + 62);
+        portrait.setRegion(portraits.get(dialogLine.owner));
+        boolean isLeft = dialogLine.owner.equals("pro");
+        portrait.setPosition(dialogPos.x + (isLeft ? 0 : 348), dialogPos.y + 80);
+        portrait.draw(batch);
     }
 
     private BitmapFont loadFonts() {

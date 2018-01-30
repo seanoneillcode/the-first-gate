@@ -6,9 +6,11 @@ public class Actor {
 
     Vector2 pos;
     String id;
+    boolean isHidden;
 
     public Actor(Vector2 pos, String id) {
         this.pos = pos;
         this.id = id;
+        this.isHidden = false;
     }
 }

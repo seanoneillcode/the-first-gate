@@ -72,7 +72,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private Texture doorImage;
     private Texture openDoorImage;
     private Sprite mask;
-    private Sprite lightHole, portrait;
+    private Sprite lightHole;
     private Animation<TextureRegion> walkanim;
     private Animation<TextureRegion> lightAnim, playerLightAnim, arrowAnim, torchAnim;
     float animationDelta = 0;
@@ -138,9 +138,11 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("torch-sheet.png", Texture.class);
         assetManager.load("portrait-1.png", Texture.class);
         assetManager.load("wizard.png", Texture.class);
+        assetManager.load("ant-test.png", Texture.class);
         assetManager.finishLoading();
 
-        dialogContainer = new DialogContainer(assetManager.get("dialog-box.png"));
+        dialogContainer = new DialogContainer(assetManager.get("dialog-box.png"), assetManager.get("portrait-1.png"),
+                assetManager.get("ant-test.png"));
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
@@ -161,7 +163,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         playerLight = new Sprite((Texture) assetManager.get("player-light.png"));
         playerLight.setScale(1.0f, 4.0f);
         levelLight = new Sprite((Texture) assetManager.get("level-light.png"));
-        portrait = new Sprite((Texture) assetManager.get("portrait-1.png"));
 
 
         buffer = FrameBuffer.createFrameBuffer(Pixmap.Format.RGBA8888, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, false);
@@ -347,10 +348,12 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             lightHole.draw(bufferBatch);
         }
         for (Actor actor : currentLevel.actors) {
-            playerLight.setRegion(playerRegion);
-            playerLight.setColor(1.0f, 0.8f, 0.5f, 1.0f);
-            playerLight.setPosition( actor.pos.x - 60, actor.pos.y);
-            playerLight.draw(bufferBatch);
+            if (!actor.isHidden) {
+                playerLight.setRegion(playerRegion);
+                playerLight.setColor(1.0f, 0.8f, 0.5f, 1.0f);
+                playerLight.setPosition( actor.pos.x - 60, actor.pos.y);
+                playerLight.draw(bufferBatch);
+            }
         }
 
         bufferBatch.end();
@@ -406,7 +409,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 }
             }
             for (Actor actor : currentLevel.actors) {
-                if (actor.pos.y <= playerPos.y) {
+                if (!actor.isHidden && actor.pos.y <= playerPos.y) {
                     Texture actorImage = actorImages.get(actor.id);
                     batch.draw(actorImage, actor.pos.x, actor.pos.y + 12);
                 }
@@ -429,7 +432,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 batch.draw(torchFrame, torch.pos.x, torch.pos.y);
             }
             for (Actor actor : currentLevel.actors) {
-                if (actor.pos.y > playerPos.y) {
+                if (!actor.isHidden && actor.pos.y > playerPos.y) {
                     Texture actorImage = actorImages.get(actor.id);
                     batch.draw(actorImage, actor.pos.x, actor.pos.y + 12);
                 }
@@ -444,9 +447,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
             if (conversation != null) {
                 DialogLine currentDialog = conversation.getCurrentDialog();
-                dialogContainer.render(batch, new Vector2(camera.position.x + 48, camera.position.y), currentDialog);
-                portrait.setPosition(camera.position.x - (VIEWPORT_WIDTH / 2.0f), camera.position.y + 64 - (VIEWPORT_HEIGHT / 2.0f));
-                portrait.draw(batch);
+                dialogContainer.render(batch, new Vector2(camera.position.x - (VIEWPORT_WIDTH / 2.0f), camera.position.y - (VIEWPORT_HEIGHT / 2.0f)), currentDialog);
             }
             batch.end();
 
@@ -639,7 +640,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 }
             }
         } else {
-            if (!moveLock && currentScene == null && !isMoving && !inputVector.isZero()) {
+            boolean sceneBlock = currentScene != null && currentScene.isBlocking();
+            if (!moveLock && !sceneBlock && !isMoving && !inputVector.isZero()) {
                 boolean blocked = false;
                 moveVector = inputVector.cpy();
                 Vector2 nextTilePos = moveVector.cpy().scl(TILE_SIZE).add(playerPos).add(QUARTER_TILE_SIZE, QUARTER_TILE_SIZE);
@@ -709,6 +711,14 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     public void resetCamera() {
         snaplock = true;
         cameraTargetPos = playerPos;
+    }
+
+    public void hideActor(String id) {
+        for (Actor levelActor : currentLevel.actors) {
+            if (levelActor.id.equals(id)) {
+                levelActor.isHidden = true;
+            }
+        }
     }
 
     public Trunk getTrunk() {

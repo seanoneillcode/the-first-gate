@@ -30,4 +30,9 @@ public class DialogVerb implements SceneVerb {
     public boolean isDone() {
         return isDone;
     }
+
+    @Override
+    public boolean isBlocking() {
+        return true;
+    }
 }

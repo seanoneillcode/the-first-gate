@@ -2,21 +2,23 @@ package com.lovely.games.scene;
 
 import com.lovely.games.Stage;
 
-public class SendEventVerb implements SceneVerb {
+public class HideShowActorVerb implements SceneVerb {
 
-    String switchId;
+    boolean hide;
     boolean isDone;
+    String actor;
 
-    public SendEventVerb(String switchId) {
-        this.switchId = switchId;
+    public HideShowActorVerb(boolean hide, String actor) {
+        this.hide = hide;
         this.isDone = false;
+        this.actor = actor;
     }
 
     @Override
     public void update(Stage stage) {
-        if (!isDone) {
+        if (!isDone && hide) {
+            stage.hideActor(actor);
             isDone = true;
-            stage.getTrunk().broadcast(switchId);
         }
     }
 

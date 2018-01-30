@@ -6,4 +6,5 @@ public interface SceneVerb {
 
     void update(Stage stage);
     boolean isDone();
+    boolean isBlocking();
 }

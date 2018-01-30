@@ -24,6 +24,11 @@ public class WaitVerb implements SceneVerb {
     }
 
     @Override
+    public boolean isBlocking() {
+        return true;
+    }
+
+    @Override
     public boolean isDone() {
         return isDone;
     }

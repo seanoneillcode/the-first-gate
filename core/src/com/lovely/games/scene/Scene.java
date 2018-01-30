@@ -34,6 +34,10 @@ public class Scene {
         }
     }
 
+    public boolean isBlocking() {
+        return verbs.get(currentVerb).isBlocking();
+    }
+
     public boolean isDone() {
         return isDone;
     }

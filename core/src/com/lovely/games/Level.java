@@ -108,7 +108,7 @@ class Level {
     SceneSource getSceneSource(Vector2 pos) {
         for (SceneSource sceneSource : scenes) {
             if (!sceneSource.isDone) {
-                Rectangle playerRect = new Rectangle(pos.x - 10, pos.y - 10, 20, 20);
+                Rectangle playerRect = new Rectangle(pos.x + 1, pos.y + 1, 20, 20);
                 if (playerRect.overlaps(new Rectangle(sceneSource.pos.x, sceneSource.pos.y, sceneSource.size.x, sceneSource.size.y))) {
                     System.out.println("layer ovralps scne " + sceneSource.id);
                     sceneSource.isDone = true;
