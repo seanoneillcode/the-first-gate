@@ -14,6 +14,8 @@ public class SceneContainer {
     public SceneContainer() {
         scenes = new HashMap<>();
         scenes.put("1", builder()
+                .verb(new MoveVerb(new Vector2(0, 3 * 32), "ant"))
+                .verb(new WaitVerb(1f))
                 .verb(new CameraVerb(new Vector2(300,100)))
                 .verb(new WaitVerb(0.5f))
                 .verb(new DialogVerb("6"))

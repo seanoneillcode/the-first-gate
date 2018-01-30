@@ -7,11 +7,13 @@ public interface Stage {
 
     void startDialog(String id, DialogVerb dialogVerb);
 
-    void moveActor(String actor, Vector2 pos);
+    void setActorPos(String actor, Vector2 pos);
 
     void moveCamera(Vector2 pos);
 
     void resetCamera();
 
     Trunk getTrunk();
+
+    void moveActor(String actor, Vector2 value);
 }

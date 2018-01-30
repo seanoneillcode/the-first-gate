@@ -1,8 +1,10 @@
 package com.lovely.games;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -87,6 +89,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     Scene currentScene;
     DialogVerb activeDialogVerb;
     boolean moveLock, snaplock;
+    Map<String, Texture> actorImages;
 
 	@Override
 	public void create () {
@@ -134,6 +137,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("level-light.png", Texture.class);
         assetManager.load("torch-sheet.png", Texture.class);
         assetManager.load("portrait-1.png", Texture.class);
+        assetManager.load("wizard.png", Texture.class);
         assetManager.finishLoading();
 
         dialogContainer = new DialogContainer(assetManager.get("dialog-box.png"));
@@ -197,6 +201,11 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         torchAnim = loadAnimation(assetManager.get("torch-sheet.png"), 2, 0.5f);
         arrowSprite = new Sprite();
         arrowSprite.setBounds(0,0,32,32);
+        actorImages = new HashMap<>();
+        actorImages.put("ant", assetManager.get("wizard.png"));
+
+
+
         newConnectionTo = "01";
         moveLock = false;
 
@@ -337,6 +346,12 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             lightHole.setPosition((torch.pos.x), (torch.pos.y));
             lightHole.draw(bufferBatch);
         }
+        for (Actor actor : currentLevel.actors) {
+            playerLight.setRegion(playerRegion);
+            playerLight.setColor(1.0f, 0.8f, 0.5f, 1.0f);
+            playerLight.setPosition( actor.pos.x - 60, actor.pos.y);
+            playerLight.draw(bufferBatch);
+        }
 
         bufferBatch.end();
         buffer.end();
@@ -390,6 +405,12 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                     batch.draw(doorImage, door.pos.x, door.pos.y);
                 }
             }
+            for (Actor actor : currentLevel.actors) {
+                if (actor.pos.y <= playerPos.y) {
+                    Texture actorImage = actorImages.get(actor.id);
+                    batch.draw(actorImage, actor.pos.x, actor.pos.y + 12);
+                }
+            }
             TextureRegion currentFrame = walkanim.getKeyFrame(animationDelta, true);
             batch.draw(currentFrame, playerPos.x, playerPos.y + QUARTER_TILE_SIZE);
 
@@ -406,6 +427,12 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             for (Torch torch : currentLevel.torches) {
                 TextureRegion torchFrame = torchAnim.getKeyFrame(animationDelta, true);
                 batch.draw(torchFrame, torch.pos.x, torch.pos.y);
+            }
+            for (Actor actor : currentLevel.actors) {
+                if (actor.pos.y > playerPos.y) {
+                    Texture actorImage = actorImages.get(actor.id);
+                    batch.draw(actorImage, actor.pos.x, actor.pos.y + 12);
+                }
             }
 
             batch.setBlendFunction(GL20.GL_ZERO, GL20.GL_SRC_COLOR);
@@ -658,8 +685,20 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         dialogLock = true;
     }
 
-    public void moveActor(String actor, Vector2 pos) {
+    public void setActorPos(String actor, Vector2 pos) {
+        for (Actor levelActor : currentLevel.actors) {
+            if (levelActor.id.equals(actor)) {
+                levelActor.pos = pos.cpy();
+            }
+        }
+    }
 
+    public void moveActor(String actor, Vector2 value) {
+        for (Actor levelActor : currentLevel.actors) {
+            if (levelActor.id.equals(actor)) {
+                levelActor.pos.add(value);
+            }
+        }
     }
 
     public void moveCamera(Vector2 pos) {

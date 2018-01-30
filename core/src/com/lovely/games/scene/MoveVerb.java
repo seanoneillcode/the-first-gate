@@ -8,25 +8,28 @@ import com.lovely.games.Stage;
 
 public class MoveVerb implements SceneVerb {
 
-    float speed = TILE_SIZE * 3.0f;
-    Vector2 pos, target;
+    float speed = TILE_SIZE * 2.0f;
+    Vector2 pos, amount, total;
     boolean isDone;
     String actor;
 
-    public MoveVerb(Vector2 pos, Vector2 target, String actor) {
-        this.pos = pos;
-        this.target = target;
+    public MoveVerb(Vector2 amount, String actor) {
+        this.amount = amount;
+        this.pos = amount.cpy();
+        this.total = new Vector2();
+        this.pos.x = pos.x / speed;
+        this.pos.y = pos.y / speed;
         this.isDone = false;
         this.actor = actor;
     }
 
     @Override
     public void update(Stage stage) {
-        if (Math.abs(pos.x - target.x) < 2 && Math.abs(pos.y - target.y) < 2 ) {
+        if (total.dst2(amount) < 16) {
             isDone = true;
         } else {
-            Vector2 dir = target.cpy().sub(pos).scl(-1).nor();
-            pos = pos.add(dir.scl(Gdx.graphics.getDeltaTime() * speed));
+            pos.cpy().scl(Gdx.graphics.getDeltaTime());
+            total.add(pos);
             stage.moveActor(actor, pos);
         }
     }

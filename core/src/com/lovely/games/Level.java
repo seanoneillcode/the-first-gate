@@ -41,11 +41,12 @@ class Level {
     List<Torch> torches;
     List<SceneSource> scenes;
     Trunk trunk;
+    List<Actor> actors;
 
     Level(List<Connection> connections, boolean[][] walls, boolean[][] deaths, String name, int numXTiles,
                  int numYTiles, List<ArrowSource> arrowSources, List<Platform> platforms, List<Block> blocks,
           List<PressureTile> pressureTiles, List<Door> doors, List<DialogSource> dialogSources,
-          List<LevelLight> lights, List<Torch> torches, List<SceneSource> scenes, Trunk trunk) {
+          List<LevelLight> lights, List<Torch> torches, List<SceneSource> scenes, Trunk trunk, List<Actor> actors) {
         this.connections = connections;
         this.walls = walls;
         this.deaths = deaths;
@@ -62,6 +63,7 @@ class Level {
         this.torches = torches;
         this.scenes = scenes;
         this.trunk = trunk;
+        this.actors = actors;
     }
 
     Vector2 getConnectionPosition(String name) {
@@ -203,6 +205,7 @@ class Level {
         List<LevelLight> lights = new ArrayList<>();
         List<Torch> torches = new ArrayList<>();
         List<SceneSource> scenes = new ArrayList<>();
+        List<Actor> actors = new ArrayList<>();
 
         Builder(String name, int numXTiles, int numYTiles) {
             this.name = name;
@@ -278,6 +281,11 @@ class Level {
             return this;
         }
 
+        Builder addActor(Vector2 pos, String id) {
+            actors.add(new Actor(pos, id));
+            return this;
+        }
+
         Builder addScene(String id, Vector2 pos, Vector2 size) {
             this.scenes.add(new SceneSource(pos, id, size));
             return this;
@@ -295,7 +303,7 @@ class Level {
                 deaths = new boolean[numXTiles][numYTiles];
             }
             return new Level(connections, walls, deaths, name, numXTiles, numYTiles, arrowSources, platforms, blocks,
-                    pressureTiles, doors, dialogSources, lights, torches, scenes, trunk);
+                    pressureTiles, doors, dialogSources, lights, torches, scenes, trunk, actors);
         }
     }
 
@@ -383,6 +391,11 @@ class Level {
                 RectangleMapObject rectObj = (RectangleMapObject) obj;
                 Vector2 pos = new Vector2(rectObj.getRectangle().x, rectObj.getRectangle().y);
                 builder.addTorch(pos, new Color(1.0f,0.75f,0.25f,1.0f));
+            }
+            if (properties.containsKey("type") && properties.get("type").equals("actor")) {
+                RectangleMapObject rectObj = (RectangleMapObject) obj;
+                Vector2 pos = new Vector2(rectObj.getRectangle().x, rectObj.getRectangle().y);
+                builder.addActor(pos, rectObj.getName());
             }
             if (properties.containsKey("type") && properties.get("type").equals("door")) {
                 RectangleMapObject rectObj = (RectangleMapObject) obj;
