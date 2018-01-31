@@ -45,6 +45,14 @@ public class SceneContainer {
                 .verb(new HideShowActorVerb(true, "ant"))
                 .build());
 
+        scenes.put("5", builder()
+                .verb(new CameraVerb(new Vector2(7 * 32, 32 * 8)))
+                .verb(new DialogVerb("10"))
+                .verb(new WaitVerb(0.5f))
+                .verb(new MoveVerb(new Vector2(6 * 32, 0), "ant", false))
+                .verb(new HideShowActorVerb(true, "ant"))
+                .build());
+
     }
 
 }

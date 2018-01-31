@@ -176,7 +176,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         levels.add(Level.loadLevel(assetManager, "levels/tower-arrow-01.tmx")); // 05
         levels.add(Level.loadLevel(assetManager, "levels/tower-arrow-02.tmx")); // 07
         levels.add(Level.loadLevel(assetManager, "levels/tower-arrow-03.tmx")); // 09
-        levels.add(Level.loadLevel(assetManager, "levels/tower-arrow-04.tmx")); // 09
+        levels.add(Level.loadLevel(assetManager, "levels/tower-arrow-04.tmx")); // 11
         levels.add(Level.loadLevel(assetManager, "levels/tower-platform-01.tmx")); // 13
         levels.add(Level.loadLevel(assetManager, "levels/tower-platform-02.tmx")); // 15
         levels.add(Level.loadLevel(assetManager, "levels/tower-platform-03.tmx")); // 17
@@ -257,11 +257,11 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         }
         isLevelDirty = true;
         moveLock = false;
-        cameraTargetPos = playerPos;
+        cameraTargetPos = null;
     }
 
     private Vector3 getCameraPosition() {
-        Vector2 pos = cameraTargetPos;
+        Vector2 pos = cameraTargetPos == null ? playerPos : cameraTargetPos;
         Vector3 target = new Vector3(pos.x, pos.y, 0);
         final float speed = CAMERA_CATCHUP_SPEED * Gdx.graphics.getDeltaTime();
         float ispeed = 1.0f - speed;
@@ -280,8 +280,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         }
         if (!snaplock) {
             float cameraTrailLimit = 100.0f;
-            cameraPosition.x = MathUtils.clamp(cameraPosition.x, -cameraTrailLimit + cameraTargetPos.x, cameraTrailLimit + cameraTargetPos.x);
-            cameraPosition.y = MathUtils.clamp(cameraPosition.y, -cameraTrailLimit + cameraTargetPos.y, cameraTrailLimit + cameraTargetPos.y);
+            cameraPosition.x = MathUtils.clamp(cameraPosition.x, -cameraTrailLimit + pos.x, cameraTrailLimit + pos.x);
+            cameraPosition.y = MathUtils.clamp(cameraPosition.y, -cameraTrailLimit + pos.y, cameraTrailLimit + pos.y);
         }
         return cameraPosition;
     }
@@ -388,7 +388,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             }
             for (Arrow arrow : arrows) {
                 TextureRegion currentFrame = arrowAnim.getKeyFrame(animationDelta, true);
-                arrowSprite.setPosition(arrow.pos.x, arrow.pos.y);
+                arrowSprite.setPosition(arrow.pos.x, arrow.pos.y + 8);
                 arrowSprite.setRegion(currentFrame);
                 arrowSprite.draw(batch);
             }
@@ -710,7 +710,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
     public void resetCamera() {
         snaplock = true;
-        cameraTargetPos = playerPos;
+        cameraTargetPos = null;
     }
 
     public void hideActor(String id) {
