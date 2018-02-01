@@ -51,7 +51,7 @@
   </object>
   <object id="10" name="40" type="connection" x="416" y="160" width="32" height="32">
    <properties>
-    <property name="to" value="41"/>
+    <property name="to" value="51"/>
    </properties>
   </object>
   <object id="21" type="pressure" x="160" y="64" width="32" height="32">

@@ -120,6 +120,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("levels/start-room.tmx", TiledMap.class);
         assetManager.load("levels/end-room.tmx", TiledMap.class);
         assetManager.load("levels/scene-test.tmx", TiledMap.class);
+        assetManager.load("levels/tower-broken-level.tmx", TiledMap.class);
 
         assetManager.load("arrow.png", Texture.class);
         assetManager.load("platform.png", Texture.class);
@@ -194,6 +195,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         levels.add(Level.loadLevel(assetManager, "levels/start-room.tmx")); // 1 // 20
         levels.add(Level.loadLevel(assetManager, "levels/end-room.tmx")); // 41 // 21
         levels.add(Level.loadLevel(assetManager, "levels/scene-test.tmx")); // 1 // 22
+        levels.add(Level.loadLevel(assetManager, "levels/tower-broken-level.tmx")); // 51 // 23
 
         walkanim = loadAnimation(assetManager.get("wizard-sheet.png"), 4, 0.5f);
         lightAnim = loadAnimation(assetManager.get("light-magic.png"), 4, 0.6f);
@@ -213,7 +215,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         sceneContainer = new SceneContainer();
 
         // special
-        startLevel(levels.get(22), "start");
+        startLevel(levels.get(23), "51");
 	}
 
     private Animation<TextureRegion> loadAnimation(Texture sheet, int numberOfFrames, float frameDelay) {
@@ -564,6 +566,17 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             if (currentLevel.isWall(arrow.pos) || currentLevel.isOutOfBounds(arrow.pos)) {
                 arrowIterator.remove();
             }
+            Vector2 nextTilePos = arrow.dir.cpy().scl(TILE_SIZE).add(arrow.pos).add(QUARTER_TILE_SIZE, QUARTER_TILE_SIZE);
+            Block block = currentLevel.getBlock(nextTilePos, true);
+            if (block!= null) {
+                Vector2 nextTileAgain = arrow.dir.cpy().scl(TILE_SIZE * 2.0f).add(arrow.pos).add(QUARTER_TILE_SIZE, QUARTER_TILE_SIZE);
+                if (currentLevel.isTileBlocked(nextTileAgain)) {
+                    arrowIterator.remove();
+                } else {
+                    block.move(arrow.dir);
+                    arrowIterator.remove();
+                }
+            }
             if (getPlayerRect().overlaps(arrow.getRect())) {
                 restartLevel();
             }
@@ -575,7 +588,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
         for (Block block : currentLevel.blocks) {
             block.update();
-            if (!block.isMoving && !block.isGround) {
+            if (!block.isMoving && !block.isGround && currentLevel.getPlatform(block.pos) == null) {
                 block.pos.x = MathUtils.round(block.pos.x / TILE_SIZE) * TILE_SIZE;
                 block.pos.y = MathUtils.round(block.pos.y / TILE_SIZE) * TILE_SIZE;
                 if (currentLevel.isDeath(block.pos.cpy().add(QUARTER_TILE_SIZE,QUARTER_TILE_SIZE))) {
