@@ -1,10 +1,6 @@
 package com.lovely.games;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -86,12 +82,13 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     OrthographicCamera cam;
     Vector2 cameraTargetPos;
     SceneContainer sceneContainer;
-    Scene currentScene;
+    List<Scene> currentScenes;
     DialogVerb activeDialogVerb;
     boolean moveLock, snaplock;
     Map<String, Texture> actorImages;
+    private boolean skipLock;
 
-	@Override
+    @Override
 	public void create () {
         assetManager = new AssetManager();
         FileHandleResolver fileHandleResolver = new InternalFileHandleResolver();
@@ -207,7 +204,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         actorImages = new HashMap<>();
         actorImages.put("ant", assetManager.get("wizard.png"));
 
-
+        currentScenes = new ArrayList<>();
 
         newConnectionTo = "01";
         moveLock = false;
@@ -254,8 +251,16 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         for (Block block : currentLevel.blocks) {
             block.start();
         }
+
         for (PressureTile pressureTile : currentLevel.pressureTiles) {
             pressureTile.start();
+        }
+        for (Actor actor : currentLevel.actors) {
+            actor.start();
+        }
+        for (SceneSource sceneSource : currentLevel.scenes) {
+            sceneSource.start();
+            sceneContainer.scenes.get(sceneSource.id).start();
         }
         isLevelDirty = true;
         moveLock = false;
@@ -290,7 +295,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
     private void renderLightMasks() {
         buffer.begin();
-        Gdx.gl.glClearColor(0.3f, 0.3f, 0.15f, 1);
+        Gdx.gl.glClearColor(0.15f, 0.15f, 0.07f, 1);
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
         bufferBatch.setProjectionMatrix(camera.combined);
         bufferBatch.begin();
@@ -388,12 +393,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             for (Platform platform : currentLevel.getPlatforms()) {
                 batch.draw(platformImg, platform.pos.x, platform.pos.y);
             }
-            for (Arrow arrow : arrows) {
-                TextureRegion currentFrame = arrowAnim.getKeyFrame(animationDelta, true);
-                arrowSprite.setPosition(arrow.pos.x, arrow.pos.y + 8);
-                arrowSprite.setRegion(currentFrame);
-                arrowSprite.draw(batch);
-            }
             for (Block block : currentLevel.blocks) {
                 if (block.isGround) {
                     batch.draw(groundBlockImage, block.pos.x, block.pos.y);
@@ -401,6 +400,12 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 if (block.pos.y > playerPos.y && !block.isGround) {
                     batch.draw(blockImage, block.pos.x, block.pos.y);
                 }
+            }
+            for (Arrow arrow : arrows) {
+                TextureRegion currentFrame = arrowAnim.getKeyFrame(animationDelta, true);
+                arrowSprite.setPosition(arrow.pos.x, arrow.pos.y + 8);
+                arrowSprite.setRegion(currentFrame);
+                arrowSprite.draw(batch);
             }
             for (Door door : currentLevel.doors) {
                 if (door.isOpen && door.pos.y >= playerPos.y) {
@@ -411,7 +416,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 }
             }
             for (Actor actor : currentLevel.actors) {
-                if (!actor.isHidden && actor.pos.y <= playerPos.y) {
+                if (!actor.isHidden && actor.pos.y >= playerPos.y) {
                     Texture actorImage = actorImages.get(actor.id);
                     batch.draw(actorImage, actor.pos.x, actor.pos.y + 12);
                 }
@@ -434,7 +439,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 batch.draw(torchFrame, torch.pos.x, torch.pos.y);
             }
             for (Actor actor : currentLevel.actors) {
-                if (!actor.isHidden && actor.pos.y > playerPos.y) {
+                if (!actor.isHidden && actor.pos.y < playerPos.y) {
                     Texture actorImage = actorImages.get(actor.id);
                     batch.draw(actorImage, actor.pos.x, actor.pos.y + 12);
                 }
@@ -545,14 +550,18 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         if (conversation != null) {
             conversation.update();
         }
-        SceneSource sceneSource = currentLevel.getSceneSource(playerPos);
-        if (sceneSource != null && sceneContainer.scenes.containsKey(sceneSource.id)) {
-            currentScene = sceneContainer.scenes.get(sceneSource.id);
+        List<SceneSource> sceneSources = currentLevel.getSceneSources(playerPos);
+        for (SceneSource sceneSource : sceneSources) {
+            if (sceneContainer.scenes.containsKey(sceneSource.id)) {
+                currentScenes.add(sceneContainer.scenes.get(sceneSource.id));
+            }
         }
-        if (currentScene != null) {
-            currentScene.update(this);
-            if (currentScene.isDone()) {
-                currentScene = null;
+        Iterator<Scene> sceneIterator = currentScenes.iterator();
+        while (sceneIterator.hasNext()) {
+            Scene scene = sceneIterator.next();
+            scene.update(this);
+            if (scene.isDone()) {
+                sceneIterator.remove();
             }
         }
         for (ArrowSource arrowSource : currentLevel.getArrowSources()) {
@@ -586,25 +595,35 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             platform.update();
         }
 
+        boolean blocksDirty = false;
         for (Block block : currentLevel.blocks) {
             block.update();
-            if (!block.isMoving && !block.isGround && currentLevel.getPlatform(block.pos) == null) {
-                block.pos.x = MathUtils.round(block.pos.x / TILE_SIZE) * TILE_SIZE;
-                block.pos.y = MathUtils.round(block.pos.y / TILE_SIZE) * TILE_SIZE;
-                if (currentLevel.isDeath(block.pos.cpy().add(QUARTER_TILE_SIZE,QUARTER_TILE_SIZE))) {
-                    boolean alreadyGround = false;
-                    for (Block otherBlock : currentLevel.blocks) {
-                        if (otherBlock.isGround) {
-                            if (block.pos.dst2(otherBlock.pos) < 64) {
-                                alreadyGround = true;
+            if (!block.isMoving && !block.isGround) {
+                Platform platform = currentLevel.getPlatform(block.pos);
+                if (platform == null) {
+                    block.pos.x = MathUtils.round(block.pos.x / TILE_SIZE) * TILE_SIZE;
+                    block.pos.y = MathUtils.round(block.pos.y / TILE_SIZE) * TILE_SIZE;
+                    if (currentLevel.isDeath(block.pos.cpy().add(QUARTER_TILE_SIZE, QUARTER_TILE_SIZE))) {
+                        boolean alreadyGround = false;
+                        for (Block otherBlock : currentLevel.blocks) {
+                            if (otherBlock.isGround) {
+                                if (block.pos.dst2(otherBlock.pos) < 64) {
+                                    alreadyGround = true;
+                                }
                             }
                         }
+                        if (!alreadyGround) {
+                            blocksDirty = true;
+                            block.isGround = true;
+                        }
                     }
-                    if (!alreadyGround) {
-                        block.isGround = true;
-                    }
+                } else {
+                    block.pos = platform.pos.cpy();
                 }
             }
+        }
+        if (blocksDirty) {
+            currentLevel.blocks.sort((o1, o2) -> o1.isGround == o2.isGround ? 0 : (o1.isGround ? -1 : 1));
         }
     }
 
@@ -646,6 +665,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                         activeDialogVerb.finish();
                         activeDialogVerb = null;
                         moveLock = true;
+                        skipLock = true;
                     }
                     conversation = null;
                 } else {
@@ -653,7 +673,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 }
             }
         } else {
-            boolean sceneBlock = currentScene != null && currentScene.isBlocking();
+            boolean sceneBlock = !currentScenes.isEmpty() && currentScenes.stream().anyMatch(Scene::isBlocking);
             if (!moveLock && !sceneBlock && !isMoving && !inputVector.isZero()) {
                 boolean blocked = false;
                 moveVector = inputVector.cpy();
@@ -676,12 +696,19 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                     movementValue = TILE_SIZE / PLAYER_SPEED;
                 }
             }
+            if (!inputVector.isZero() && !skipLock) {
+                skipLock = true;
+                for (Scene scene : currentScenes) {
+                    scene.skip();
+                }
+            }
         }
         if ((inputVector.x != 0 || inputVector.y != 0)) {
             dialogLock = true;
         } else {
             dialogLock = false;
             moveLock = false;
+            skipLock = false;
         }
         inputVector = new Vector2();
 
@@ -717,6 +744,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     }
 
     public void moveCamera(Vector2 pos) {
+	    System.out.println("got camera mov req");
         cameraTargetPos = pos.cpy();
         snaplock = true;
     }

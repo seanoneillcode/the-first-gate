@@ -7,11 +7,19 @@ public class HideShowActorVerb implements SceneVerb {
     boolean hide;
     boolean isDone;
     String actor;
+    boolean originalHide;
 
     public HideShowActorVerb(boolean hide, String actor) {
         this.hide = hide;
         this.isDone = false;
         this.actor = actor;
+        this.originalHide = hide;
+    }
+
+    @Override
+    public void start() {
+        isDone = false;
+        hide = originalHide;
     }
 
     @Override
@@ -30,5 +38,9 @@ public class HideShowActorVerb implements SceneVerb {
     @Override
     public boolean isBlocking() {
         return true;
+    }
+
+    public void skip() {
+
     }
 }

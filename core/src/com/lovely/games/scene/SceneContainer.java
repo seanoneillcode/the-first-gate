@@ -59,11 +59,21 @@ public class SceneContainer {
                 .verb(new HideShowActorVerb(true, "ant"))
                 .build());
 
+        scenes.put("7", builder()
+                .resetCamera(false)
+                .verb(new SendEventVerb("c"))
+                .build());
+
         // ant fucks over player
         scenes.put("6", builder()
-                .verb(new CameraVerb(new Vector2(11 * 32, 32 * 2)))
+                .verb(new CameraVerb(new Vector2(11 * 32, 32 * 4)))
+                .verb(new WaitVerb(2f))
+                .verb(new MoveVerb(new Vector2(3 * 32, 0), "ant", true))
+                .verb(new WaitVerb(2f))
                 .verb(new DialogVerb("11"))
-                .verb(new MoveVerb(new Vector2(6 * 32, 0), "ant", false))
+                .verb(new MoveVerb(new Vector2(0, -5 * 32), "ant", false))
+                .verb(new MoveVerb(new Vector2(-5 * 32, 0), "ant", false))
+                .verb(new MoveVerb(new Vector2(0, -3 * 32), "ant", false))
                 .verb(new HideShowActorVerb(true, "ant"))
                 .build());
 

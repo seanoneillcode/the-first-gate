@@ -7,10 +7,12 @@ public class WaitVerb implements SceneVerb {
 
     float timer;
     boolean isDone;
+    float originalTimer;
 
     public WaitVerb(float timer) {
         this.timer = timer;
         this.isDone = false;
+        this.originalTimer = timer;
     }
 
     @Override
@@ -26,6 +28,17 @@ public class WaitVerb implements SceneVerb {
     @Override
     public boolean isBlocking() {
         return true;
+    }
+
+    @Override
+    public void start() {
+        isDone = false;
+        timer = originalTimer;
+    }
+
+    @Override
+    public void skip() {
+        timer = -1;
     }
 
     @Override

@@ -30,4 +30,13 @@ public class CameraVerb implements SceneVerb {
     public boolean isBlocking() {
         return true;
     }
+
+    @Override
+    public void start() {
+        isDone = false;
+    }
+
+    public void skip() {
+
+    }
 }

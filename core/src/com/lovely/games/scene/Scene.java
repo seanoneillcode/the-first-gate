@@ -10,11 +10,25 @@ public class Scene {
     List<SceneVerb> verbs;
     int currentVerb;
     boolean isDone;
+    boolean resetCamera;
 
-    public Scene(List<SceneVerb> verbs) {
+    public Scene(List<SceneVerb> verbs, boolean resetCamera) {
         this.verbs = verbs;
         this.currentVerb = 0;
         this.isDone = false;
+        this.resetCamera = resetCamera;
+    }
+
+    public void start() {
+        this.isDone = false;
+        this.currentVerb = 0;
+        for (SceneVerb sceneVerb : verbs) {
+            sceneVerb.start();
+        }
+    }
+
+    public void skip() {
+        verbs.get(currentVerb).skip();
     }
 
     public void update(Stage stage) {
@@ -29,7 +43,9 @@ public class Scene {
                 currentVerb = 0;
                 isDone = true;
                 System.out.println("resetting camera, all verbs done ");
-                stage.resetCamera();
+                if (resetCamera) {
+                    stage.resetCamera();
+                }
             }
         }
     }
@@ -49,14 +65,20 @@ public class Scene {
     public static class Builder {
 
         List<SceneVerb> verbs = new ArrayList<>();
+        boolean resetCamera = true;
 
         public Builder verb(SceneVerb verb) {
             verbs.add(verb);
             return this;
         }
 
+        public Builder resetCamera(boolean resetCamera) {
+            this.resetCamera = resetCamera;
+            return this;
+        }
+
         public Scene build() {
-            return new Scene(verbs);
+            return new Scene(verbs, resetCamera);
         }
     }
 

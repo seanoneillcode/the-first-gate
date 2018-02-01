@@ -105,18 +105,19 @@ class Level {
         return null;
     }
 
-    SceneSource getSceneSource(Vector2 pos) {
+    List<SceneSource> getSceneSources(Vector2 pos) {
+        List<SceneSource> sceneSources = new ArrayList<>();
         for (SceneSource sceneSource : scenes) {
             if (!sceneSource.isDone) {
                 Rectangle playerRect = new Rectangle(pos.x + 1, pos.y + 1, 20, 20);
                 if (playerRect.overlaps(new Rectangle(sceneSource.pos.x, sceneSource.pos.y, sceneSource.size.x, sceneSource.size.y))) {
                     System.out.println("layer ovralps scne " + sceneSource.id);
                     sceneSource.isDone = true;
-                    return sceneSource;
+                    sceneSources.add(sceneSource);
                 }
             }
         }
-        return null;
+        return sceneSources;
     }
 
     Door getDoor(Vector2 pos, boolean isOpen) {
@@ -286,8 +287,8 @@ class Level {
             return this;
         }
 
-        Builder addScene(String id, Vector2 pos, Vector2 size) {
-            this.scenes.add(new SceneSource(pos, id, size));
+        Builder addScene(String id, Vector2 pos, Vector2 size, boolean playOnce) {
+            this.scenes.add(new SceneSource(pos, id, size, playOnce));
             return this;
         }
 
@@ -429,8 +430,11 @@ class Level {
                 RectangleMapObject rectObj = (RectangleMapObject) obj;
                 Vector2 pos = new Vector2(rectObj.getRectangle().x, rectObj.getRectangle().y);
                 Vector2 size = new Vector2(rectObj.getRectangle().width, rectObj.getRectangle().height);
-
-                builder.addScene(obj.getName(), pos, size);
+                boolean playOnce = false;
+                if (properties.containsKey("playOnce")) {
+                    playOnce = Boolean.parseBoolean(properties.get("playOnce").toString());
+                }
+                builder.addScene(obj.getName(), pos, size, playOnce);
             }
             if (properties.containsKey("type") && properties.get("type").equals("pressure")) {
                 RectangleMapObject rectObj = (RectangleMapObject) obj;

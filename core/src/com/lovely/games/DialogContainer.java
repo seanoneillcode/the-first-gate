@@ -67,7 +67,7 @@ public class DialogContainer {
                 line(pro, "I'll go back if you go with me and let me out.")
         ));
         dialogs.put("11", Arrays.asList(
-                line(ant, "You've gone far enough, I've sabotaged this puzzle. Don't die on the way back. HAHAHaha")
+                line(ant, "You've gone far enough, I've sabotaged this trial to make sure")
         ));
     }
 

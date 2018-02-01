@@ -13,6 +13,7 @@ public class MoveVerb implements SceneVerb {
     boolean isDone;
     String actor;
     boolean isBlocking;
+    boolean skip = false;
 
     public MoveVerb(Vector2 amount, String actor) {
         this.amount = amount;
@@ -33,13 +34,25 @@ public class MoveVerb implements SceneVerb {
     }
 
     @Override
+    public void start() {
+        isDone = false;
+        total = new Vector2();
+    }
+
+    @Override
     public void update(Stage stage) {
-        if (total.dst2(amount) < 16) {
+        if (skip) {
+            Vector2 rest = amount.cpy().sub(total);
+            stage.moveActor(actor, rest);
             isDone = true;
         } else {
-            Vector2 mov = pos.cpy().scl(Gdx.graphics.getDeltaTime());
-            total.add(mov);
-            stage.moveActor(actor, mov);
+            if (total.dst2(amount) < 16) {
+                isDone = true;
+            } else {
+                Vector2 mov = pos.cpy().scl(Gdx.graphics.getDeltaTime());
+                total.add(mov);
+                stage.moveActor(actor, mov);
+            }
         }
     }
 
@@ -51,5 +64,9 @@ public class MoveVerb implements SceneVerb {
     @Override
     public boolean isBlocking() {
         return isBlocking;
+    }
+
+    public void skip() {
+        skip = true;
     }
 }

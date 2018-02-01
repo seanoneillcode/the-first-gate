@@ -29,4 +29,14 @@ public class SendEventVerb implements SceneVerb {
     public boolean isBlocking() {
         return true;
     }
+
+    @Override
+    public void start() {
+        isDone = false;
+    }
+
+    @Override
+    public void skip() {
+
+    }
 }

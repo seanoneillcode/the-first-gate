@@ -8,11 +8,19 @@ public class SceneSource {
     public String id;
     public Vector2 size;
     public boolean isDone;
+    boolean playOnce;
 
-    public SceneSource(Vector2 pos, String id, Vector2 size) {
+    public SceneSource(Vector2 pos, String id, Vector2 size, boolean playOnce) {
         this.pos = pos;
         this.id = id;
         this.size = size;
         this.isDone = false;
+        this.playOnce = playOnce;
+    }
+
+    public void start() {
+        if (!playOnce) {
+            this.isDone = false;
+        }
     }
 }

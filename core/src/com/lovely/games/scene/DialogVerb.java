@@ -15,6 +15,12 @@ public class DialogVerb implements SceneVerb {
     }
 
     @Override
+    public void start() {
+        isDone = false;
+        this.conversationStarted = false;
+    }
+
+    @Override
     public void update(Stage stage) {
         if (!conversationStarted) {
             conversationStarted = true;
@@ -34,5 +40,9 @@ public class DialogVerb implements SceneVerb {
     @Override
     public boolean isBlocking() {
         return true;
+    }
+
+    public void skip() {
+
     }
 }
