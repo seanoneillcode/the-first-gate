@@ -77,6 +77,47 @@ public class SceneContainer {
                 .verb(new HideShowActorVerb(true, "ant"))
                 .build());
 
+        scenes.put("8", builder()
+                .verb(new HideShowActorVerb(false, "ant"))
+                .verb(new MoveVerb(new Vector2(32 * 8, 0), "ant", true))
+                .verb(new DialogVerb("12"))
+                .build());
+
+        scenes.put("9", builder()
+                .verb(new MoveVerb(new Vector2(0, 32 * -2), "ant", true))
+                .verb(new SendEventVerb("a"))
+                .build());
+
+        // ant asks for help
+        scenes.put("10", builder()
+                .verb(new CameraVerb(new Vector2(3 * 32, 32 * 8)))
+                .verb(new HideShowActorVerb(false, "ant"))
+                .verb(new MoveVerb(new Vector2(2 * 32, 0), "ant", true))
+                .verb(new MoveVerb(new Vector2(0, 32 * 5), "ant", true))
+                .verb(new MoveVerb(new Vector2(2 * 32, 0), "ant", true))
+                .verb(new DialogVerb("14"))
+                .verb(new SendEventVerb("b"))
+                .build());
+
+        // pro feels the magic
+        scenes.put("11", builder()
+                .verb(new DialogVerb("13"))
+                .build());
+
+        // pro walks away to leave ant to die
+        scenes.put("12", builder()
+                .verb(new DialogVerb("15"))
+                .build());
+
+        // pro is a kind fool!
+        scenes.put("13", builder()
+                .verb(new DialogVerb("16"))
+                .verb(new WaitVerb(3f))
+                .verb(new MoveVerb(new Vector2(9 * 32, 0), "ant", true))
+                .verb(new DialogVerb("17"))
+                .build());
+
+
     }
 
 }

@@ -8,16 +8,18 @@ public class Actor {
     String id;
     boolean isHidden;
     Vector2 originalPos;
+    boolean originalIsHide;
 
-    public Actor(Vector2 pos, String id) {
+    public Actor(Vector2 pos, String id, boolean isHide) {
         this.pos = pos;
         this.id = id;
-        this.isHidden = false;
+        this.originalIsHide = isHide;
+        this.isHidden = isHide;
         this.originalPos = pos.cpy();
     }
 
     public void start() {
         this.pos = originalPos.cpy();
-        this.isHidden = false;
+        this.isHidden = originalIsHide;
     }
 }

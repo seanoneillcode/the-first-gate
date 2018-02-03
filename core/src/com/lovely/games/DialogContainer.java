@@ -69,6 +69,36 @@ public class DialogContainer {
         dialogs.put("11", Arrays.asList(
                 line(ant, "You've gone far enough, I've sabotaged this trial to make sure")
         ));
+        dialogs.put("12", Arrays.asList(
+                line(ant, "Stop! damn it!"),
+                line(ant, "It's mine, get out of the way."),
+                line(pro, "No"),
+                line(pro, "I completed the trials, despite your sabotage, and I did it first."),
+                line(ant, "Listen here you little shit, are you forgetting who I am?"),
+                line(ant, "I have more estates and money then you're shitty village."),
+                line(ant, "I will ruin you before I kill you so you and no one else can forget."),
+                line(pro, "Do it."),
+                line(pro, "I'm getting what I earned.")
+        ));
+        dialogs.put("13", Arrays.asList(
+                line(pro, "I can feel a strange power, stirring inside of me"),
+                line(pro, "(press 'spacebar' to cast a spell)")
+        ));
+        dialogs.put("14", Arrays.asList(
+                line(ant, "Wait! don't leave me here."),
+                line(ant, "Step on the switch so I can cross")
+        ));
+        dialogs.put("15", Arrays.asList(
+                line(ant, "No!"),
+                line(ant, "No! You bastard!"),
+                line(ant, "I'll kill you!")
+        ));
+        dialogs.put("16", Arrays.asList(
+                line(ant, "Thank you for your kindness.")
+        ));
+        dialogs.put("17", Arrays.asList(
+                line(ant, "Fool, now I'll take what's mine.")
+        ));
     }
 
     String currentDialog;

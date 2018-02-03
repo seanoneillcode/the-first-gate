@@ -108,7 +108,7 @@ class Level {
     List<SceneSource> getSceneSources(Vector2 pos) {
         List<SceneSource> sceneSources = new ArrayList<>();
         for (SceneSource sceneSource : scenes) {
-            if (!sceneSource.isDone) {
+            if (!sceneSource.isDone && sceneSource.isActive) {
                 Rectangle playerRect = new Rectangle(pos.x + 1, pos.y + 1, 20, 20);
                 if (playerRect.overlaps(new Rectangle(sceneSource.pos.x, sceneSource.pos.y, sceneSource.size.x, sceneSource.size.y))) {
                     System.out.println("layer ovralps scne " + sceneSource.id);
@@ -282,13 +282,17 @@ class Level {
             return this;
         }
 
-        Builder addActor(Vector2 pos, String id) {
-            actors.add(new Actor(pos, id));
+        Builder addActor(Vector2 pos, String id, boolean isHide) {
+            actors.add(new Actor(pos, id, isHide));
             return this;
         }
 
-        Builder addScene(String id, Vector2 pos, Vector2 size, boolean playOnce) {
-            this.scenes.add(new SceneSource(pos, id, size, playOnce));
+        Builder addScene(String id, Vector2 pos, Vector2 size, boolean playOnce, boolean isActive, String switchId) {
+            SceneSource sceneSource = new SceneSource(pos, id, size, playOnce, isActive, switchId);
+            if (switchId != null) {
+                trunk.addListener(sceneSource);
+            }
+            this.scenes.add(sceneSource);
             return this;
         }
 
@@ -404,7 +408,11 @@ class Level {
             if (properties.containsKey("type") && properties.get("type").equals("actor")) {
                 RectangleMapObject rectObj = (RectangleMapObject) obj;
                 Vector2 pos = new Vector2(rectObj.getRectangle().x, rectObj.getRectangle().y);
-                builder.addActor(pos, rectObj.getName());
+                boolean isHide = false;
+                if (properties.containsKey("isHide")) {
+                    isHide = Boolean.parseBoolean(properties.get("isHide").toString());
+                }
+                builder.addActor(pos, rectObj.getName(), isHide);
             }
             if (properties.containsKey("type") && properties.get("type").equals("door")) {
                 RectangleMapObject rectObj = (RectangleMapObject) obj;
@@ -439,10 +447,18 @@ class Level {
                 Vector2 pos = new Vector2(rectObj.getRectangle().x, rectObj.getRectangle().y);
                 Vector2 size = new Vector2(rectObj.getRectangle().width, rectObj.getRectangle().height);
                 boolean playOnce = false;
+                boolean isActive = true;
                 if (properties.containsKey("playOnce")) {
                     playOnce = Boolean.parseBoolean(properties.get("playOnce").toString());
                 }
-                builder.addScene(obj.getName(), pos, size, playOnce);
+                if (properties.containsKey("isActive")) {
+                    isActive = Boolean.parseBoolean(properties.get("isActive").toString());
+                }
+                String switchId = null;
+                if (properties.containsKey("switch")) {
+                    switchId = properties.get("switch").toString();
+                }
+                builder.addScene(obj.getName(), pos, size, playOnce, isActive, switchId);
             }
             if (properties.containsKey("type") && properties.get("type").equals("pressure")) {
                 RectangleMapObject rectObj = (RectangleMapObject) obj;

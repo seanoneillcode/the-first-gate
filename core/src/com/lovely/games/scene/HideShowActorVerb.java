@@ -24,8 +24,8 @@ public class HideShowActorVerb implements SceneVerb {
 
     @Override
     public void update(Stage stage) {
-        if (!isDone && hide) {
-            stage.hideActor(actor);
+        if (!isDone) {
+            stage.hideActor(actor, hide);
             isDone = true;
         }
     }

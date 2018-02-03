@@ -17,5 +17,5 @@ public interface Stage {
 
     void moveActor(String actor, Vector2 value);
 
-    void hideActor(String actor);
+    void hideActor(String actor, boolean isHide);
 }

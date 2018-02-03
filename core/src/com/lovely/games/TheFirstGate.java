@@ -42,6 +42,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private static final float CAMERA_CATCHUP_SPEED = 2.0f;
     public static final int VIEWPORT_WIDTH = 600;
     public static final int VIEWPORT_HEIGHT = 480;
+    public static final float CAST_ARROW_COOLDOWN = 2.0f;
 
     private SpriteBatch batch;
     private SpriteBatch bufferBatch;
@@ -50,7 +51,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private OrthographicCamera camera;
 
     private Level currentLevel;
-    private Vector2 playerPos;
+    private Vector2 playerPos, playerDir;
     private boolean isMoving;
     private Vector2 moveVector;
     private Vector2 inputVector;
@@ -87,6 +88,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     boolean moveLock, snaplock;
     Map<String, Texture> actorImages;
     private boolean skipLock;
+    private boolean castLock;
+    private String currentSpell;
+    private float castCooldown = 0;
 
     @Override
 	public void create () {
@@ -121,6 +125,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("levels/tower-broken-level.tmx", TiledMap.class);
         assetManager.load("levels/tower-bridge-1.tmx", TiledMap.class);
         assetManager.load("levels/tower-prize-fight.tmx", TiledMap.class);
+        assetManager.load("levels/tower-ant-revenge.tmx", TiledMap.class);
 
         assetManager.load("arrow.png", Texture.class);
         assetManager.load("platform.png", Texture.class);
@@ -199,6 +204,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         levels.add(Level.loadLevel(assetManager, "levels/tower-arrow-06.tmx")); // 53 // 24
         levels.add(Level.loadLevel(assetManager, "levels/tower-bridge-1.tmx")); // 55 // 25
         levels.add(Level.loadLevel(assetManager, "levels/tower-prize-fight.tmx")); // 57 // 26
+        levels.add(Level.loadLevel(assetManager, "levels/tower-ant-revenge.tmx")); // 59 // 27
 
         walkanim = loadAnimation(assetManager.get("wizard-sheet.png"), 4, 0.5f);
         lightAnim = loadAnimation(assetManager.get("light-magic.png"), 4, 0.6f);
@@ -217,8 +223,10 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
         sceneContainer = new SceneContainer();
 
+
+
         // special
-        startLevel(levels.get(26), "57");
+        startLevel(levels.get(27), "59");
 	}
 
     private Animation<TextureRegion> loadAnimation(Texture sheet, int numberOfFrames, float frameDelay) {
@@ -271,6 +279,10 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         isLevelDirty = true;
         moveLock = false;
         cameraTargetPos = null;
+        playerDir = new Vector2(1,0);
+        if (level.name.equals("levels/tower-ant-revenge.tmx")) {
+            currentSpell = "arrow";
+        }
     }
 
     private Vector3 getCameraPosition() {
@@ -601,6 +613,10 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             platform.update();
         }
 
+        if (castCooldown > 0) {
+            castCooldown = castCooldown - Gdx.graphics.getDeltaTime();
+        }
+
         boolean blocksDirty = false;
         for (Block block : currentLevel.blocks) {
             block.update();
@@ -699,6 +715,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 }
                 if (!blocked) {
                     isMoving = true;
+                    playerDir = inputVector.cpy();
                     movementValue = TILE_SIZE / PLAYER_SPEED;
                 }
             }
@@ -707,6 +724,14 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 for (Scene scene : currentScenes) {
                     scene.skip();
                 }
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+                if (!sceneBlock && !castLock) {
+                    castCurrentSpell();
+                }
+                castLock = true;
+            } else {
+                castLock = false;
             }
         }
         if ((inputVector.x != 0 || inputVector.y != 0)) {
@@ -723,6 +748,17 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         }
         if (Gdx.input.isKeyPressed(Input.Keys.R)) {
             restartLevel();
+        }
+    }
+
+    public void castCurrentSpell() {
+        if (castCooldown > 0) {
+            return;
+        }
+        if (currentSpell.equals("arrow")) {
+            Vector2 nextTilePos = playerDir.cpy().scl(TILE_SIZE).add(playerPos);
+            addArrow(nextTilePos, playerDir);
+            castCooldown = CAST_ARROW_COOLDOWN;
         }
     }
 
@@ -760,10 +796,10 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         cameraTargetPos = null;
     }
 
-    public void hideActor(String id) {
+    public void hideActor(String id, boolean isHide) {
         for (Actor levelActor : currentLevel.actors) {
             if (levelActor.id.equals(id)) {
-                levelActor.isHidden = true;
+                levelActor.isHidden = isHide;
             }
         }
     }
