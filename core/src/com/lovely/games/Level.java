@@ -391,7 +391,15 @@ class Level {
             if (properties.containsKey("type") && properties.get("type").equals("torch")) {
                 RectangleMapObject rectObj = (RectangleMapObject) obj;
                 Vector2 pos = new Vector2(rectObj.getRectangle().x, rectObj.getRectangle().y);
-                builder.addTorch(pos, new Color(1.0f,0.75f,0.25f,1.0f));
+                Color color = new Color(1.0f,0.75f,0.25f,1.0f);
+                if (properties.containsKey("r")) {
+                    float r = Float.valueOf(properties.get("r").toString());
+                    float g = Float.valueOf(properties.get("g").toString());
+                    float b = Float.valueOf(properties.get("b").toString());
+                    float a = Float.valueOf(properties.get("a").toString());
+                    color = new Color(r, g, b, a);
+                }
+                builder.addTorch(pos, color);
             }
             if (properties.containsKey("type") && properties.get("type").equals("actor")) {
                 RectangleMapObject rectObj = (RectangleMapObject) obj;

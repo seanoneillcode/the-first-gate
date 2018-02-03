@@ -100,6 +100,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("levels/tower-arrow-02.tmx", TiledMap.class);
         assetManager.load("levels/tower-arrow-03.tmx", TiledMap.class);
         assetManager.load("levels/tower-arrow-04.tmx", TiledMap.class);
+        assetManager.load("levels/tower-arrow-06.tmx", TiledMap.class);
         assetManager.load("levels/tower-platform-01.tmx", TiledMap.class);
         assetManager.load("levels/tower-platform-02.tmx", TiledMap.class);
         assetManager.load("levels/tower-platform-03.tmx", TiledMap.class);
@@ -118,6 +119,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("levels/end-room.tmx", TiledMap.class);
         assetManager.load("levels/scene-test.tmx", TiledMap.class);
         assetManager.load("levels/tower-broken-level.tmx", TiledMap.class);
+        assetManager.load("levels/tower-bridge-1.tmx", TiledMap.class);
+        assetManager.load("levels/tower-prize-fight.tmx", TiledMap.class);
 
         assetManager.load("arrow.png", Texture.class);
         assetManager.load("platform.png", Texture.class);
@@ -193,6 +196,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         levels.add(Level.loadLevel(assetManager, "levels/end-room.tmx")); // 41 // 21
         levels.add(Level.loadLevel(assetManager, "levels/scene-test.tmx")); // 1 // 22
         levels.add(Level.loadLevel(assetManager, "levels/tower-broken-level.tmx")); // 51 // 23
+        levels.add(Level.loadLevel(assetManager, "levels/tower-arrow-06.tmx")); // 53 // 24
+        levels.add(Level.loadLevel(assetManager, "levels/tower-bridge-1.tmx")); // 55 // 25
+        levels.add(Level.loadLevel(assetManager, "levels/tower-prize-fight.tmx")); // 57 // 26
 
         walkanim = loadAnimation(assetManager.get("wizard-sheet.png"), 4, 0.5f);
         lightAnim = loadAnimation(assetManager.get("light-magic.png"), 4, 0.6f);
@@ -212,7 +218,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         sceneContainer = new SceneContainer();
 
         // special
-        startLevel(levels.get(23), "51");
+        startLevel(levels.get(26), "57");
 	}
 
     private Animation<TextureRegion> loadAnimation(Texture sheet, int numberOfFrames, float frameDelay) {
