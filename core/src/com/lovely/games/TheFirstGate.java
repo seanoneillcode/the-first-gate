@@ -88,9 +88,14 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private String currentSpell;
     private float castCooldown = 0;
     private boolean fighting;
-    private int fightLevel;
+    private float fightLevel;
     private ShapeRenderer shapeRenderer;
     private Vector2 antFightJitter, proFightJitter;
+    private String fightInputNeeded;
+    private List<String> directions;
+    private float fightInputScale;
+    private Sprite fightDirectionArrow;
+    private boolean fightInputLock;
 
     @Override
 	public void create () {
@@ -149,11 +154,14 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("fight-indicator.png", Texture.class);
         assetManager.load("fight-pro-avatar.png", Texture.class);
         assetManager.load("fight-ant-avatar.png", Texture.class);
+        assetManager.load("direction-arrow.png", Texture.class);
 
         assetManager.finishLoading();
 
         dialogContainer = new DialogContainer(assetManager.get("dialog-box.png"), assetManager.get("portrait-1.png"),
                 assetManager.get("ant-test.png"));
+
+        directions = Arrays.asList("left", "right", "up", "down");
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
@@ -174,7 +182,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         playerLight = new Sprite((Texture) assetManager.get("player-light.png"));
         playerLight.setScale(1.0f, 4.0f);
         levelLight = new Sprite((Texture) assetManager.get("level-light.png"));
-
+        fightDirectionArrow = new Sprite((Texture) assetManager.get("direction-arrow.png"));
 
         buffer = FrameBuffer.createFrameBuffer(Pixmap.Format.RGBA8888, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, false);
         cam = new OrthographicCamera(buffer.getWidth(), buffer.getHeight());
@@ -498,6 +506,21 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 batch.begin();
 
                 batch.draw((Texture) assetManager.get("fight-indicator.png"), camera.position.x - (VIEWPORT_WIDTH / 2.0f) + (fightLevel * 5) , camera.position.y - 216);
+
+                fightDirectionArrow.setScale(fightInputScale);
+                float rotation = 0;
+                if (fightInputNeeded.equals("left")) {
+                    rotation = 180;
+                }
+                if (fightInputNeeded.equals("up")) {
+                    rotation = 90;
+                }
+                if (fightInputNeeded.equals("down")) {
+                    rotation = 270;
+                }
+                fightDirectionArrow.setRotation(rotation);
+                fightDirectionArrow.setPosition(camera.position.x - 32, camera.position.y - 32);
+                fightDirectionArrow.draw(batch);
             }
 
             batch.end();
@@ -566,15 +589,19 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         }
 
         if (fighting) {
-            fightLevel = fightLevel + 1;
-            if (fightLevel > 100) {
+            fightLevel = fightLevel - 0.2f;
+            if (fightLevel < 0 || fightLevel > 100) {
                 fightLevel = 0;
+                fighting = false;
             }
             int jitter = 10;
             antFightJitter.x = antFightJitter.x + MathUtils.random(-jitter, jitter);
             antFightJitter.y = antFightJitter.y + MathUtils.random(-jitter, jitter);
             proFightJitter.x = proFightJitter.x + MathUtils.random(-jitter, jitter);
             proFightJitter.y = proFightJitter.y + MathUtils.random(-jitter, jitter);
+            if (fightInputScale > 1.0f ) {
+                fightInputScale = fightInputScale - (Gdx.graphics.getDeltaTime() * 2);
+            }
         }
 
         if (currentPlatform != null && !isMoving) {
@@ -733,43 +760,80 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 }
             }
         } else {
-            boolean sceneBlock = !currentScenes.isEmpty() && currentScenes.stream().anyMatch(Scene::isBlocking);
-            if (!moveLock && !sceneBlock && !isMoving && !inputVector.isZero()) {
-                boolean blocked = false;
-                moveVector = inputVector.cpy();
-                Vector2 nextTilePos = moveVector.cpy().scl(TILE_SIZE).add(playerPos).add(QUARTER_TILE_SIZE, QUARTER_TILE_SIZE);
-                if (currentLevel.isTileBlocked(nextTilePos)) {
-                    Block block = currentLevel.getBlock(nextTilePos, true);
-                    if (block == null) {
-                        blocked = true;
-                    } else {
-                        Vector2 nextTileAgain = moveVector.cpy().scl(TILE_SIZE * 2.0f).add(playerPos).add(QUARTER_TILE_SIZE, QUARTER_TILE_SIZE);
-                        if (currentLevel.isTileBlocked(nextTileAgain)) {
+            if (!fighting) {
+                boolean sceneBlock = !currentScenes.isEmpty() && currentScenes.stream().anyMatch(Scene::isBlocking);
+                if (!moveLock && !sceneBlock && !isMoving && !inputVector.isZero()) {
+                    boolean blocked = false;
+                    moveVector = inputVector.cpy();
+                    Vector2 nextTilePos = moveVector.cpy().scl(TILE_SIZE).add(playerPos).add(QUARTER_TILE_SIZE, QUARTER_TILE_SIZE);
+                    if (currentLevel.isTileBlocked(nextTilePos)) {
+                        Block block = currentLevel.getBlock(nextTilePos, true);
+                        if (block == null) {
                             blocked = true;
                         } else {
-                            block.move(moveVector);
+                            Vector2 nextTileAgain = moveVector.cpy().scl(TILE_SIZE * 2.0f).add(playerPos).add(QUARTER_TILE_SIZE, QUARTER_TILE_SIZE);
+                            if (currentLevel.isTileBlocked(nextTileAgain)) {
+                                blocked = true;
+                            } else {
+                                block.move(moveVector);
+                            }
                         }
                     }
+                    if (!blocked) {
+                        isMoving = true;
+                        playerDir = inputVector.cpy();
+                        movementValue = TILE_SIZE / PLAYER_SPEED;
+                    }
                 }
-                if (!blocked) {
-                    isMoving = true;
-                    playerDir = inputVector.cpy();
-                    movementValue = TILE_SIZE / PLAYER_SPEED;
+                if (!inputVector.isZero() && !skipLock) {
+                    skipLock = true;
+                    for (Scene scene : currentScenes) {
+                        scene.skip();
+                    }
                 }
-            }
-            if (!inputVector.isZero() && !skipLock) {
-                skipLock = true;
-                for (Scene scene : currentScenes) {
-                    scene.skip();
+                if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+                    if (!sceneBlock && !castLock) {
+                        castCurrentSpell();
+                    }
+                    castLock = true;
+                } else {
+                    castLock = false;
                 }
-            }
-            if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-                if (!sceneBlock && !castLock) {
-                    castCurrentSpell();
-                }
-                castLock = true;
             } else {
-                castLock = false;
+                int fightLevelAmount = 4;
+                if (fightInputNeeded != null && !fightInputLock) {
+                    switch (fightInputNeeded) {
+                        case "left":
+                            if (inputVector.x == -1 && inputVector.y == 0) {
+                                fightInputNeeded = getRandomFightInput();
+                                fightLevel = fightLevel + fightLevelAmount;
+                                fightInputLock = true;
+                            }
+                            break;
+                        case "right":
+                            if (inputVector.x == 1 && inputVector.y == 0) {
+                                fightInputNeeded = getRandomFightInput();
+                                fightLevel = fightLevel + fightLevelAmount;
+                                fightInputLock = true;
+                            }
+                            break;
+                        case "up":
+                            if (inputVector.x == 0 && inputVector.y == 1) {
+                                fightInputNeeded = getRandomFightInput();
+                                fightLevel = fightLevel + fightLevelAmount;
+                                fightInputLock = true;
+                            }
+                            break;
+                        case "down":
+                            if (inputVector.x == 0 && inputVector.y == -1) {
+                                fightInputNeeded = getRandomFightInput();
+                                fightLevel = fightLevel + fightLevelAmount;
+                                fightInputLock = true;
+                            }
+                            break;
+                    }
+
+                }
             }
         }
         if ((inputVector.x != 0 || inputVector.y != 0)) {
@@ -778,6 +842,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             dialogLock = false;
             moveLock = false;
             skipLock = false;
+            fightInputLock = false;
         }
         inputVector = new Vector2();
 
@@ -803,7 +868,17 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             castCooldown = CAST_ARROW_COOLDOWN;
             antFightJitter = new Vector2();
             proFightJitter = new Vector2();
+            fightInputNeeded = getRandomFightInput();
+            fightInputScale = 1.0f;
         }
+    }
+
+    private String getRandomFightInput() {
+        fightInputScale = 2.0f;
+        if (MathUtils.random(0,5) == 0 || fightInputNeeded == null) {
+            return directions.get(MathUtils.random(0,3));
+        }
+        return fightInputNeeded;
     }
 
     public void startDialog(String id, DialogVerb dialogVerb) {
