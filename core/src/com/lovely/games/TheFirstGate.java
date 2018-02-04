@@ -24,10 +24,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-import com.lovely.games.scene.DialogVerb;
-import com.lovely.games.scene.Scene;
-import com.lovely.games.scene.SceneContainer;
-import com.lovely.games.scene.SceneSource;
+import com.lovely.games.scene.*;
 
 public class TheFirstGate extends ApplicationAdapter implements Stage {
 
@@ -97,6 +94,11 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private Sprite fightDirectionArrow;
     private boolean fightInputLock;
 
+    private FightVerb fightVerb;
+    private float posterAlpha;
+    private String posterImageName;
+    private Sprite posterSprite;
+
     @Override
 	public void create () {
         assetManager = new AssetManager();
@@ -155,6 +157,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("fight-pro-avatar.png", Texture.class);
         assetManager.load("fight-ant-avatar.png", Texture.class);
         assetManager.load("direction-arrow.png", Texture.class);
+        assetManager.load("poster-prize.png", Texture.class);
 
         assetManager.finishLoading();
 
@@ -188,6 +191,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         cam = new OrthographicCamera(buffer.getWidth(), buffer.getHeight());
         cam.position.set(buffer.getWidth() / 2, buffer.getWidth() / 2, 0);
         cam.update();
+
+        posterSprite = new Sprite((Texture) assetManager.get("poster-prize.png"));
+        posterSprite.setBounds(0,0,VIEWPORT_WIDTH,VIEWPORT_HEIGHT);
 
         shapeRenderer = new ShapeRenderer();
 
@@ -523,6 +529,14 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 fightDirectionArrow.draw(batch);
             }
 
+            if (posterImageName != null) {
+                Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+                posterSprite.setTexture(assetManager.get(posterImageName));
+                posterSprite.setAlpha(posterAlpha);
+                posterSprite.setPosition(camera.position.x - (VIEWPORT_WIDTH / 2.0f), camera.position.y - (VIEWPORT_HEIGHT / 2.0f));
+                posterSprite.draw(batch);
+            }
+
             batch.end();
 
         }
@@ -593,6 +607,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             if (fightLevel < 0 || fightLevel > 100) {
                 fightLevel = 0;
                 fighting = false;
+                fightVerb.isDone = true;
             }
             int jitter = 10;
             antFightJitter.x = antFightJitter.x + MathUtils.random(-jitter, jitter);
@@ -862,14 +877,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             Vector2 nextTilePos = playerDir.cpy().scl(TILE_SIZE).add(playerPos);
             addArrow(nextTilePos, playerDir);
             castCooldown = CAST_ARROW_COOLDOWN;
-        } else {
-            fighting = !fighting;
-            fightLevel = 50;
-            castCooldown = CAST_ARROW_COOLDOWN;
-            antFightJitter = new Vector2();
-            proFightJitter = new Vector2();
-            fightInputNeeded = getRandomFightInput();
-            fightInputScale = 1.0f;
         }
     }
 
@@ -905,7 +912,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     }
 
     public void moveCamera(Vector2 pos) {
-	    System.out.println("got camera mov req");
         cameraTargetPos = pos.cpy();
         snaplock = true;
     }
@@ -929,5 +935,20 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
     void addArrow(Vector2 pos, Vector2 dir) {
         arrows.add(new Arrow(arrowImage, pos, dir));
+    }
+
+    public void startFight(String fightName, FightVerb fightVerb) {
+        fighting = true;
+        fightLevel = 50;
+        antFightJitter = new Vector2();
+        proFightJitter = new Vector2();
+        fightInputNeeded = getRandomFightInput();
+        fightInputScale = 1.0f;
+        this.fightVerb = fightVerb;
+    }
+
+    public void showPoster(float alpha, String poster) {
+        posterAlpha = alpha;
+        posterImageName = poster;
     }
 }

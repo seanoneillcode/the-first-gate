@@ -2,6 +2,7 @@ package com.lovely.games;
 
 import com.badlogic.gdx.math.Vector2;
 import com.lovely.games.scene.DialogVerb;
+import com.lovely.games.scene.FightVerb;
 
 public interface Stage {
 
@@ -18,4 +19,8 @@ public interface Stage {
     void moveActor(String actor, Vector2 value);
 
     void hideActor(String actor, boolean isHide);
+
+    void startFight(String fightName, FightVerb fightVerb);
+
+    void showPoster(float alpha, String poster);
 }

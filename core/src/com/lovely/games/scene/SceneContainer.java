@@ -87,6 +87,7 @@ public class SceneContainer {
         scenes.put("9", builder()
                 .verb(new MoveVerb(new Vector2(0, 32 * -2), "ant", true))
                 .verb(new SendEventVerb("a"))
+                .verb(new FightVerb("prize"))
                 .build());
 
         // ant asks for help
@@ -116,6 +117,10 @@ public class SceneContainer {
                 .verb(new WaitVerb(3f))
                 .verb(new MoveVerb(new Vector2(9 * 32, 0), "ant", true))
                 .verb(new DialogVerb("17"))
+                .build());
+
+        scenes.put("14", builder()
+                .verb(new PosterVerb("poster-prize.png"))
                 .build());
 
 

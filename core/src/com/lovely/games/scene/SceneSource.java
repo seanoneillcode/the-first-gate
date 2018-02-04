@@ -11,6 +11,7 @@ public class SceneSource implements Switchable {
     public boolean isDone;
     boolean playOnce;
     public boolean isActive;
+    boolean originalIsActive;
     String switchId;
 
     public SceneSource(Vector2 pos, String id, Vector2 size, boolean playOnce, boolean isActive, String switchId) {
@@ -21,11 +22,13 @@ public class SceneSource implements Switchable {
         this.isDone = false;
         this.isActive = isActive;
         this.playOnce = playOnce;
+        this.originalIsActive = isActive;
     }
 
     public void start() {
         if (!playOnce) {
             this.isDone = false;
+            this.isActive = originalIsActive;
         }
     }
 
