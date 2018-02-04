@@ -9,15 +9,13 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.assets.loaders.TextureLoader;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
@@ -68,29 +66,31 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private Platform currentPlatform;
     private Texture doorImage;
     private Texture openDoorImage;
-    private Sprite mask;
     private Sprite lightHole;
     private Animation<TextureRegion> walkanim;
     private Animation<TextureRegion> lightAnim, playerLightAnim, arrowAnim, torchAnim;
-    float animationDelta = 0;
-    DialogContainer dialogContainer;
-    Conversation conversation;
-    boolean dialogLock = false;
-    Sprite playerLight, arrowSprite, levelLight;
-    boolean isLevelDirty = false;
-    Texture bufferLight;
-    FrameBuffer buffer;
-    OrthographicCamera cam;
-    Vector2 cameraTargetPos;
-    SceneContainer sceneContainer;
-    List<Scene> currentScenes;
-    DialogVerb activeDialogVerb;
-    boolean moveLock, snaplock;
-    Map<String, Texture> actorImages;
+    private float animationDelta = 0;
+    private DialogContainer dialogContainer;
+    private Conversation conversation;
+    private boolean dialogLock = false;
+    private Sprite playerLight, arrowSprite, levelLight;
+    private boolean isLevelDirty = false;
+    private FrameBuffer buffer;
+    private OrthographicCamera cam;
+    private Vector2 cameraTargetPos;
+    private SceneContainer sceneContainer;
+    private List<Scene> currentScenes;
+    private DialogVerb activeDialogVerb;
+    private boolean moveLock, snaplock;
+    private Map<String, Texture> actorImages;
     private boolean skipLock;
     private boolean castLock;
     private String currentSpell;
     private float castCooldown = 0;
+    private boolean fighting;
+    private int fightLevel;
+    private ShapeRenderer shapeRenderer;
+    private Vector2 antFightJitter, proFightJitter;
 
     @Override
 	public void create () {
@@ -145,6 +145,11 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("portrait-1.png", Texture.class);
         assetManager.load("wizard.png", Texture.class);
         assetManager.load("ant-test.png", Texture.class);
+
+        assetManager.load("fight-indicator.png", Texture.class);
+        assetManager.load("fight-pro-avatar.png", Texture.class);
+        assetManager.load("fight-ant-avatar.png", Texture.class);
+
         assetManager.finishLoading();
 
         dialogContainer = new DialogContainer(assetManager.get("dialog-box.png"), assetManager.get("portrait-1.png"),
@@ -155,6 +160,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
 		batch = new SpriteBatch();
         bufferBatch = new SpriteBatch();
+        fighting = false;
 
 		arrowImage = assetManager.get("arrow.png");
         platformImg = assetManager.get("platform.png");
@@ -164,7 +170,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         doorImage = assetManager.get("door.png");
         openDoorImage = assetManager.get("open-door.png");
         lightHole = new Sprite((Texture) assetManager.get("light-hole.png"));
-        bufferLight = assetManager.get("light-hole.png");
         lightHole.setScale(6.0f);
         playerLight = new Sprite((Texture) assetManager.get("player-light.png"));
         playerLight.setScale(1.0f, 4.0f);
@@ -175,6 +180,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         cam = new OrthographicCamera(buffer.getWidth(), buffer.getHeight());
         cam.position.set(buffer.getWidth() / 2, buffer.getWidth() / 2, 0);
         cam.update();
+
+        shapeRenderer = new ShapeRenderer();
 
         levels = new ArrayList<>();
         levels.add(Level.loadLevel(assetManager, "levels/tower-01.tmx")); // 01
@@ -226,7 +233,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
 
         // special
-        startLevel(levels.get(27), "59");
+        startLevel(levels.get(26), "57");
 	}
 
     private Animation<TextureRegion> loadAnimation(Texture sheet, int numberOfFrames, float frameDelay) {
@@ -283,6 +290,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         if (level.name.equals("levels/tower-ant-revenge.tmx")) {
             currentSpell = "arrow";
         }
+        fightLevel = 0;
     }
 
     private Vector3 getCameraPosition() {
@@ -474,6 +482,24 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 DialogLine currentDialog = conversation.getCurrentDialog();
                 dialogContainer.render(batch, new Vector2(camera.position.x - (VIEWPORT_WIDTH / 2.0f), camera.position.y - (VIEWPORT_HEIGHT / 2.0f)), currentDialog);
             }
+
+            if (fighting) {
+                batch.draw((Texture) assetManager.get("fight-pro-avatar.png"), proFightJitter.x + camera.position.x - (VIEWPORT_WIDTH / 2.0f) , proFightJitter.y + camera.position.y - 160);
+                batch.draw((Texture) assetManager.get("fight-ant-avatar.png"), camera.position.x + (VIEWPORT_WIDTH / 2.0f) - 300 + antFightJitter.x, antFightJitter.y + camera.position.y - 160);
+
+                batch.end();
+                shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
+                shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+                shapeRenderer.setColor(new Color(1.0f, 0.2f, 0.2f, 1.0f));
+                shapeRenderer.rect(camera.position.x - (VIEWPORT_WIDTH / 2.0f) + 48, camera.position.y - 200, fightLevel * 5, 32);
+                shapeRenderer.setColor(new Color(0.2f, 0.2f, 1.0f, 1.0f));
+                shapeRenderer.rect(camera.position.x - (VIEWPORT_WIDTH / 2.0f) + 48 + (fightLevel * 5), camera.position.y - 200, (100 - fightLevel) * 5, 32);
+                shapeRenderer.end();
+                batch.begin();
+
+                batch.draw((Texture) assetManager.get("fight-indicator.png"), camera.position.x - (VIEWPORT_WIDTH / 2.0f) + (fightLevel * 5) , camera.position.y - 216);
+            }
+
             batch.end();
 
         }
@@ -537,6 +563,18 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             playerPos.x = MathUtils.round(playerPos.x / TILE_SIZE) * TILE_SIZE;
             playerPos.y = MathUtils.round(playerPos.y / TILE_SIZE) * TILE_SIZE;
 
+        }
+
+        if (fighting) {
+            fightLevel = fightLevel + 1;
+            if (fightLevel > 100) {
+                fightLevel = 0;
+            }
+            int jitter = 10;
+            antFightJitter.x = antFightJitter.x + MathUtils.random(-jitter, jitter);
+            antFightJitter.y = antFightJitter.y + MathUtils.random(-jitter, jitter);
+            proFightJitter.x = proFightJitter.x + MathUtils.random(-jitter, jitter);
+            proFightJitter.y = proFightJitter.y + MathUtils.random(-jitter, jitter);
         }
 
         if (currentPlatform != null && !isMoving) {
@@ -751,14 +789,20 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         }
     }
 
-    public void castCurrentSpell() {
+    private void castCurrentSpell() {
         if (castCooldown > 0) {
             return;
         }
-        if (currentSpell.equals("arrow")) {
+        if (currentSpell != null && currentSpell.equals("arrow")) {
             Vector2 nextTilePos = playerDir.cpy().scl(TILE_SIZE).add(playerPos);
             addArrow(nextTilePos, playerDir);
             castCooldown = CAST_ARROW_COOLDOWN;
+        } else {
+            fighting = !fighting;
+            fightLevel = 50;
+            castCooldown = CAST_ARROW_COOLDOWN;
+            antFightJitter = new Vector2();
+            proFightJitter = new Vector2();
         }
     }
 

@@ -77,6 +77,7 @@ public class SceneContainer {
                 .verb(new HideShowActorVerb(true, "ant"))
                 .build());
 
+        // prize fight - before confrontation
         scenes.put("8", builder()
                 .verb(new HideShowActorVerb(false, "ant"))
                 .verb(new MoveVerb(new Vector2(32 * 8, 0), "ant", true))
