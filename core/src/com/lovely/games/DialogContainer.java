@@ -99,6 +99,9 @@ public class DialogContainer {
         dialogs.put("17", Arrays.asList(
                 line(ant, "Fool, now I'll take what's mine.")
         ));
+        dialogs.put("18", Arrays.asList(
+                line(ant, "Now to take the stone")
+        ));
     }
 
     String currentDialog;

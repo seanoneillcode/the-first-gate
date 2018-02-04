@@ -66,7 +66,7 @@ public class PosterVerb implements SceneVerb {
 
     @Override
     public void skip() {
-        timer = 4.0f;
-        this.stage = "end";
+//        timer = 4.0f;
+//        this.stage = "end";
     }
 }
