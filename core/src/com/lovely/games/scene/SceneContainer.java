@@ -124,6 +124,11 @@ public class SceneContainer {
                 .verb(new PosterVerb("poster-prize.png"))
                 .build());
 
+        scenes.put("15", builder()
+                .verb(new DialogVerb("19"))
+                .build());
+
+
 
     }
 

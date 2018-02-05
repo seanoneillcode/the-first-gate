@@ -100,7 +100,10 @@ public class DialogContainer {
                 line(ant, "Fool, now I'll take what's mine.")
         ));
         dialogs.put("18", Arrays.asList(
-                line(ant, "Now to take the stone")
+                line(pro, "Now to take the stone")
+        ));
+        dialogs.put("19", Arrays.asList(
+                line(ant, "Don't disturb me.")
         ));
     }
 

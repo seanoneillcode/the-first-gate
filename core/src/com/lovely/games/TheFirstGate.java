@@ -133,6 +133,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("levels/tower-bridge-1.tmx", TiledMap.class);
         assetManager.load("levels/tower-prize-fight.tmx", TiledMap.class);
         assetManager.load("levels/tower-ant-revenge.tmx", TiledMap.class);
+        assetManager.load("levels/camp-fire.tmx", TiledMap.class);
 
         assetManager.load("arrow.png", Texture.class);
         assetManager.load("platform.png", Texture.class);
@@ -226,6 +227,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         levels.add(Level.loadLevel(assetManager, "levels/tower-bridge-1.tmx")); // 55 // 25
         levels.add(Level.loadLevel(assetManager, "levels/tower-prize-fight.tmx")); // 57 // 26
         levels.add(Level.loadLevel(assetManager, "levels/tower-ant-revenge.tmx")); // 59 // 27
+        levels.add(Level.loadLevel(assetManager, "levels/camp-fire.tmx")); // start // 28
+
 
         walkanim = loadAnimation(assetManager.get("wizard-sheet.png"), 4, 0.5f);
         lightAnim = loadAnimation(assetManager.get("light-magic.png"), 4, 0.6f);
@@ -247,7 +250,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
 
         // special
-        startLevel(levels.get(26), "57");
+        startLevel(levels.get(28), "start");
 	}
 
     private Animation<TextureRegion> loadAnimation(Texture sheet, int numberOfFrames, float frameDelay) {
