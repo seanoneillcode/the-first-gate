@@ -65,7 +65,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private Texture openDoorImage;
     private Sprite lightHole;
     private Animation<TextureRegion> walkanim;
-    private Animation<TextureRegion> lightAnim, playerLightAnim, arrowAnim, torchAnim;
+    private Animation<TextureRegion> lightAnim, playerLightAnim, arrowAnim, torchAnim, campfireAnim;
     private float animationDelta = 0;
     private DialogContainer dialogContainer;
     private Conversation conversation;
@@ -159,6 +159,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("fight-ant-avatar.png", Texture.class);
         assetManager.load("direction-arrow.png", Texture.class);
         assetManager.load("poster-prize.png", Texture.class);
+        assetManager.load("campfire.png", Texture.class);
 
         assetManager.finishLoading();
 
@@ -235,6 +236,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         playerLightAnim = loadAnimation(assetManager.get("player-light.png"), 4, 0.5f);
         arrowAnim = loadAnimation(assetManager.get("arrow-sheet.png"), 8, 0.05f);
         torchAnim = loadAnimation(assetManager.get("torch-sheet.png"), 2, 0.5f);
+        campfireAnim = loadAnimation(assetManager.get("campfire.png"), 8, 0.1f);
         arrowSprite = new Sprite();
         arrowSprite.setBounds(0,0,32,32);
         actorImages = new HashMap<>();
@@ -338,7 +340,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
     private void renderLightMasks() {
         buffer.begin();
-        Gdx.gl.glClearColor(0.15f, 0.15f, 0.07f, 1);
+        Gdx.gl.glClearColor(0.3f, 0.3f, 0.15f, 1);
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
         bufferBatch.setProjectionMatrix(camera.combined);
         bufferBatch.begin();
@@ -347,13 +349,15 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
         Vector2 offset = new Vector2((playerPos.x), (playerPos.y) );
         TextureRegion playerRegion = playerLightAnim.getKeyFrame(animationDelta, true);
-        playerLight.setRegion(playerRegion);
-        playerLight.setColor(1.0f, 0.8f, 0.5f, 1.0f);
-        playerLight.setPosition( offset.x - 60, offset.y);
-        playerLight.draw(bufferBatch);
-
+        if (!currentLevel.name.equals("levels/camp-fire.tmx")) {
+            playerLight.setRegion(playerRegion);
+            playerLight.setColor(1.0f, 0.8f, 0.5f, 1.0f);
+            playerLight.setPosition( offset.x - 60, offset.y);
+            playerLight.draw(bufferBatch);
+        }
 
         TextureRegion tr = lightAnim.getKeyFrame(animationDelta, true);
+        TextureRegion slow = lightAnim.getKeyFrame(animationDelta * 2.0f, true);
         for (Arrow arrow : arrows) {
 
             lightHole.setColor(arrow.color);
@@ -392,17 +396,26 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             levelLight.draw(bufferBatch);
         }
         for (Torch torch : currentLevel.torches) {
-            lightHole.setColor(torch.color);
-            lightHole.setRegion(tr);
-            lightHole.setPosition((torch.pos.x), (torch.pos.y));
-            lightHole.draw(bufferBatch);
+            if (torch.isFire) {
+                lightHole.setColor(torch.color);
+                lightHole.setRegion(slow);
+                lightHole.setPosition((torch.pos.x), (torch.pos.y));
+                lightHole.draw(bufferBatch);
+            } else {
+                lightHole.setColor(torch.color);
+                lightHole.setRegion(tr);
+                lightHole.setPosition((torch.pos.x), (torch.pos.y));
+                lightHole.draw(bufferBatch);
+            }
         }
-        for (Actor actor : currentLevel.actors) {
-            if (!actor.isHidden) {
-                playerLight.setRegion(playerRegion);
-                playerLight.setColor(1.0f, 0.8f, 0.5f, 1.0f);
-                playerLight.setPosition( actor.pos.x - 60, actor.pos.y);
-                playerLight.draw(bufferBatch);
+        if (!currentLevel.name.equals("levels/camp-fire.tmx")) {
+            for (Actor actor : currentLevel.actors) {
+                if (!actor.isHidden) {
+                    playerLight.setRegion(playerRegion);
+                    playerLight.setColor(1.0f, 0.8f, 0.5f, 1.0f);
+                    playerLight.setPosition(actor.pos.x - 60, actor.pos.y);
+                    playerLight.draw(bufferBatch);
+                }
             }
         }
 
@@ -464,6 +477,15 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                     batch.draw(actorImage, actor.pos.x, actor.pos.y + 12);
                 }
             }
+            for (Torch torch : currentLevel.torches) {
+                if (torch.isFire) {
+                    TextureRegion torchFrame = campfireAnim.getKeyFrame(animationDelta, true);
+                    batch.draw(torchFrame, torch.pos.x - 20, torch.pos.y - 20);
+                } else {
+                    TextureRegion torchFrame = torchAnim.getKeyFrame(animationDelta, true);
+                    batch.draw(torchFrame, torch.pos.x, torch.pos.y);
+                }
+            }
             TextureRegion currentFrame = walkanim.getKeyFrame(animationDelta, true);
             batch.draw(currentFrame, playerPos.x, playerPos.y + QUARTER_TILE_SIZE);
 
@@ -477,10 +499,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                     batch.draw(openDoorImage, door.pos.x, door.pos.y);
                 }
             }
-            for (Torch torch : currentLevel.torches) {
-                TextureRegion torchFrame = torchAnim.getKeyFrame(animationDelta, true);
-                batch.draw(torchFrame, torch.pos.x, torch.pos.y);
-            }
+
             for (Actor actor : currentLevel.actors) {
                 if (!actor.isHidden && actor.pos.y < playerPos.y) {
                     Texture actorImage = actorImages.get(actor.id);

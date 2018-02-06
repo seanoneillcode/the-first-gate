@@ -128,7 +128,10 @@ public class SceneContainer {
                 .verb(new DialogVerb("19"))
                 .build());
 
-
+        // standing in fire
+        scenes.put("16", builder()
+                .verb(new DialogVerb("20"))
+                .build());
 
     }
 

@@ -7,9 +7,11 @@ public class Torch {
 
     Vector2 pos;
     Color color;
+    boolean isFire;
 
-    public Torch(Vector2 pos, Color color) {
+    public Torch(Vector2 pos, Color color, boolean isFire) {
         this.pos = pos;
         this.color = color;
+        this.isFire = isFire;
     }
 }

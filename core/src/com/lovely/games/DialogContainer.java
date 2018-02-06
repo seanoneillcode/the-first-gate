@@ -105,6 +105,9 @@ public class DialogContainer {
         dialogs.put("19", Arrays.asList(
                 line(ant, "Don't disturb me.")
         ));
+        dialogs.put("20", Arrays.asList(
+                line(pro, "This really burns! OUCH!!")
+        ));
     }
 
     String currentDialog;
