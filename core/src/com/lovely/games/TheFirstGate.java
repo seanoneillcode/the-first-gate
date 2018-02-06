@@ -98,6 +98,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private float posterAlpha;
     private String posterImageName;
     private Sprite posterSprite;
+    private boolean staticLevel;
+    private String fightName;
 
     @Override
 	public void create () {
@@ -310,10 +312,18 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             currentSpell = "arrow";
         }
         fightLevel = 0;
+        if (level.name.equals("levels/camp-fire.tmx")) {
+            staticLevel = true;
+        } else {
+            staticLevel = false;
+        }
     }
 
     private Vector3 getCameraPosition() {
         Vector2 pos = cameraTargetPos == null ? playerPos : cameraTargetPos;
+        if (staticLevel) {
+            pos = new Vector2(280, 240);
+        }
         Vector3 target = new Vector3(pos.x, pos.y, 0);
         final float speed = CAMERA_CATCHUP_SPEED * Gdx.graphics.getDeltaTime();
         float ispeed = 1.0f - speed;
@@ -349,7 +359,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
         Vector2 offset = new Vector2((playerPos.x), (playerPos.y) );
         TextureRegion playerRegion = playerLightAnim.getKeyFrame(animationDelta, true);
-        if (!currentLevel.name.equals("levels/camp-fire.tmx")) {
+        if (!staticLevel) {
             playerLight.setRegion(playerRegion);
             playerLight.setColor(1.0f, 0.8f, 0.5f, 1.0f);
             playerLight.setPosition( offset.x - 60, offset.y);
@@ -408,7 +418,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 lightHole.draw(bufferBatch);
             }
         }
-        if (!currentLevel.name.equals("levels/camp-fire.tmx")) {
+        if (!staticLevel) {
             for (Actor actor : currentLevel.actors) {
                 if (!actor.isHidden) {
                     playerLight.setRegion(playerRegion);
@@ -480,7 +490,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             for (Torch torch : currentLevel.torches) {
                 if (torch.isFire) {
                     TextureRegion torchFrame = campfireAnim.getKeyFrame(animationDelta, true);
-                    batch.draw(torchFrame, torch.pos.x - 20, torch.pos.y - 20);
+                    batch.draw(torchFrame, torch.pos.x - 20, torch.pos.y - 10);
                 } else {
                     TextureRegion torchFrame = torchAnim.getKeyFrame(animationDelta, true);
                     batch.draw(torchFrame, torch.pos.x, torch.pos.y);
@@ -625,7 +635,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         }
 
         if (fighting) {
-            fightLevel = fightLevel - 0.2f;
+            fightLevel = fightLevel - (fightName.equals("camp") ? 0.4f : 0.2f);
             if (fightLevel < 0 || fightLevel > 100) {
                 fightLevel = 0;
                 fighting = false;
@@ -967,6 +977,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         fightInputNeeded = getRandomFightInput();
         fightInputScale = 1.0f;
         this.fightVerb = fightVerb;
+        this.fightName = fightName;
     }
 
     public void showPoster(float alpha, String poster) {

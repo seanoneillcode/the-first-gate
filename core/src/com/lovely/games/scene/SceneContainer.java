@@ -126,6 +126,7 @@ public class SceneContainer {
 
         scenes.put("15", builder()
                 .verb(new DialogVerb("19"))
+                .verb(new FightVerb("camp"))
                 .build());
 
         // standing in fire
