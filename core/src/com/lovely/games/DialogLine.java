@@ -1,11 +1,13 @@
 package com.lovely.games;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Vector2;
 
-public class DialogLine {
+public class DialogLine implements DialogElement {
 
     private static final float TIME_PER_CHAR = 20f;
     private static final int CHAR_PER_LINE = 36;
@@ -14,42 +16,66 @@ public class DialogLine {
     int charIndex;
 
     String owner;
-    String line;
+    int lineIndex;
+    List<String> lines;
+    boolean isDone;
 
     public DialogLine(String owner, String line) {
-        this.line = parseLine(line);
+        this.lines = parseLine(line);
+        lineIndex = 0;
         this.owner = owner;
         charTimer = 0;
         charIndex = 0;
+        isDone = false;
     }
 
-    private String parseLine(String line) {
-        int lineCount = 0;
+    private List<String> parseLine(String line) {
+        List<String> lines = new ArrayList<>();
+        int charPerLineCount = 0;
         StringBuilder sb = new StringBuilder();
         List<String> words = Arrays.asList(line.split(" "));
         for (String word : words) {
-            if (word.length() + lineCount > CHAR_PER_LINE) {
-                sb.append("\r\n");
-                lineCount = 0;
+            if (word.length() + charPerLineCount > CHAR_PER_LINE) {
+                lines.add(sb.toString());
+                charPerLineCount = 0;
+                sb = new StringBuilder();
             }
-            lineCount = lineCount + word.length();
-            sb.append(word);
-            sb.append(" ");
+            charPerLineCount += word.length();
+            sb.append(word).append(" ");
         }
-        return sb.toString();
+        lines.add(sb.toString());
+        return lines;
     }
 
     public void update() {
-        float delta = Gdx.graphics.getDeltaTime();
-        charTimer = charTimer + (TIME_PER_CHAR * delta);
-        charIndex = (int) charTimer;
-        if (charIndex > line.length()) {
-            charIndex = line.length();
+        if (!isDone) {
+            float delta = Gdx.graphics.getDeltaTime();
+            charTimer = charTimer + (TIME_PER_CHAR * delta);
+            charIndex = (int) charTimer;
+            if (charIndex > lines.get(lineIndex).length()) {
+                charIndex = 0;
+                charTimer = 0;
+                lineIndex += 1;
+                if (lineIndex == lines.size()) {
+                    lineIndex -= 1;
+                    isDone = true;
+                }
+            }
         }
     }
 
-    public String getLine() {
-        return this.line.substring(0, charIndex);
+
+
+    public List<String> getLines() {
+        if (isDone) {
+            return lines;
+        }
+        List<String> returnLines = new ArrayList<>();
+        for (int i = 0 ; i < lineIndex; i++) {
+            returnLines.add(lines.get(i));
+        }
+        returnLines.add(lines.get(lineIndex).substring(0,charIndex));
+        return returnLines;
     }
 
     public void reset() {
@@ -57,16 +83,33 @@ public class DialogLine {
         charTimer = 0;
     }
 
-    public void finish() {
-        charIndex = line.length();
-        charTimer = charIndex;
+    public void handleInput(Vector2 inputVector) {
+        isDone = true;
+    }
+
+    @Override
+    public int getTotalLines() {
+        return lines.size();
+    }
+
+    @Override
+    public String getChosenOption() {
+        return null;
     }
 
     public boolean isFinished() {
-        return charIndex >= line.length();
+        return isDone;
+    }
+
+    public String getOwner() {
+        return owner;
     }
 
     public static DialogLine line(String owner, String line) {
         return new DialogLine(owner, line);
+    }
+
+    public static DialogOption options(String owner, String... options) {
+        return new DialogOption(owner, Arrays.asList(options));
     }
 }

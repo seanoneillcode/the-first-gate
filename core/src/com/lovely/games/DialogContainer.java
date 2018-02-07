@@ -1,6 +1,7 @@
 package com.lovely.games;
 
 import static com.lovely.games.DialogLine.line;
+import static com.lovely.games.DialogLine.options;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -8,20 +9,18 @@ import java.util.List;
 import java.util.Map;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.math.Vector2;
 
 public class DialogContainer {
 
-    Map<String, List<DialogLine>> dialogs = new HashMap<>();
+    Map<String, List<DialogElement>> dialogs = new HashMap<>();
     String pro = "pro";
     String ant = "ant";
     private Sprite portrait;
@@ -103,10 +102,10 @@ public class DialogContainer {
                 line(pro, "Now to take the stone")
         ));
         dialogs.put("19", Arrays.asList(
-                line(ant, "Don't disturb me.")
+                line(ant, "Don't disturb me. Here is some more test la la la la lahomer catches a flame in his eyes oh yes he does indeed")
         ));
         dialogs.put("20", Arrays.asList(
-                line(pro, "This really burns! OUCH!!")
+                options(pro, "to be", "not to be")
         ));
     }
 
@@ -114,41 +113,57 @@ public class DialogContainer {
     Integer dialogIndex;
     private BitmapFont font;
     private float timer;
-    private Texture dialogBox;
+    private Texture dialogBottom, dialogTop, dialogLineImg;
     private Color fontColorMain = new Color(202.0f / 256.0f, 253.0f  / 256.0f, 255.0f / 256.0f, 1);
     private Color fontColorSecondary = new Color(7.0f / 256.0f, 0.0f  / 256.0f, 7.0f / 256.0f, 1);
     private Map<String, Texture> portraits;
 
-    public DialogContainer(Texture dialogBox, Texture proPortrait, Texture antPortrait) {
+    public DialogContainer(Texture dialogBottom, Texture dialogTop, Texture dialogLineImg, Texture proPortrait, Texture antPortrait) {
         currentDialog = null;
         dialogIndex = 0;
         font = loadFonts();
         timer = 0;
-        this.dialogBox = dialogBox;
+        this.dialogBottom = dialogBottom;
+        this.dialogTop = dialogTop;
+        this.dialogLineImg = dialogLineImg;
         portraits = new HashMap<>();
         portraits.put("ant", antPortrait);
         portraits.put("pro", proPortrait);
         this.portrait = new Sprite(portraits.get("pro"));
     }
 
-    void render(SpriteBatch batch, Vector2 offset, DialogLine dialogLine) {
-        Vector2 dialogPos = offset.cpy().add(64, 32);
-        batch.draw(dialogBox, dialogPos.x, dialogPos.y);
-        font.setColor(fontColorSecondary);
-        font.draw(batch, dialogLine.getLine(), dialogPos.x + 10, dialogPos.y + 64);
-        font.setColor(fontColorMain);
-        font.draw(batch, dialogLine.getLine(), dialogPos.x + 10, dialogPos.y + 62);
-        portrait.setRegion(portraits.get(dialogLine.owner));
-        boolean isLeft = dialogLine.owner.equals("pro");
-        portrait.setPosition(dialogPos.x + (isLeft ? 0 : 348), dialogPos.y + 80);
+    void render(SpriteBatch batch, Vector2 offset, DialogElement dialogLine) {
+        Vector2 dialogPos = offset.cpy().add(64, 16);
+
+        List<String> lines = dialogLine.getLines();
+        float ypos = dialogLine.getTotalLines() * 32;
+        batch.draw(dialogTop, dialogPos.x, dialogPos.y + ypos + 16 + 8);
+        batch.draw(dialogBottom, dialogPos.x, dialogPos.y + 16);
+        for (int i = 0; i < dialogLine.getTotalLines(); i++) {
+            batch.draw(dialogLineImg, dialogPos.x, dialogPos.y + 16 + (i * 32) + 8);
+        }
+
+        portrait.setRegion(portraits.get(dialogLine.getOwner()));
+        boolean isLeft = dialogLine.getOwner().equals("pro");
+        portrait.setPosition(dialogPos.x + (isLeft ? 0 : 348), dialogPos.y + ypos + 32);
         portrait.draw(batch);
+
+        for (String line : lines) {
+            font.setColor(fontColorSecondary);
+            font.draw(batch, line, dialogPos.x + 10, dialogPos.y + 16 + 2 + ypos);
+            font.setColor(fontColorMain);
+            font.draw(batch, line, dialogPos.x + 10, dialogPos.y + 16 + ypos);
+            ypos = ypos - 32;
+        }
+
+
     }
 
     private BitmapFont loadFonts() {
         FileHandle handle = Gdx.files.internal("roboto.ttf");
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(handle);
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = 22;
+        parameter.size = 20;
         BitmapFont font = generator.generateFont(parameter);
         font.setUseIntegerPositions(false);
         font.setColor(fontColorMain);

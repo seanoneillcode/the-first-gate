@@ -145,7 +145,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("door.png", Texture.class);
         assetManager.load("open-door.png", Texture.class);
         assetManager.load("wizard-sheet.png", Texture.class);
-        assetManager.load("dialog-box.png", Texture.class);
+        assetManager.load("dialog-bottom.png", Texture.class);
+        assetManager.load("dialog-top.png", Texture.class);
+        assetManager.load("dialog-line.png", Texture.class);
         assetManager.load("light-hole.png", Texture.class);
         assetManager.load("light-magic.png", Texture.class);
         assetManager.load("player-light.png", Texture.class);
@@ -165,7 +167,10 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
         assetManager.finishLoading();
 
-        dialogContainer = new DialogContainer(assetManager.get("dialog-box.png"), assetManager.get("portrait-1.png"),
+        dialogContainer = new DialogContainer(assetManager.get("dialog-bottom.png"),
+                assetManager.get("dialog-top.png"),
+                assetManager.get("dialog-line.png"),
+                assetManager.get("portrait-1.png"),
                 assetManager.get("ant-test.png"));
 
         directions = Arrays.asList("left", "right", "up", "down");
@@ -525,7 +530,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
             if (conversation != null) {
-                DialogLine currentDialog = conversation.getCurrentDialog();
+                DialogElement currentDialog = conversation.getCurrentDialog();
                 dialogContainer.render(batch, new Vector2(camera.position.x - (VIEWPORT_WIDTH / 2.0f), camera.position.y - (VIEWPORT_HEIGHT / 2.0f)), currentDialog);
             }
 
@@ -673,7 +678,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
         DialogSource dialogSource = currentLevel.getDialogSource(playerPos);
         if (dialogSource != null) {
-            System.out.println("hit dialog " + dialogSource.id);
             startDialog(dialogSource.id, null);
             dialogSource.done = true;
         }
@@ -794,7 +798,14 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
         if (conversation != null) {
             if ((inputVector.x != 0 || inputVector.y != 0) && !dialogLock) {
+                if (!conversation.isFinished()) {
+                    conversation.handleInput(inputVector);
+                }
                 if (conversation.isFinished()) {
+                    String chosenOption = conversation.getCurrentDialog().getChosenOption();
+                    if (chosenOption != null) {
+                        System.out.println("player chose : " + chosenOption);
+                    }
                     if (activeDialogVerb != null) {
                         activeDialogVerb.finish();
                         activeDialogVerb = null;
@@ -802,8 +813,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                         skipLock = true;
                     }
                     conversation = null;
-                } else {
-                    conversation.handleInput();
                 }
             }
         } else {
