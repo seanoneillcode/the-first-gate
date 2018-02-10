@@ -102,6 +102,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private String fightName;
     private float screenFade;
     private Sprite fadeSprite;
+    private float gamma;
 
     @Override
 	public void create () {
@@ -245,6 +246,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         levels.add(Level.loadLevel(assetManager, "levels/camp-fire.tmx")); // start // 28
 
 
+        gamma = 0.2f;
+
         walkanim = loadAnimation(assetManager.get("wizard-sheet.png"), 4, 0.5f);
         lightAnim = loadAnimation(assetManager.get("light-magic.png"), 4, 0.6f);
         playerLightAnim = loadAnimation(assetManager.get("player-light.png"), 4, 0.5f);
@@ -362,7 +365,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
     private void renderLightMasks() {
         buffer.begin();
-        float gamma = 0.2f;
         Gdx.gl.glClearColor(gamma, gamma, gamma, 1.0f);
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
         bufferBatch.setProjectionMatrix(camera.combined);
@@ -932,6 +934,13 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             fightInputLock = false;
         }
         inputVector = new Vector2();
+        if (Gdx.input.isKeyPressed(Input.Keys.NUM_9)) {
+            gamma = gamma + 0.025f;
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.NUM_8)) {
+            gamma = gamma - 0.025f;
+        }
+        gamma = MathUtils.clamp(gamma, 0, 1.0f);
 
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
             Gdx.app.exit();

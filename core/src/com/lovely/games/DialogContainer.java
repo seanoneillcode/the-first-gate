@@ -15,7 +15,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.math.Vector2;
 
 public class DialogContainer {
@@ -139,7 +138,7 @@ public class DialogContainer {
     private BitmapFont font;
     private float timer;
     private Texture dialogBottom, dialogTop, dialogLineImg;
-    private Color fontColorMain = new Color(202.0f / 256.0f, 253.0f  / 256.0f, 255.0f / 256.0f, 1);
+    private Color fontColorMain = new Color(172.0f / 256.0f, 203.0f  / 256.0f, 255.0f / 256.0f, 1);
     private Color fontColorSecondary = new Color(7.0f / 256.0f, 0.0f  / 256.0f, 7.0f / 256.0f, 1);
     private Map<String, Texture> portraits;
 
@@ -177,7 +176,7 @@ public class DialogContainer {
 
         for (String line : lines) {
             font.setColor(fontColorSecondary);
-            font.draw(batch, line, dialogPos.x + 10, dialogPos.y + 16 + 2 + ypos);
+            font.draw(batch, line, dialogPos.x + 10, dialogPos.y + 16 - 2 + ypos);
             font.setColor(fontColorMain);
             font.draw(batch, line, dialogPos.x + 10, dialogPos.y + 16 + ypos);
             ypos = ypos - 32;
@@ -185,11 +184,7 @@ public class DialogContainer {
     }
 
     private BitmapFont loadFonts() {
-        FileHandle handle = Gdx.files.internal("roboto.ttf");
-        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(handle);
-        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = 20;
-        BitmapFont font = generator.generateFont(parameter);
+        font = new BitmapFont(Gdx.files.internal("test.fnt"),false);
         font.setUseIntegerPositions(false);
         font.setColor(fontColorMain);
         return font;
