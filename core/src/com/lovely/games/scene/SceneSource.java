@@ -38,4 +38,8 @@ public class SceneSource implements Switchable {
             this.isActive = !isActive;
         }
     }
+
+    public boolean isPlayOnce() {
+        return playOnce;
+    }
 }

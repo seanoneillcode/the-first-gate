@@ -23,4 +23,6 @@ public interface Stage {
     void startFight(String fightName, FightVerb fightVerb);
 
     void showPoster(float alpha, String poster);
+
+    void goToConnection(String connection);
 }

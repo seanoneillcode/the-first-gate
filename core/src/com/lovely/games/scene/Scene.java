@@ -11,12 +11,14 @@ public class Scene {
     int currentVerb;
     boolean isDone;
     boolean resetCamera;
+    String outcome;
 
     public Scene(List<SceneVerb> verbs, boolean resetCamera) {
         this.verbs = verbs;
         this.currentVerb = 0;
         this.isDone = false;
         this.resetCamera = resetCamera;
+        this.outcome = null;
     }
 
     public void start() {
@@ -25,6 +27,7 @@ public class Scene {
         for (SceneVerb sceneVerb : verbs) {
             sceneVerb.start();
         }
+        this.outcome = null;
     }
 
     public void skip() {
@@ -37,6 +40,10 @@ public class Scene {
             verb.update(stage);
             if (verb.isDone()) {
                 System.out.println("current verb is done " + verb.getClass().getName());
+                System.out.println("verb outcome is " + verb.getOutcome());
+                if (verb.getOutcome() != null) {
+                    this.outcome = verb.getOutcome();
+                }
                 currentVerb = currentVerb + 1;
             }
             if (currentVerb == verbs.size()) {
@@ -60,6 +67,10 @@ public class Scene {
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    public String getOutcome() {
+        return outcome;
     }
 
     public static class Builder {

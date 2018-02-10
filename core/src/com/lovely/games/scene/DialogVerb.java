@@ -7,6 +7,7 @@ public class DialogVerb implements SceneVerb {
     boolean isDone;
     boolean conversationStarted;
     String id;
+    private String outcome;
 
     public DialogVerb(String id) {
         this.isDone = false;
@@ -28,8 +29,9 @@ public class DialogVerb implements SceneVerb {
         }
     }
 
-    public void finish() {
+    public void finish(String outcome) {
         isDone = true;
+        this.outcome = outcome;
     }
 
     @Override
@@ -44,5 +46,10 @@ public class DialogVerb implements SceneVerb {
 
     public void skip() {
 
+    }
+
+    @Override
+    public String getOutcome() {
+        return outcome;
     }
 }

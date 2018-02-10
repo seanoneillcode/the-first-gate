@@ -126,14 +126,26 @@ public class SceneContainer {
 
         scenes.put("15", builder()
                 .verb(new DialogVerb("19"))
-                .verb(new FightVerb("camp"))
                 .build());
 
         // standing in fire
         scenes.put("16", builder()
                 .verb(new DialogVerb("20"))
                 .build());
+        scenes.put("18", builder()
+                .verb(new DialogVerb("21"))
+                .build());
+        scenes.put("19", builder()
+                .verb(new DialogVerb("22"))
+                .build());
+        scenes.put("20", builder()
+                .verb(new DialogVerb("23"))
+                .build());
 
+        // go to sleep
+        scenes.put("17", builder()
+                .verb(new ConnectionVerb("start"))
+                .build());
     }
 
 }

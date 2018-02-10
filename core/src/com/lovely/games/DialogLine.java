@@ -19,6 +19,7 @@ public class DialogLine implements DialogElement {
     int lineIndex;
     List<String> lines;
     boolean isDone;
+    private boolean skipped;
 
     public DialogLine(String owner, String line) {
         this.lines = parseLine(line);
@@ -27,6 +28,7 @@ public class DialogLine implements DialogElement {
         charTimer = 0;
         charIndex = 0;
         isDone = false;
+        skipped = false;
     }
 
     private List<String> parseLine(String line) {
@@ -56,10 +58,13 @@ public class DialogLine implements DialogElement {
                 charIndex = 0;
                 charTimer = 0;
                 lineIndex += 1;
-                if (lineIndex == lines.size()) {
-                    lineIndex -= 1;
-                    isDone = true;
-                }
+            }
+            if (lineIndex == lines.size()) {
+                lineIndex -= 1;
+                isDone = true;
+            }
+            if (skipped) {
+                isDone = true;
             }
         }
     }
@@ -81,10 +86,12 @@ public class DialogLine implements DialogElement {
     public void reset() {
         charIndex = 0;
         charTimer = 0;
+        skipped = false;
+        isDone = false;
     }
 
     public void handleInput(Vector2 inputVector) {
-        isDone = true;
+        skipped = true;
     }
 
     @Override
@@ -109,7 +116,7 @@ public class DialogLine implements DialogElement {
         return new DialogLine(owner, line);
     }
 
-    public static DialogOption options(String owner, String... options) {
-        return new DialogOption(owner, Arrays.asList(options));
+    public static DialogOption.Builder options(String owner) {
+        return new DialogOption.Builder(owner);
     }
 }

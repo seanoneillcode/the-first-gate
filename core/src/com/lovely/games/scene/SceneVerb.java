@@ -9,4 +9,7 @@ public interface SceneVerb {
     boolean isBlocking();
     void start();
     void skip();
+    default String getOutcome() {
+        return null;
+    }
 }

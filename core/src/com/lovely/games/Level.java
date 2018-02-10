@@ -186,6 +186,17 @@ class Level {
         return this.arrowSources;
     }
 
+    public void resetSceneSources(Vector2 pos) {
+        for (SceneSource sceneSource : scenes) {
+            if (sceneSource.isDone && sceneSource.isActive && !sceneSource.isPlayOnce()) {
+                Rectangle playerRect = new Rectangle(pos.x + 1, pos.y + 1, 20, 20);
+                if (!playerRect.overlaps(new Rectangle(sceneSource.pos.x, sceneSource.pos.y, sceneSource.size.x, sceneSource.size.y))) {
+                    sceneSource.isDone = false;
+                }
+            }
+        }
+    }
+
     /**
      * BUILDEr
      */
@@ -450,7 +461,7 @@ class Level {
                 RectangleMapObject rectObj = (RectangleMapObject) obj;
                 Vector2 pos = new Vector2(rectObj.getRectangle().x, rectObj.getRectangle().y);
                 Vector2 size = new Vector2(rectObj.getRectangle().width, rectObj.getRectangle().height);
-                boolean playOnce = false;
+                boolean playOnce = true;
                 boolean isActive = true;
                 if (properties.containsKey("playOnce")) {
                     playOnce = Boolean.parseBoolean(properties.get("playOnce").toString());

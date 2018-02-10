@@ -3,22 +3,24 @@ package com.lovely.games;
 import com.badlogic.gdx.math.Vector2;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DialogOption implements DialogElement {
 
     private String owner;
-    private List<String> options;
+    private Map<String, String> options;
     private int optionIndex;
-    private String line;
     private boolean isDone;
+    private String outcome;
 
-    public DialogOption(String owner, List<String> options) {
+    public DialogOption(String owner, Map<String, String> options) {
         this.owner = owner;
         this.options = options;
         optionIndex = 0;
         isDone = false;
-        this.line = options.stream().reduce("", (p, c) -> p + c + "\r\n");
+        this.outcome = null;
     }
 
     @Override
@@ -40,12 +42,15 @@ public class DialogOption implements DialogElement {
     @Override
     public List<String> getLines() {
         List<String> lines = new ArrayList<>();
-        for (int i = 0; i < options.size(); i++) {
-            if (i != optionIndex) {
-                lines.add("  " + options.get(i));
+        int index = 0;
+        for (String key : options.keySet()) {
+            if (index != optionIndex) {
+                lines.add("  " + key);
             } else {
-                lines.add("> " + options.get(i));
+                lines.add("> " + key);
+                outcome = options.get(key);
             }
+            index++;
         }
         return lines;
     }
@@ -57,7 +62,7 @@ public class DialogOption implements DialogElement {
 
     @Override
     public void handleInput(Vector2 inputVector) {
-        optionIndex = optionIndex + (int) inputVector.y;
+        optionIndex = optionIndex - (int) inputVector.y;
         if (optionIndex < 0) {
             optionIndex = options.size() - 1;
         }
@@ -76,6 +81,25 @@ public class DialogOption implements DialogElement {
 
     @Override
     public String getChosenOption() {
-        return options.get(optionIndex);
+        return outcome;
+    }
+
+    static class Builder {
+
+        private String owner;
+        private Map<String, String> options = new HashMap<>();
+
+        public Builder(String owner) {
+            this.owner = owner;
+        }
+
+        public Builder opt(String dialog, String id) {
+            options.put(dialog, id);
+            return this;
+        }
+
+        public DialogOption build() {
+            return new DialogOption(owner, options);
+        }
     }
 }

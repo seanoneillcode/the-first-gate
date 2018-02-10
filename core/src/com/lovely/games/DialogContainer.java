@@ -102,10 +102,34 @@ public class DialogContainer {
                 line(pro, "Now to take the stone")
         ));
         dialogs.put("19", Arrays.asList(
-                line(ant, "Don't disturb me. Here is some more test la la la la lahomer catches a flame in his eyes oh yes he does indeed")
+                line(ant, "What do you want?"),
+                options(pro)
+                        .opt("When will we arrive? It's been days of travel", "18")
+                        .opt("Why do I have to carry everything...", "19")
+                        .opt("Where are we going?", "20")
+                        .build()
+        ));
+        dialogs.put("21", Arrays.asList(
+                line(ant, "Only a day or two more. Over the nearest peak and through a valley."),
+                line(pro, "We will run out of supplies for the return journey if we go too far"),
+                line(ant, "I'm well aware..."),
+                line(ant, "Do not fret, I have something planned. Now leave me be.")
+        ));
+        dialogs.put("22", Arrays.asList(
+                line(ant, "Because I'm paying you to. You need the money and I can't be bothered to carry it myself")
+        ));
+        dialogs.put("23", Arrays.asList(
+                line(ant, "I told you several times, a small castle belonging to my cousin."),
+                line(pro, "I haven't heard of any castles out this far."),
+                line(ant, "Are you calling me a liar?"),
+                line(pro, "No I just..."),
+                line(ant, "Hold your tongue if you want your pay.")
         ));
         dialogs.put("20", Arrays.asList(
-                options(pro, "to be", "not to be")
+                options(pro)
+                        .opt("sleep", "17")
+                        .opt("stay up a while longer", null)
+                        .build()
         ));
     }
 

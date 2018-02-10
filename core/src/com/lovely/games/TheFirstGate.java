@@ -665,14 +665,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             newConnectionTo = null;
         }
         if (connection != null && !connection.name.equals(newConnectionTo)) {
-            if (connection.to != null) {
-                for (Level level : levels) {
-                    if (level.hasConnection(connection.to)) {
-                        startLevel(level, connection.to);
-                        newConnectionTo = connection.to;
-                        break;
-                    }
-                }
+            if (connection.to != null && !connection.to.isEmpty()) {
+                goToConnection(connection.to);
             }
         }
 
@@ -684,20 +678,25 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         if (conversation != null) {
             conversation.update();
         }
-        List<SceneSource> sceneSources = currentLevel.getSceneSources(playerPos);
-        for (SceneSource sceneSource : sceneSources) {
-            if (sceneContainer.scenes.containsKey(sceneSource.id)) {
-                currentScenes.add(sceneContainer.scenes.get(sceneSource.id));
-            }
-        }
+        checkForSceneSources(playerPos);
+        currentLevel.resetSceneSources(playerPos);
+        List<Scene> newScenes = new ArrayList<>();
         Iterator<Scene> sceneIterator = currentScenes.iterator();
         while (sceneIterator.hasNext()) {
             Scene scene = sceneIterator.next();
             scene.update(this);
             if (scene.isDone()) {
+                String outcome = scene.getOutcome();
+                if (outcome != null) {
+                    if (sceneContainer.scenes.containsKey(outcome)) {
+                        newScenes.add(sceneContainer.scenes.get(outcome));
+                    }
+                }
+                scene.start();
                 sceneIterator.remove();
             }
         }
+        currentScenes.addAll(newScenes);
         for (ArrowSource arrowSource : currentLevel.getArrowSources()) {
             arrowSource.update(this);
         }
@@ -765,6 +764,17 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         }
     }
 
+    private void checkForSceneSources(Vector2 pos) {
+        List<SceneSource> sceneSources = currentLevel.getSceneSources(pos);
+        for (SceneSource sceneSource : sceneSources) {
+            if (sceneContainer.scenes.containsKey(sceneSource.id) &&
+                    !currentScenes.contains(sceneContainer.scenes.get(sceneSource.id))) {
+                Scene scene = sceneContainer.scenes.get(sceneSource.id);
+                currentScenes.add(scene);
+            }
+        }
+    }
+
     private void restartLevel() {
         newConnectionTo = lastConnection;
         startLevel(currentLevel, lastConnection);
@@ -803,11 +813,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 }
                 if (conversation.isFinished()) {
                     String chosenOption = conversation.getCurrentDialog().getChosenOption();
-                    if (chosenOption != null) {
-                        System.out.println("player chose : " + chosenOption);
-                    }
                     if (activeDialogVerb != null) {
-                        activeDialogVerb.finish();
+                        activeDialogVerb.finish(chosenOption);
                         activeDialogVerb = null;
                         moveLock = true;
                         skipLock = true;
@@ -825,6 +832,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                     if (currentLevel.isTileBlocked(nextTilePos)) {
                         Block block = currentLevel.getBlock(nextTilePos, true);
                         if (block == null) {
+                            checkForSceneSources(nextTilePos);
                             blocked = true;
                         } else {
                             Vector2 nextTileAgain = moveVector.cpy().scl(TILE_SIZE * 2.0f).add(playerPos).add(QUARTER_TILE_SIZE, QUARTER_TILE_SIZE);
@@ -992,5 +1000,16 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     public void showPoster(float alpha, String poster) {
         posterAlpha = alpha;
         posterImageName = poster;
+    }
+
+    @Override
+    public void goToConnection(String target) {
+        for (Level level : levels) {
+            if (level.hasConnection(target)) {
+                startLevel(level, target);
+                newConnectionTo = target;
+                break;
+            }
+        }
     }
 }
