@@ -144,7 +144,12 @@ public class SceneContainer {
 
         // go to sleep
         scenes.put("17", builder()
+                .verb(new FadeScreenVerb(false, 2.0f))
                 .verb(new ConnectionVerb("start"))
+                .build());
+
+        scenes.put("21", builder()
+                .verb(new FadeScreenVerb(true, 2.0f))
                 .build());
     }
 

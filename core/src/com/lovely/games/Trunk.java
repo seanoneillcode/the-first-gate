@@ -12,7 +12,6 @@ public class Trunk {
     }
 
     public void broadcast(String id) {
-        System.out.println("sending message " + id);
         for (Switchable listener : listeners) {
             listener.handleMessage(id);
         }

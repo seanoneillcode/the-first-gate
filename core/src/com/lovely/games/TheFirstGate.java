@@ -100,6 +100,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private Sprite posterSprite;
     private boolean staticLevel;
     private String fightName;
+    private float screenFade;
+    private Sprite fadeSprite;
 
     @Override
 	public void create () {
@@ -157,6 +159,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("portrait-1.png", Texture.class);
         assetManager.load("wizard.png", Texture.class);
         assetManager.load("ant-test.png", Texture.class);
+        assetManager.load("fade-image.png", Texture.class);
 
         assetManager.load("fight-indicator.png", Texture.class);
         assetManager.load("fight-pro-avatar.png", Texture.class);
@@ -195,6 +198,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         playerLight.setScale(1.0f, 4.0f);
         levelLight = new Sprite((Texture) assetManager.get("level-light.png"));
         fightDirectionArrow = new Sprite((Texture) assetManager.get("direction-arrow.png"));
+        fadeSprite = new Sprite((Texture) assetManager.get("fade-image.png"));
+        fadeSprite.setScale(4.0f);
 
         buffer = FrameBuffer.createFrameBuffer(Pixmap.Format.RGBA8888, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, false);
         cam = new OrthographicCamera(buffer.getWidth(), buffer.getHeight());
@@ -205,6 +210,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         posterSprite.setBounds(0,0,VIEWPORT_WIDTH,VIEWPORT_HEIGHT);
 
         shapeRenderer = new ShapeRenderer();
+
+        screenFade = 0f;
 
         levels = new ArrayList<>();
         levels.add(Level.loadLevel(assetManager, "levels/tower-01.tmx")); // 01
@@ -355,7 +362,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
     private void renderLightMasks() {
         buffer.begin();
-        Gdx.gl.glClearColor(0.3f, 0.3f, 0.15f, 1);
+        float gamma = 0.2f;
+        Gdx.gl.glClearColor(gamma, gamma, gamma, 1.0f);
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
         bufferBatch.setProjectionMatrix(camera.combined);
         bufferBatch.begin();
@@ -433,7 +441,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 }
             }
         }
-
         bufferBatch.end();
         buffer.end();
     }
@@ -493,12 +500,14 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 }
             }
             for (Torch torch : currentLevel.torches) {
-                if (torch.isFire) {
-                    TextureRegion torchFrame = campfireAnim.getKeyFrame(animationDelta, true);
-                    batch.draw(torchFrame, torch.pos.x - 20, torch.pos.y - 10);
-                } else {
-                    TextureRegion torchFrame = torchAnim.getKeyFrame(animationDelta, true);
-                    batch.draw(torchFrame, torch.pos.x, torch.pos.y);
+                if (torch.pos.y >= playerPos.y) {
+                    if (torch.isFire) {
+                        TextureRegion torchFrame = campfireAnim.getKeyFrame(animationDelta, true);
+                        batch.draw(torchFrame, torch.pos.x - 20, torch.pos.y - 10);
+                    } else {
+                        TextureRegion torchFrame = torchAnim.getKeyFrame(animationDelta, true);
+                        batch.draw(torchFrame, torch.pos.x, torch.pos.y);
+                    }
                 }
             }
             TextureRegion currentFrame = walkanim.getKeyFrame(animationDelta, true);
@@ -512,6 +521,17 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             for (Door door : currentLevel.doors) {
                 if (door.pos.y < playerPos.y && door.isOpen) {
                     batch.draw(openDoorImage, door.pos.x, door.pos.y);
+                }
+            }
+            for (Torch torch : currentLevel.torches) {
+                if (torch.pos.y < playerPos.y) {
+                    if (torch.isFire) {
+                        TextureRegion torchFrame = campfireAnim.getKeyFrame(animationDelta, true);
+                        batch.draw(torchFrame, torch.pos.x - 20, torch.pos.y - 10);
+                    } else {
+                        TextureRegion torchFrame = torchAnim.getKeyFrame(animationDelta, true);
+                        batch.draw(torchFrame, torch.pos.x, torch.pos.y);
+                    }
                 }
             }
 
@@ -565,7 +585,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 fightDirectionArrow.setPosition(camera.position.x - 32, camera.position.y - 32);
                 fightDirectionArrow.draw(batch);
             }
-
             if (posterImageName != null) {
                 Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
                 posterSprite.setTexture(assetManager.get(posterImageName));
@@ -573,10 +592,14 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 posterSprite.setPosition(camera.position.x - (VIEWPORT_WIDTH / 2.0f), camera.position.y - (VIEWPORT_HEIGHT / 2.0f));
                 posterSprite.draw(batch);
             }
-
+            if (screenFade > 0) {
+                fadeSprite.setAlpha(screenFade);
+                fadeSprite.setPosition(camera.position.x , camera.position.y );
+                fadeSprite.draw(batch);
+            }
             batch.end();
-
         }
+
         isLevelDirty = false;
 	}
 	
@@ -1000,6 +1023,10 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     public void showPoster(float alpha, String poster) {
         posterAlpha = alpha;
         posterImageName = poster;
+    }
+
+    public void fadeScreen(float amount) {
+        screenFade = amount;
     }
 
     @Override

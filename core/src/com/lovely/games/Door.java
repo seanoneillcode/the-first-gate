@@ -21,11 +21,8 @@ public class Door implements Switchable {
 
     @Override
     public void handleMessage(String id) {
-        System.out.println("got message");
         if (switchId != null && switchId.equals(id)) {
-
             isOpen = !isOpen;
-            System.out.println("door isopen " + isOpen);
         }
     }
 }

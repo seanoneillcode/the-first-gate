@@ -39,8 +39,6 @@ public class Scene {
             SceneVerb verb = verbs.get(currentVerb);
             verb.update(stage);
             if (verb.isDone()) {
-                System.out.println("current verb is done " + verb.getClass().getName());
-                System.out.println("verb outcome is " + verb.getOutcome());
                 if (verb.getOutcome() != null) {
                     this.outcome = verb.getOutcome();
                 }
@@ -49,7 +47,6 @@ public class Scene {
             if (currentVerb == verbs.size()) {
                 currentVerb = 0;
                 isDone = true;
-                System.out.println("resetting camera, all verbs done ");
                 if (resetCamera) {
                     stage.resetCamera();
                 }

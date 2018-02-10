@@ -28,12 +28,12 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,34,34,34,34,34,34,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,34,0,0,0,0,34,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,34,0,0,0,0,34,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,34,0,0,0,34,34,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,34,34,34,34,34,34,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,34,34,34,34,34,34,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,34,0,0,0,0,34,34,0,0,0,0,0,0,0,
+0,0,0,0,0,0,34,0,0,34,34,0,34,0,0,0,0,0,0,0,
+0,0,0,0,0,0,34,34,0,0,0,0,34,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,34,34,34,34,34,34,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
@@ -58,27 +58,27 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <imagelayer name="background" offsetx="0" offsety="-32">
+ <imagelayer name="background">
   <image source="../campsite-concept-colored.png" width="600" height="480"/>
  </imagelayer>
- <objectgroup name="objects" offsetx="0" offsety="-32">
+ <objectgroup name="objects">
   <object id="56" name="15" type="scene" x="320" y="288" width="32" height="32">
    <properties>
     <property name="playOnce" value="false"/>
    </properties>
   </object>
-  <object id="57" name="start" type="connection" x="224" y="288" width="32" height="32">
+  <object id="57" name="start" type="connection" x="256" y="256" width="32" height="32">
    <properties>
     <property name="to" value=""/>
    </properties>
   </object>
   <object id="58" name="ant" type="actor" x="320" y="288" width="32" height="32"/>
-  <object id="59" type="torch" x="288" y="256" width="32" height="32">
+  <object id="59" type="torch" x="288" y="288" width="32" height="32">
    <properties>
     <property name="isFire" value="true"/>
    </properties>
   </object>
-  <object id="61" name="16" type="scene" x="288" y="256" width="32" height="32">
+  <object id="61" name="16" type="scene" x="224" y="288" width="32" height="32">
    <properties>
     <property name="playOnce" value="false"/>
    </properties>

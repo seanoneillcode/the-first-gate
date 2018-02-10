@@ -25,4 +25,6 @@ public interface Stage {
     void showPoster(float alpha, String poster);
 
     void goToConnection(String connection);
+
+    void fadeScreen(float amount);
 }

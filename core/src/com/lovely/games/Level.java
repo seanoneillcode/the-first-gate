@@ -111,7 +111,6 @@ class Level {
             if (!sceneSource.isDone && sceneSource.isActive) {
                 Rectangle playerRect = new Rectangle(pos.x + 1, pos.y + 1, 20, 20);
                 if (playerRect.overlaps(new Rectangle(sceneSource.pos.x, sceneSource.pos.y, sceneSource.size.x, sceneSource.size.y))) {
-                    System.out.println("layer ovralps scne " + sceneSource.id);
                     sceneSource.isDone = true;
                     sceneSources.add(sceneSource);
                 }
@@ -481,8 +480,6 @@ class Level {
                 String switchId = null;
                 if (properties.containsKey("switch")) {
                     switchId = properties.get("switch").toString();
-                } else {
-                    System.out.println("found pressure tile missing switchlink x, y: " + pos.x + ", " + pos.y);
                 }
                 boolean isSwitch = false;
                 if (properties.containsKey("isSwitch")) {

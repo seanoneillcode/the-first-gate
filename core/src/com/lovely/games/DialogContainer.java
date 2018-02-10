@@ -23,6 +23,7 @@ public class DialogContainer {
     Map<String, List<DialogElement>> dialogs = new HashMap<>();
     String pro = "pro";
     String ant = "ant";
+    String info = "info";
     private Sprite portrait;
 
     {
@@ -30,7 +31,7 @@ public class DialogContainer {
                 line(pro, "I must push on with all haste, perhaps I can catch him")
         ));
         dialogs.put("2", Arrays.asList(
-                line(pro, "( press 'R' to restart a level )")
+                line(info, "( press 'R' to restart a level )")
         ));
         dialogs.put("3", Arrays.asList(
                 line(pro, "!? I've never seen a flying ball of green fire before. Magic!")
@@ -81,7 +82,7 @@ public class DialogContainer {
         ));
         dialogs.put("13", Arrays.asList(
                 line(pro, "I can feel a strange power, stirring inside of me"),
-                line(pro, "(press 'spacebar' to cast a spell)")
+                line(info, "(press 'spacebar' to cast a spell)")
         ));
         dialogs.put("14", Arrays.asList(
                 line(ant, "Wait! don't leave me here."),
@@ -126,7 +127,7 @@ public class DialogContainer {
                 line(ant, "Hold your tongue if you want your pay.")
         ));
         dialogs.put("20", Arrays.asList(
-                options(pro)
+                options(info)
                         .opt("sleep", "17")
                         .opt("stay up a while longer", null)
                         .build()
@@ -167,10 +168,12 @@ public class DialogContainer {
             batch.draw(dialogLineImg, dialogPos.x, dialogPos.y + 16 + (i * 32) + 8);
         }
 
-        portrait.setRegion(portraits.get(dialogLine.getOwner()));
-        boolean isLeft = dialogLine.getOwner().equals("pro");
-        portrait.setPosition(dialogPos.x + (isLeft ? 0 : 348), dialogPos.y + ypos + 32);
-        portrait.draw(batch);
+        if (portraits.containsKey(dialogLine.getOwner())) {
+            portrait.setRegion(portraits.get(dialogLine.getOwner()));
+            boolean isLeft = dialogLine.getOwner().equals("pro");
+            portrait.setPosition(dialogPos.x + (isLeft ? 0 : 348), dialogPos.y + ypos + 32);
+            portrait.draw(batch);
+        }
 
         for (String line : lines) {
             font.setColor(fontColorSecondary);
@@ -179,8 +182,6 @@ public class DialogContainer {
             font.draw(batch, line, dialogPos.x + 10, dialogPos.y + 16 + ypos);
             ypos = ypos - 32;
         }
-
-
     }
 
     private BitmapFont loadFonts() {
