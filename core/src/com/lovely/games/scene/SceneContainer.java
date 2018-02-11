@@ -151,6 +151,9 @@ public class SceneContainer {
         scenes.put("21", builder()
                 .verb(new FadeScreenVerb(true, 2.0f))
                 .build());
+        scenes.put("22", builder()
+                .verb(new FadeScreenVerb(true, 2.0f))
+                .build());
     }
 
 }

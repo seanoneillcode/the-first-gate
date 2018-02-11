@@ -28,13 +28,13 @@ public class DialogContainer {
 
     {
         dialogs.put("1", Arrays.asList(
-                line(pro, "I must push on with all haste, perhaps I can catch him")
+                line(pro, "Perhaps I can catch him")
         ));
         dialogs.put("2", Arrays.asList(
                 line(info, "( press 'R' to restart a level )")
         ));
         dialogs.put("3", Arrays.asList(
-                line(pro, "!? I've never seen a flying ball of green fire before. Magic!")
+                line(pro, "I've never seen a flying ball of fire before. Magic!")
         ));
         dialogs.put("4", Arrays.asList(
                 line(pro, "( press 'R' to restart a level )")
@@ -45,7 +45,7 @@ public class DialogContainer {
         dialogs.put("6", Arrays.asList(
                 line(pro, "Okay I got you here. I'm leaving now."),
                 line(ant, "Hold!"),
-                line(ant, "You must to stand on the other switch, it takes two to open the door."),
+                line(ant, "You must to stand on the other floor switch, it takes two to open the door."),
                 line(pro, "I'm only here to carry the gear"),
                 line(ant, "Just stand there to open the door. I will face the trials alone.")
         ));
@@ -121,7 +121,7 @@ public class DialogContainer {
         ));
         dialogs.put("23", Arrays.asList(
                 line(ant, "I told you several times, a small castle belonging to my cousin."),
-                line(pro, "I haven't heard of any castles out this far."),
+                line(pro, "But I haven't heard of any castles out this far."),
                 line(ant, "Are you calling me a liar?"),
                 line(pro, "No I just..."),
                 line(ant, "Hold your tongue if you want your pay.")
@@ -129,7 +129,7 @@ public class DialogContainer {
         dialogs.put("20", Arrays.asList(
                 options(info)
                         .opt("sleep", "17")
-                        .opt("stay up a while longer", null)
+                        .opt("stay up a little longer", null)
                         .build()
         ));
     }
