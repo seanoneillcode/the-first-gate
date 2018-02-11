@@ -10,7 +10,7 @@ import com.badlogic.gdx.math.Vector2;
 public class DialogLine implements DialogElement {
 
     private static final float TIME_PER_CHAR = 20f;
-    private static final int CHAR_PER_LINE = 36;
+    private static final int CHAR_PER_LINE = 32;
 
     float charTimer;
     int charIndex;
@@ -103,6 +103,12 @@ public class DialogLine implements DialogElement {
     public String getChosenOption() {
         return null;
     }
+
+    @Override
+    public String getCurrentOption() {
+        return null;
+    }
+
 
     public boolean isFinished() {
         return isDone;

@@ -14,6 +14,7 @@ public class DialogOption implements DialogElement {
     private int optionIndex;
     private boolean isDone;
     private String outcome;
+    private String currentOption;
 
     public DialogOption(String owner, Map<String, String> options) {
         this.owner = owner;
@@ -45,10 +46,11 @@ public class DialogOption implements DialogElement {
         int index = 0;
         for (String key : options.keySet()) {
             if (index != optionIndex) {
-                lines.add("  " + key);
+                lines.add("" + key);
             } else {
-                lines.add("> " + key);
+                lines.add("" + key);
                 outcome = options.get(key);
+                currentOption = key;
             }
             index++;
         }
@@ -82,6 +84,11 @@ public class DialogOption implements DialogElement {
     @Override
     public String getChosenOption() {
         return outcome;
+    }
+
+    @Override
+    public String getCurrentOption() {
+        return currentOption;
     }
 
     static class Builder {

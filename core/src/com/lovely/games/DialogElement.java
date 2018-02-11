@@ -14,4 +14,5 @@ public interface DialogElement {
     void handleInput(Vector2 inputVector);
     int getTotalLines();
     String getChosenOption();
+    String getCurrentOption();
 }

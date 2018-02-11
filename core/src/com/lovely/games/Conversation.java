@@ -2,16 +2,25 @@ package com.lovely.games;
 
 import com.badlogic.gdx.math.Vector2;
 
-import java.util.List;
+import java.util.*;
 
 public class Conversation {
 
     private List<DialogElement> dialogs;
     private int dialogIndex;
+    private Set<String> actors;
 
     public Conversation(List<DialogElement> dialogs) {
         this.dialogs = dialogs;
         dialogIndex = 0;
+        actors = new HashSet<>();
+        for (DialogElement dialogElement : dialogs) {
+            actors.add(dialogElement.getOwner());
+        }
+    }
+
+    public Set<String> getActors() {
+        return actors;
     }
 
     public void reset() {

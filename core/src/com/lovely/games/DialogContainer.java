@@ -3,12 +3,10 @@ package com.lovely.games;
 import static com.lovely.games.DialogLine.line;
 import static com.lovely.games.DialogLine.options;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -19,11 +17,14 @@ import com.badlogic.gdx.math.Vector2;
 
 public class DialogContainer {
 
+    private final Sprite rightDialogPointer;
     Map<String, List<DialogElement>> dialogs = new HashMap<>();
     String pro = "pro";
     String ant = "ant";
     String info = "info";
-    private Sprite portrait;
+    private Sprite leftPortrait, rightPortrait;
+    private Color greyColor = new Color(0.3f, 0.3f, 0.3f, 1.0f);
+    private Color white = new Color(1, 1, 1, 1.0f);
 
     {
         dialogs.put("1", Arrays.asList(
@@ -104,7 +105,7 @@ public class DialogContainer {
         dialogs.put("19", Arrays.asList(
                 line(ant, "What do you want?"),
                 options(pro)
-                        .opt("When will we arrive? It's been days of travel", "18")
+                        .opt("When will we arrive?", "18")
                         .opt("Why do I have to carry everything...", "19")
                         .opt("Where are we going?", "20")
                         .build()
@@ -139,52 +140,103 @@ public class DialogContainer {
     private float timer;
     private Texture dialogBottom, dialogTop, dialogLineImg;
     private Color fontColorMain = new Color(172.0f / 256.0f, 203.0f  / 256.0f, 255.0f / 256.0f, 1);
+    private Color fontColorHighlighted = new Color(200.0f / 256.0f, 200.0f  / 256.0f, 160.0f / 256.0f, 1);
     private Color fontColorSecondary = new Color(7.0f / 256.0f, 0.0f  / 256.0f, 7.0f / 256.0f, 1);
     private Map<String, Texture> portraits;
+    private Sprite dialogPointer, optionPointer;
+    private Set<String> actors;
 
-    public DialogContainer(Texture dialogBottom, Texture dialogTop, Texture dialogLineImg, Texture proPortrait, Texture antPortrait) {
+    public DialogContainer(AssetManager assetManager) {
         currentDialog = null;
         dialogIndex = 0;
         font = loadFonts();
         timer = 0;
-        this.dialogBottom = dialogBottom;
-        this.dialogTop = dialogTop;
-        this.dialogLineImg = dialogLineImg;
+        this.dialogBottom = assetManager.get("dialog-bottom.png");
+        this.dialogTop = assetManager.get("dialog-top.png");
+        this.dialogLineImg = assetManager.get("dialog-line.png");
+        this.dialogPointer = new Sprite((Texture) assetManager.get("dialog-pointer.png"));
+        this.rightDialogPointer = new Sprite((Texture) assetManager.get("dialog-pointer.png"));
+        this.optionPointer = new Sprite((Texture) assetManager.get("option-pointer.png"));
+        rightDialogPointer.flip(true, false);
         portraits = new HashMap<>();
-        portraits.put("ant", antPortrait);
-        portraits.put("pro", proPortrait);
-        this.portrait = new Sprite(portraits.get("pro"));
+        portraits.put("pro", assetManager.get("portraits/portrait-1.png"));
+        portraits.put("ant", assetManager.get("portraits/red-01.png"));
+        this.leftPortrait = new Sprite(portraits.get("pro"));
+        this.rightPortrait = new Sprite(portraits.get("ant"));
     }
 
-    void render(SpriteBatch batch, Vector2 offset, DialogElement dialogLine) {
+    void render(SpriteBatch batch, Vector2 offset, Conversation conversation) {
         Vector2 dialogPos = offset.cpy().add(64, 16);
+        DialogElement dialogLine = conversation.getCurrentDialog();
+        actors = new HashSet<>(conversation.getActors());
+        if (portraits.containsKey(dialogLine.getOwner())) {
+            boolean isLeft = dialogLine.getOwner().equals("pro");
+            if (isLeft) {
+                rightPortrait.setColor(greyColor);
+                leftPortrait.setColor(white);
+                rightPortrait.setScale(0.85f);
+                leftPortrait.setScale(1);
+                dialogPointer.setPosition(dialogPos.x + 96, dialogPos.y + 128 - 10);
+            } else {
+                rightPortrait.setScale(1);
+                leftPortrait.setScale(0.85f);
+                rightPortrait.setColor(white);
+                leftPortrait.setColor(greyColor);
+                rightDialogPointer.setPosition(dialogPos.x + 302, dialogPos.y + 128 - 10);
+            }
+            if (actors.contains("pro")) {
+                leftPortrait.setPosition(dialogPos.x, dialogPos.y + 4);
+                leftPortrait.draw(batch);
+            }
+            if (actors.contains("ant")) {
+                rightPortrait.setPosition(dialogPos.x + 348, dialogPos.y + 4);
+                rightPortrait.draw(batch);
+            }
+        }
 
         List<String> lines = dialogLine.getLines();
         float ypos = dialogLine.getTotalLines() * 32;
-        batch.draw(dialogTop, dialogPos.x, dialogPos.y + ypos + 16 + 8);
-        batch.draw(dialogBottom, dialogPos.x, dialogPos.y + 16);
+
+        float startHeight = 128 + 16;
+
+        batch.draw(dialogBottom, dialogPos.x, dialogPos.y + startHeight);
+        batch.draw(dialogTop, dialogPos.x, dialogPos.y + 8 + ypos + startHeight);
         for (int i = 0; i < dialogLine.getTotalLines(); i++) {
-            batch.draw(dialogLineImg, dialogPos.x, dialogPos.y + 16 + (i * 32) + 8);
+            batch.draw(dialogLineImg, dialogPos.x, dialogPos.y + 8 + (i * 32) + startHeight);
         }
 
         if (portraits.containsKey(dialogLine.getOwner())) {
-            portrait.setRegion(portraits.get(dialogLine.getOwner()));
             boolean isLeft = dialogLine.getOwner().equals("pro");
-            portrait.setPosition(dialogPos.x + (isLeft ? 0 : 348), dialogPos.y + ypos + 32 + 4);
-            portrait.draw(batch);
+            if (isLeft) {
+                dialogPointer.draw(batch);
+            } else {
+                rightDialogPointer.draw(batch);
+            }
         }
 
         for (String line : lines) {
-            font.setColor(fontColorSecondary);
-            font.draw(batch, line, dialogPos.x + 10, dialogPos.y + 16 - 2 + ypos);
-            font.setColor(fontColorMain);
-            font.draw(batch, line, dialogPos.x + 10, dialogPos.y + 16 + ypos);
+            String chosenOption = dialogLine.getCurrentOption();
+            float offsetx = dialogLine instanceof DialogOption ? 16 : 0;
+            if (chosenOption != null && line.equals(chosenOption)) {
+                optionPointer.setPosition(dialogPos.x + 6, dialogPos.y - 2 + ypos + startHeight - 14);
+                optionPointer.draw(batch);
+                font.setColor(fontColorSecondary);
+                font.draw(batch, line, dialogPos.x + 10 + offsetx, dialogPos.y - 2 + ypos + startHeight - 2);
+                font.setColor(fontColorHighlighted);
+                font.draw(batch, line, dialogPos.x + 10 + offsetx, dialogPos.y + ypos + startHeight - 2);
+            } else {
+                font.setColor(fontColorSecondary);
+                font.draw(batch, line, dialogPos.x + 10 + offsetx, dialogPos.y - 2 + ypos + startHeight - 2);
+                font.setColor(fontColorMain);
+                font.draw(batch, line, dialogPos.x + 10 + offsetx, dialogPos.y + ypos + startHeight - 2);
+            }
+
             ypos = ypos - 32;
         }
     }
 
     private BitmapFont loadFonts() {
-        font = new BitmapFont(Gdx.files.internal("test.fnt"),false);
+        font = new BitmapFont(Gdx.files.internal("consolas.fnt"),false);
         font.setUseIntegerPositions(false);
         font.setColor(fontColorMain);
         return font;

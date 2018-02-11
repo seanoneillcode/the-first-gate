@@ -157,11 +157,12 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("arrow-sheet.png", Texture.class);
         assetManager.load("level-light.png", Texture.class);
         assetManager.load("torch-sheet.png", Texture.class);
-        assetManager.load("portrait-1.png", Texture.class);
+        assetManager.load("portraits/portrait-1.png", Texture.class);
         assetManager.load("portraits/red-01.png", Texture.class);
         assetManager.load("wizard.png", Texture.class);
         assetManager.load("ant-test.png", Texture.class);
         assetManager.load("fade-image.png", Texture.class);
+        assetManager.load("dialog-pointer.png", Texture.class);
 
         assetManager.load("fight-indicator.png", Texture.class);
         assetManager.load("fight-pro-avatar.png", Texture.class);
@@ -169,14 +170,11 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("direction-arrow.png", Texture.class);
         assetManager.load("poster-prize.png", Texture.class);
         assetManager.load("campfire.png", Texture.class);
+        assetManager.load("option-pointer.png", Texture.class);
 
         assetManager.finishLoading();
 
-        dialogContainer = new DialogContainer(assetManager.get("dialog-bottom.png"),
-                assetManager.get("dialog-top.png"),
-                assetManager.get("dialog-line.png"),
-                assetManager.get("portrait-1.png"),
-                assetManager.get("portraits/red-01.png"));
+        dialogContainer = new DialogContainer(assetManager);
 
         directions = Arrays.asList("left", "right", "up", "down");
 
@@ -553,8 +551,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
             if (conversation != null) {
-                DialogElement currentDialog = conversation.getCurrentDialog();
-                dialogContainer.render(batch, new Vector2(camera.position.x - (VIEWPORT_WIDTH / 2.0f), camera.position.y - (VIEWPORT_HEIGHT / 2.0f)), currentDialog);
+                dialogContainer.render(batch, new Vector2(camera.position.x - (VIEWPORT_WIDTH / 2.0f), camera.position.y - (VIEWPORT_HEIGHT / 2.0f)), conversation);
             }
 
             if (fighting) {
@@ -936,10 +933,10 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         }
         inputVector = new Vector2();
         if (Gdx.input.isKeyPressed(Input.Keys.NUM_9)) {
-            gamma = gamma + 0.025f;
+            gamma = gamma + 0.01f;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.NUM_8)) {
-            gamma = gamma - 0.025f;
+            gamma = gamma - 0.01f;
         }
         gamma = MathUtils.clamp(gamma, 0, 1.0f);
 
