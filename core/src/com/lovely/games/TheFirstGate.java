@@ -158,6 +158,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("level-light.png", Texture.class);
         assetManager.load("torch-sheet.png", Texture.class);
         assetManager.load("portrait-1.png", Texture.class);
+        assetManager.load("portraits/red-01.png", Texture.class);
         assetManager.load("wizard.png", Texture.class);
         assetManager.load("ant-test.png", Texture.class);
         assetManager.load("fade-image.png", Texture.class);
@@ -175,7 +176,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 assetManager.get("dialog-top.png"),
                 assetManager.get("dialog-line.png"),
                 assetManager.get("portrait-1.png"),
-                assetManager.get("ant-test.png"));
+                assetManager.get("portraits/red-01.png"));
 
         directions = Arrays.asList("left", "right", "up", "down");
 

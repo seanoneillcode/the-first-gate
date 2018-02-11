@@ -170,7 +170,7 @@ public class DialogContainer {
         if (portraits.containsKey(dialogLine.getOwner())) {
             portrait.setRegion(portraits.get(dialogLine.getOwner()));
             boolean isLeft = dialogLine.getOwner().equals("pro");
-            portrait.setPosition(dialogPos.x + (isLeft ? 0 : 348), dialogPos.y + ypos + 32);
+            portrait.setPosition(dialogPos.x + (isLeft ? 0 : 348), dialogPos.y + ypos + 32 + 4);
             portrait.draw(batch);
         }
 
