@@ -35,9 +35,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private static final float PLAYER_SPEED = TILE_SIZE * 4.0f;
     private static final float CAMERA_MARGIN = 0.5f;
     private static final float CAMERA_CATCHUP_SPEED = 2.0f;
-    public static final int VIEWPORT_WIDTH = 600;
-    public static final int VIEWPORT_HEIGHT = 480;
-    public static final float CAST_ARROW_COOLDOWN = 2.0f;
+    private static final int VIEWPORT_WIDTH = 600;
+    private static final int VIEWPORT_HEIGHT = 480;
+    private static final float CAST_ARROW_COOLDOWN = 2.0f;
 
     private SpriteBatch batch;
     private SpriteBatch bufferBatch;
@@ -268,7 +268,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
 
         // special
-        startLevel(levels.get(28), "start");
+        startLevel(levels.get(27), "59");
 	}
 
     private Animation<TextureRegion> loadAnimation(Texture sheet, int numberOfFrames, float frameDelay) {

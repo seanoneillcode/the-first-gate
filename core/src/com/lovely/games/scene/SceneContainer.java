@@ -114,9 +114,6 @@ public class SceneContainer {
         // pro is a kind fool!
         scenes.put("13", builder()
                 .verb(new DialogVerb("16"))
-                .verb(new WaitVerb(3f))
-                .verb(new MoveVerb(new Vector2(9 * 32, 0), "ant", true))
-                .verb(new DialogVerb("17"))
                 .build());
 
         scenes.put("14", builder()
@@ -153,6 +150,11 @@ public class SceneContainer {
                 .build());
         scenes.put("22", builder()
                 .verb(new FadeScreenVerb(true, 2.0f))
+                .build());
+
+        scenes.put("23", builder()
+                .verb(new FadeScreenVerb(false, 2.0f))
+                .verb(new PosterVerb("poster-prize.png"))
                 .build());
     }
 

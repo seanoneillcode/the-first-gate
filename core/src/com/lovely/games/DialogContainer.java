@@ -45,9 +45,9 @@ public class DialogContainer {
         dialogs.put("6", Arrays.asList(
                 line(pro, "Okay I got you here. I'm leaving now."),
                 line(ant, "Hold!"),
-                line(ant, "You must to stand on the other floor switch, it takes two to open the door."),
+                line(ant, "You must to stand on the other floor switch, both floor switches need to be active"),
                 line(pro, "I'm only here to carry the gear"),
-                line(ant, "Just stand there to open the door. I will face the trials alone.")
+                line(ant, "Just stand on the switch, then you can go.")
         ));
         dialogs.put("7", Arrays.asList(
                 line(pro, "Damn!"),
@@ -55,12 +55,13 @@ public class DialogContainer {
         ));
         dialogs.put("8", Arrays.asList(
                 line(pro, "What does it say..."),
-                line(pro, "\"Two must enter, but only one can gain power. Power comes from sacrifice.\"")
+                line(pro, "\"Power requires sacrifice.\"")
         ));
         dialogs.put("9", Arrays.asList(
                 line(pro, "Stand on the switch, I can't leave."),
                 line(ant, "Back off you filthy peasant, you will demand nothing of me."),
-                line(ant, "You will remain here. I will complete the trials and return.")
+                line(pro, "What!?"),
+                line(ant, "You will remain here. I will return later.")
         ));
         dialogs.put("10", Arrays.asList(
                 line(ant, "You don't know what you're playing with, turn back now before you get hurt."),
@@ -73,10 +74,9 @@ public class DialogContainer {
                 line(ant, "Stop! damn it!"),
                 line(ant, "It's mine, get out of the way."),
                 line(pro, "No"),
-                line(pro, "I completed the trials, despite your sabotage, and I did it first."),
-                line(ant, "Listen here you little shit, are you forgetting who I am?"),
-                line(ant, "I have more estates and money then you're shitty village."),
-                line(ant, "I will ruin you before I kill you so you and no one else can forget."),
+                line(pro, "I completed these trials, despite your sabotage, and I did it first."),
+                line(ant, "Are you forgetting who I am? I have more estates and money then all of the peasants in your shitty village."),
+                line(ant, "I will ruin you before I kill you, so you and no one else can forget."),
                 line(pro, "Do it."),
                 line(pro, "I'm getting what I earned.")
         ));
@@ -86,7 +86,11 @@ public class DialogContainer {
         ));
         dialogs.put("14", Arrays.asList(
                 line(ant, "Wait! don't leave me here."),
-                line(ant, "Step on the switch so I can cross")
+                line(ant, "Step on the switch so I can cross"),
+                options(info)
+                        .opt("help him", "13")
+                        .opt("walk away", "12")
+                        .build()
         ));
         dialogs.put("15", Arrays.asList(
                 line(ant, "No!"),
@@ -94,16 +98,14 @@ public class DialogContainer {
                 line(ant, "I'll kill you!")
         ));
         dialogs.put("16", Arrays.asList(
-                line(ant, "Thank you for your kindness.")
-        ));
-        dialogs.put("17", Arrays.asList(
+                line(ant, "Thank you for your kindness."),
                 line(ant, "Fool, now I'll take what's mine.")
         ));
         dialogs.put("18", Arrays.asList(
                 line(pro, "Now to take the stone")
         ));
         dialogs.put("19", Arrays.asList(
-                line(ant, "What do you want?"),
+                line(ant, "Yes?"),
                 options(pro)
                         .opt("When will we arrive?", "18")
                         .opt("Why do I have to carry everything...", "19")
@@ -112,9 +114,8 @@ public class DialogContainer {
         ));
         dialogs.put("21", Arrays.asList(
                 line(ant, "Only a day or two more. Over the nearest peak and through a valley."),
-                line(pro, "We will run out of supplies for the return journey if we go too far"),
-                line(ant, "I'm well aware..."),
-                line(ant, "Do not fret, I have something planned. Now leave me be.")
+                line(pro, "We will run out of supplies for the return journey if we go too far."),
+                line(ant, "I have something planned, don't worry.")
         ));
         dialogs.put("22", Arrays.asList(
                 line(ant, "Because I'm paying you to. You need the money and I can't be bothered to carry it myself")
@@ -122,9 +123,9 @@ public class DialogContainer {
         dialogs.put("23", Arrays.asList(
                 line(ant, "I told you several times, a small castle belonging to my cousin."),
                 line(pro, "But I haven't heard of any castles out this far."),
-                line(ant, "Are you calling me a liar?"),
+                line(ant, "That's no surprise with your education, or lack thereof. There are many wonderful things outside of your village."),
                 line(pro, "No I just..."),
-                line(ant, "Hold your tongue if you want your pay.")
+                line(ant, "Trust me, my uncle will put us up and provide food and drink plenty.")
         ));
         dialogs.put("20", Arrays.asList(
                 options(info)
