@@ -5,6 +5,7 @@ import static com.lovely.games.scene.Scene.builder;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 
 public class SceneContainer {
@@ -114,6 +115,8 @@ public class SceneContainer {
         // pro is a kind fool!
         scenes.put("13", builder()
                 .verb(new DialogVerb("16"))
+                .verb(new PosterVerb("poster-help-ant.png"))
+                .verb(new FadeScreenVerb(false, 2.0f, Color.WHITE))
                 .build());
 
         scenes.put("14", builder()
@@ -141,20 +144,20 @@ public class SceneContainer {
 
         // go to sleep
         scenes.put("17", builder()
-                .verb(new FadeScreenVerb(false, 2.0f))
+                .verb(new FadeScreenVerb(false, 2.0f, Color.BLACK))
                 .verb(new ConnectionVerb("start"))
                 .build());
 
         scenes.put("21", builder()
-                .verb(new FadeScreenVerb(true, 2.0f))
+                .verb(new FadeScreenVerb(true, 2.0f, Color.BLACK))
                 .build());
         scenes.put("22", builder()
-                .verb(new FadeScreenVerb(true, 2.0f))
+                .verb(new FadeScreenVerb(true, 2.0f, Color.BLACK))
                 .build());
 
         scenes.put("23", builder()
-                .verb(new FadeScreenVerb(false, 2.0f))
-                .verb(new PosterVerb("poster-prize.png"))
+                .verb(new PosterVerb("poster-fuck-ant.png"))
+                .verb(new FadeScreenVerb(false, 2.0f, Color.BLACK))
                 .build());
     }
 

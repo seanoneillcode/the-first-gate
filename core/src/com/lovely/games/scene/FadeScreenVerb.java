@@ -1,6 +1,7 @@
 package com.lovely.games.scene;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.lovely.games.Stage;
 
 public class FadeScreenVerb implements SceneVerb {
@@ -10,13 +11,15 @@ public class FadeScreenVerb implements SceneVerb {
     private float amount;
     private float time;
     private float originalAmount;
+    private Color color;
 
-    public FadeScreenVerb(boolean inDirection, float time) {
+    public FadeScreenVerb(boolean inDirection, float time, Color color) {
         this.inDirection = inDirection;
         this.time = time;
         this.amount = inDirection ? time : 0;
         this.originalAmount = amount;
         this.isDone = false;
+        this.color = color;
     }
 
     @Override
@@ -37,7 +40,7 @@ public class FadeScreenVerb implements SceneVerb {
             }
 
         }
-        stage.fadeScreen(amount / time);
+        stage.fadeScreen(amount / time, color);
     }
 
     @Override

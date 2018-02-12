@@ -1,5 +1,6 @@
 package com.lovely.games;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.lovely.games.scene.DialogVerb;
 import com.lovely.games.scene.FightVerb;
@@ -26,5 +27,5 @@ public interface Stage {
 
     void goToConnection(String connection);
 
-    void fadeScreen(float amount);
+    void fadeScreen(float amount, Color color);
 }

@@ -103,6 +103,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private float screenFade;
     private Sprite fadeSprite;
     private float gamma;
+    private Color fadeColor;
 
     @Override
 	public void create () {
@@ -169,12 +170,16 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("fight-ant-avatar.png", Texture.class);
         assetManager.load("direction-arrow.png", Texture.class);
         assetManager.load("poster-prize.png", Texture.class);
+        assetManager.load("poster-help-ant.png", Texture.class);
+        assetManager.load("poster-fuck-ant.png", Texture.class);
         assetManager.load("campfire.png", Texture.class);
         assetManager.load("option-pointer.png", Texture.class);
 
         assetManager.finishLoading();
 
         dialogContainer = new DialogContainer(assetManager);
+
+        fadeColor = Color.BLACK;
 
         directions = Arrays.asList("left", "right", "up", "down");
 
@@ -593,8 +598,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 posterSprite.draw(batch);
             }
             if (screenFade > 0) {
+                fadeSprite.setColor(fadeColor);
                 fadeSprite.setAlpha(screenFade);
-                fadeSprite.setPosition(camera.position.x , camera.position.y );
+                fadeSprite.setPosition(camera.position.x - 76, camera.position.y - 62);
                 fadeSprite.draw(batch);
             }
             batch.end();
@@ -1032,8 +1038,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         posterImageName = poster;
     }
 
-    public void fadeScreen(float amount) {
+    public void fadeScreen(float amount, Color color) {
         screenFade = amount;
+        fadeColor = color;
     }
 
     @Override
