@@ -83,6 +83,10 @@
     <property name="playOnce" value="false"/>
    </properties>
   </object>
-  <object id="62" name="22" type="scene" x="256" y="256" width="32" height="32"/>
+  <object id="62" name="22" type="scene" x="256" y="256" width="32" height="32">
+   <properties>
+    <property name="playOnce" value="true"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>

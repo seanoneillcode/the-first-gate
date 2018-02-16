@@ -27,14 +27,16 @@
                 evt.target.style.cursor = '';
               }
 
-              function handleKeypress(evt) {
-                evt.preventDefault();
-                evt.stopPropagation();
-                evt.target.style.cursor = '';
-              }
+              document.onkeydown = function(evt) {
+                     evt = evt || window.event;
+                     var keyCode = evt.keyCode;
+                     if (keyCode >= 37 && keyCode <= 40) {
+                      return false;
+                     }
+              };
+
 
               document.getElementById('embed-html').addEventListener('mousedown', handleMouseDown, false);
               document.getElementById('embed-html').addEventListener('mouseup', handleMouseUp, false);
-              document.getElementById('embed-html').addEventListener('keydown', handleKeypress, false);
        </script>
 </html>

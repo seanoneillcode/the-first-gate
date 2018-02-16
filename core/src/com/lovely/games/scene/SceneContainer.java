@@ -152,7 +152,7 @@ public class SceneContainer {
                 .verb(new FadeScreenVerb(true, 2.0f, Color.BLACK))
                 .build());
         scenes.put("22", builder()
-                .verb(new FadeScreenVerb(true, 2.0f, Color.BLACK))
+                .verb(new FadeScreenVerb(true, 0.2f, Color.BLACK))
                 .build());
 
         scenes.put("23", builder()

@@ -15,4 +15,5 @@ public interface DialogElement {
     int getTotalLines();
     String getChosenOption();
     String getCurrentOption();
+    String getMood();
 }

@@ -20,8 +20,9 @@ public class DialogLine implements DialogElement {
     List<String> lines;
     boolean isDone;
     private boolean skipped;
+    private String mood;
 
-    public DialogLine(String owner, String line) {
+    public DialogLine(String owner, String line, String mood) {
         this.lines = parseLine(line);
         lineIndex = 0;
         this.owner = owner;
@@ -29,6 +30,7 @@ public class DialogLine implements DialogElement {
         charIndex = 0;
         isDone = false;
         skipped = false;
+        this.mood = mood;
     }
 
     private List<String> parseLine(String line) {
@@ -69,7 +71,9 @@ public class DialogLine implements DialogElement {
         }
     }
 
-
+    public String getMood() {
+        return mood;
+    }
 
     public List<String> getLines() {
         if (isDone) {
@@ -119,7 +123,11 @@ public class DialogLine implements DialogElement {
     }
 
     public static DialogLine line(String owner, String line) {
-        return new DialogLine(owner, line);
+        return new DialogLine(owner, line, null);
+    }
+
+    public static DialogLine line(String owner, String line, String mood) {
+        return new DialogLine(owner, line, mood);
     }
 
     public static DialogOption.Builder options(String owner) {

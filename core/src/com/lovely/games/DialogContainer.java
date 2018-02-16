@@ -34,7 +34,7 @@ public class DialogContainer {
                 line(info, "( press 'R' to restart a level )")
         ));
         dialogs.put("3", Arrays.asList(
-                line(pro, "I've never seen a flying ball of fire before. Magic!")
+                line(pro, "I've never seen a flying ball of fire before. Magic!", "happy")
         ));
         dialogs.put("4", Arrays.asList(
                 line(pro, "( press 'R' to restart a level )")
@@ -46,11 +46,11 @@ public class DialogContainer {
                 line(pro, "Okay I got you here. I'm leaving now."),
                 line(ant, "Hold!"),
                 line(ant, "You must to stand on the other floor switch, both floor switches need to be active"),
-                line(pro, "I'm only here to carry the gear"),
+                line(pro, "I'm only here to carry the gear", "angry"),
                 line(ant, "Just stand on the switch, then you can go.")
         ));
         dialogs.put("7", Arrays.asList(
-                line(pro, "Damn!"),
+                line(pro, "Damn!", "angry"),
                 line(pro, "Now I can't leave")
         ));
         dialogs.put("8", Arrays.asList(
@@ -60,7 +60,7 @@ public class DialogContainer {
         dialogs.put("9", Arrays.asList(
                 line(pro, "Stand on the switch, I can't leave."),
                 line(ant, "Back off you filthy peasant, you will demand nothing of me."),
-                line(pro, "What!?"),
+                line(pro, "What!?", "angry"),
                 line(ant, "You will remain here. I will return later.")
         ));
         dialogs.put("10", Arrays.asList(
@@ -78,10 +78,10 @@ public class DialogContainer {
                 line(ant, "Are you forgetting who I am? I have more estates and money then all of the peasants in your shitty village."),
                 line(ant, "I will ruin you before I kill you, so you and no one else can forget."),
                 line(pro, "Do it."),
-                line(pro, "I'm getting what I earned.")
+                line(pro, "I'm getting what I earned.", "happy")
         ));
         dialogs.put("13", Arrays.asList(
-                line(pro, "I can feel a strange power, stirring inside of me"),
+                line(pro, "I can feel a strange power, stirring inside of me", "happy"),
                 line(info, "(press 'spacebar' to cast a spell)")
         ));
         dialogs.put("14", Arrays.asList(
@@ -118,13 +118,14 @@ public class DialogContainer {
                 line(ant, "I have something planned, don't worry.")
         ));
         dialogs.put("22", Arrays.asList(
-                line(ant, "Because I'm paying you to. You need the money and I can't be bothered to carry it myself")
+                line(ant, "Because I'm paying you to. You need the money and I can't be bothered to carry it myself"),
+                line(pro, "That's true", "happy")
         ));
         dialogs.put("23", Arrays.asList(
                 line(ant, "I told you several times, a small castle belonging to my cousin."),
                 line(pro, "But I haven't heard of any castles out this far."),
                 line(ant, "That's no surprise with your education, or lack thereof. There are many wonderful things outside of your village."),
-                line(pro, "No I just..."),
+                line(pro, "No I just...", "angry"),
                 line(ant, "Trust me, my uncle will put us up and provide food and drink plenty.")
         ));
         dialogs.put("20", Arrays.asList(
@@ -160,9 +161,12 @@ public class DialogContainer {
         this.optionPointer = new Sprite((Texture) assetManager.get("option-pointer.png"));
         rightDialogPointer.flip(true, false);
         portraits = new HashMap<>();
-        portraits.put("pro", assetManager.get("portraits/portrait-1.png"));
+        portraits.put("pro-talk", assetManager.get("portraits/portrait-pro.png"));
+        portraits.put("pro-listening", assetManager.get("portraits/portrait-pro-listening.png"));
+        portraits.put("pro-angry", assetManager.get("portraits/portrait-pro-angry.png"));
+        portraits.put("pro-happy", assetManager.get("portraits/portrait-pro-happy.png"));
         portraits.put("ant", assetManager.get("portraits/red-01.png"));
-        this.leftPortrait = new Sprite(portraits.get("pro"));
+        this.leftPortrait = new Sprite(portraits.get("pro-talk"));
         this.rightPortrait = new Sprite(portraits.get("ant"));
     }
 
@@ -170,35 +174,34 @@ public class DialogContainer {
         Vector2 dialogPos = offset.cpy().add(64, 16);
         DialogElement dialogLine = conversation.getCurrentDialog();
         actors = new HashSet<>(conversation.getActors());
-        if (portraits.containsKey(dialogLine.getOwner())) {
-            boolean isLeft = dialogLine.getOwner().equals("pro");
-            if (isLeft) {
-                rightPortrait.setColor(greyColor);
-                leftPortrait.setColor(white);
-                rightPortrait.setScale(0.85f);
-                leftPortrait.setScale(1);
-                dialogPointer.setPosition(dialogPos.x + 96, dialogPos.y + 128 - 10);
+        float portraitHeight = 160;
+        boolean isLeft = dialogLine.getOwner().equals("pro");
+        if (isLeft) {
+            if (dialogLine.getMood() != null) {
+                leftPortrait.setTexture(portraits.get("pro-" + dialogLine.getMood()));
             } else {
-                rightPortrait.setScale(1);
-                leftPortrait.setScale(0.85f);
-                rightPortrait.setColor(white);
-                leftPortrait.setColor(greyColor);
-                rightDialogPointer.setPosition(dialogPos.x + 302, dialogPos.y + 128 - 10);
+                leftPortrait.setTexture(portraits.get("pro-talk"));
             }
-            if (actors.contains("pro")) {
-                leftPortrait.setPosition(dialogPos.x, dialogPos.y + 4);
-                leftPortrait.draw(batch);
-            }
-            if (actors.contains("ant")) {
-                rightPortrait.setPosition(dialogPos.x + 348, dialogPos.y + 4);
-                rightPortrait.draw(batch);
-            }
+            dialogPointer.setPosition(dialogPos.x + 96, dialogPos.y + portraitHeight - 10);
+        } else {
+            leftPortrait.setTexture(portraits.get("pro-listening"));
+            rightDialogPointer.setPosition(dialogPos.x + 302, dialogPos.y + portraitHeight - 10);
+        }
+        if (actors.contains("pro")) {
+
+            leftPortrait.setPosition(dialogPos.x, dialogPos.y + 4 - 60);
+            leftPortrait.setScale(0.5f);
+            leftPortrait.draw(batch);
+        }
+        if (actors.contains("ant")) {
+            rightPortrait.setPosition(dialogPos.x + 348, dialogPos.y + 4);
+            rightPortrait.draw(batch);
         }
 
         List<String> lines = dialogLine.getLines();
         float ypos = dialogLine.getTotalLines() * 32;
 
-        float startHeight = 128 + 16;
+        float startHeight = portraitHeight + 16;
 
         batch.draw(dialogBottom, dialogPos.x, dialogPos.y + startHeight);
         batch.draw(dialogTop, dialogPos.x, dialogPos.y + 8 + ypos + startHeight);
@@ -206,8 +209,7 @@ public class DialogContainer {
             batch.draw(dialogLineImg, dialogPos.x, dialogPos.y + 8 + (i * 32) + startHeight);
         }
 
-        if (portraits.containsKey(dialogLine.getOwner())) {
-            boolean isLeft = dialogLine.getOwner().equals("pro");
+        if (actors.contains(dialogLine.getOwner())) {
             if (isLeft) {
                 dialogPointer.draw(batch);
             } else {

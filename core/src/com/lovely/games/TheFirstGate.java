@@ -174,6 +174,11 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("poster-fuck-ant.png", Texture.class);
         assetManager.load("campfire.png", Texture.class);
         assetManager.load("option-pointer.png", Texture.class);
+        assetManager.load("portraits/real-test.png", Texture.class);
+        assetManager.load("portraits/portrait-pro.png", Texture.class);
+        assetManager.load("portraits/portrait-pro-listening.png", Texture.class);
+        assetManager.load("portraits/portrait-pro-angry.png", Texture.class);
+        assetManager.load("portraits/portrait-pro-happy.png", Texture.class);
 
         assetManager.finishLoading();
 
@@ -273,7 +278,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
 
         // special
-        startLevel(levels.get(27), "59");
+        startLevel(levels.get(28), "start");
 	}
 
     private Animation<TextureRegion> loadAnimation(Texture sheet, int numberOfFrames, float frameDelay) {

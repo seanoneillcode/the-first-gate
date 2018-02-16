@@ -15,13 +15,15 @@ public class DialogOption implements DialogElement {
     private boolean isDone;
     private String outcome;
     private String currentOption;
+    private String mood;
 
-    public DialogOption(String owner, Map<String, String> options) {
+    public DialogOption(String owner, Map<String, String> options, String mood) {
         this.owner = owner;
         this.options = options;
         optionIndex = 0;
         isDone = false;
         this.outcome = null;
+        this.mood = mood;
     }
 
     @Override
@@ -91,10 +93,16 @@ public class DialogOption implements DialogElement {
         return currentOption;
     }
 
+    @Override
+    public String getMood() {
+        return mood;
+    }
+
     static class Builder {
 
         private String owner;
         private Map<String, String> options = new HashMap<>();
+        private String mood = null;
 
         public Builder(String owner) {
             this.owner = owner;
@@ -105,8 +113,13 @@ public class DialogOption implements DialogElement {
             return this;
         }
 
+        public Builder mood(String mood) {
+            this.mood = mood;
+            return this;
+        }
+
         public DialogOption build() {
-            return new DialogOption(owner, options);
+            return new DialogOption(owner, options, mood);
         }
     }
 }
