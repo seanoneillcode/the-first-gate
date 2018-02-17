@@ -7,7 +7,6 @@ import java.util.*;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -23,8 +22,7 @@ public class DialogContainer {
     String ant = "ant";
     String info = "info";
     private Sprite leftPortrait, rightPortrait;
-    private Color greyColor = new Color(0.3f, 0.3f, 0.3f, 1.0f);
-    private Color white = new Color(1, 1, 1, 1.0f);
+    private String lastAntMood;
 
     {
         dialogs.put("1", Arrays.asList(
@@ -40,7 +38,7 @@ public class DialogContainer {
                 line(pro, "( press 'R' to restart a level )")
         ));
         dialogs.put("5", Arrays.asList(
-                line(pro, "There it is. The magic stone.")
+                line(pro, "There it is. The magic stone.", "happy")
         ));
         dialogs.put("6", Arrays.asList(
                 line(pro, "Okay I got you here. I'm leaving now."),
@@ -51,58 +49,58 @@ public class DialogContainer {
         ));
         dialogs.put("7", Arrays.asList(
                 line(pro, "Damn!", "angry"),
-                line(pro, "Now I can't leave")
+                line(pro, "Now I can't leave", "angry")
         ));
         dialogs.put("8", Arrays.asList(
                 line(pro, "What does it say..."),
-                line(pro, "\"Power requires sacrifice.\"")
+                line(info, "\"Power requires sacrifice.\"")
         ));
         dialogs.put("9", Arrays.asList(
-                line(pro, "Stand on the switch, I can't leave."),
-                line(ant, "Back off you filthy peasant, you will demand nothing of me."),
+                line(pro, "Stand on the switch, I can't leave.", "worried"),
+                line(ant, "Back off you filthy peasant, you will demand nothing of me.", "angry"),
                 line(pro, "What!?", "angry"),
                 line(ant, "You will remain here. I will return later.")
         ));
         dialogs.put("10", Arrays.asList(
-                line(ant, "You don't know what you're playing with, turn back now before you get hurt."),
+                line(ant, "You don't know what you're playing with, turn back now before you get hurt.", "worried"),
                 line(pro, "I'll go back if you go with me and let me out.")
         ));
         dialogs.put("11", Arrays.asList(
-                line(ant, "You've gone far enough, I've sabotaged this trial to make sure")
+                line(ant, "You've gone far enough, I've sabotaged this trial to make sure", "happy")
         ));
         dialogs.put("12", Arrays.asList(
-                line(ant, "Stop! damn it!"),
-                line(ant, "It's mine, get out of the way."),
+                line(ant, "Stop! damn it!", "angry"),
+                line(ant, "It's mine, get out of the way.", "worried"),
                 line(pro, "No"),
                 line(pro, "I completed these trials, despite your sabotage, and I did it first."),
-                line(ant, "Are you forgetting who I am? I have more estates and money then all of the peasants in your shitty village."),
-                line(ant, "I will ruin you before I kill you, so you and no one else can forget."),
+                line(ant, "Are you forgetting who I am? I have more estates and money then all of the peasants in your shitty village.", "angry"),
+                line(ant, "I will ruin you before I kill you, so you and no one else can forget.", "angry"),
                 line(pro, "Do it."),
-                line(pro, "I'm getting what I earned.", "happy")
+                line(pro, "I'm getting what I earned.")
         ));
         dialogs.put("13", Arrays.asList(
-                line(pro, "I can feel a strange power, stirring inside of me", "happy"),
+                line(pro, "My bones feel like they're going to burst", "worried"),
                 line(info, "(press 'spacebar' to cast a spell)")
         ));
         dialogs.put("14", Arrays.asList(
-                line(ant, "Wait! don't leave me here."),
-                line(ant, "Step on the switch so I can cross"),
+                line(ant, "Wait! don't leave me here.", "worried"),
+                line(ant, "Step on the switch so I can cross", "worried"),
                 options(info)
                         .opt("help him", "13")
                         .opt("walk away", "12")
                         .build()
         ));
         dialogs.put("15", Arrays.asList(
-                line(ant, "No!"),
-                line(ant, "No! You bastard!"),
-                line(ant, "I'll kill you!")
+                line(ant, "No!", "angry"),
+                line(ant, "No! You bastard!", "angry"),
+                line(ant, "I'll kill you!", "angry")
         ));
         dialogs.put("16", Arrays.asList(
-                line(ant, "Thank you for your kindness."),
-                line(ant, "Fool, now I'll take what's mine.")
+                line(ant, "Thank you for your kindness.", "happy"),
+                line(ant, "Fool, now I'll take what's mine.", "happy")
         ));
         dialogs.put("18", Arrays.asList(
-                line(pro, "Now to take the stone")
+                line(pro, "Now to take the stone", "happy")
         ));
         dialogs.put("19", Arrays.asList(
                 line(ant, "Yes?"),
@@ -110,12 +108,13 @@ public class DialogContainer {
                         .opt("When will we arrive?", "18")
                         .opt("Why do I have to carry everything...", "19")
                         .opt("Where are we going?", "20")
+                        .mood("worried")
                         .build()
         ));
         dialogs.put("21", Arrays.asList(
                 line(ant, "Only a day or two more. Over the nearest peak and through a valley."),
-                line(pro, "We will run out of supplies for the return journey if we go too far."),
-                line(ant, "I have something planned, don't worry.")
+                line(pro, "We will run out of supplies for the return journey if we go too far.", "worried"),
+                line(ant, "I have something planned, don't worry.", "happy")
         ));
         dialogs.put("22", Arrays.asList(
                 line(ant, "Because I'm paying you to. You need the money and I can't be bothered to carry it myself"),
@@ -123,10 +122,10 @@ public class DialogContainer {
         ));
         dialogs.put("23", Arrays.asList(
                 line(ant, "I told you several times, a small castle belonging to my cousin."),
-                line(pro, "But I haven't heard of any castles out this far."),
+                line(pro, "But I haven't heard of any castles out this far.", "worried"),
                 line(ant, "That's no surprise with your education, or lack thereof. There are many wonderful things outside of your village."),
-                line(pro, "No I just...", "angry"),
-                line(ant, "Trust me, my uncle will put us up and provide food and drink plenty.")
+                line(pro, "No I just...", "worried"),
+                line(ant, "Trust me, my uncle will put us up and provide food and drink plenty.", "happy")
         ));
         dialogs.put("20", Arrays.asList(
                 options(info)
@@ -147,6 +146,7 @@ public class DialogContainer {
     private Map<String, Texture> portraits;
     private Sprite dialogPointer, optionPointer;
     private Set<String> actors;
+    private String lastMood;
 
     public DialogContainer(AssetManager assetManager) {
         currentDialog = null;
@@ -165,9 +165,20 @@ public class DialogContainer {
         portraits.put("pro-listening", assetManager.get("portraits/portrait-pro-listening.png"));
         portraits.put("pro-angry", assetManager.get("portraits/portrait-pro-angry.png"));
         portraits.put("pro-happy", assetManager.get("portraits/portrait-pro-happy.png"));
-        portraits.put("ant", assetManager.get("portraits/red-01.png"));
+        portraits.put("pro-worried", assetManager.get("portraits/portrait-pro-worried.png"));
+        portraits.put("ant-talk", assetManager.get("portraits/portrait-ant-talking.png"));
+        portraits.put("ant-listening", assetManager.get("portraits/portrait-ant-listening.png"));
+        portraits.put("ant-angry", assetManager.get("portraits/portrait-ant-angry.png"));
+        portraits.put("ant-happy", assetManager.get("portraits/portrait-ant-happy.png"));
+        portraits.put("ant-worried", assetManager.get("portraits/portrait-ant-worried.png"));
+//        portraits.put("ant-listening", assetManager.get("portraits/portrait-pro.png"));
         this.leftPortrait = new Sprite(portraits.get("pro-talk"));
-        this.rightPortrait = new Sprite(portraits.get("ant"));
+        this.rightPortrait = new Sprite(portraits.get("pro-listening"));
+        this.rightPortrait.flip(true, false);
+        leftPortrait.setScale(0.6f);
+        rightPortrait.setScale(0.7f);
+        lastMood = "pro-listening";
+        lastAntMood = "pro-listening";
     }
 
     void render(SpriteBatch batch, Vector2 offset, Conversation conversation) {
@@ -179,22 +190,30 @@ public class DialogContainer {
         if (isLeft) {
             if (dialogLine.getMood() != null) {
                 leftPortrait.setTexture(portraits.get("pro-" + dialogLine.getMood()));
+                lastMood = "pro-" + dialogLine.getMood();
             } else {
                 leftPortrait.setTexture(portraits.get("pro-talk"));
+                lastMood = "pro-listening";
             }
-            dialogPointer.setPosition(dialogPos.x + 96, dialogPos.y + portraitHeight - 10);
+            dialogPointer.setPosition(dialogPos.x + 150, dialogPos.y + portraitHeight - 10);
+            rightPortrait.setTexture(portraits.get(lastAntMood));
         } else {
-            leftPortrait.setTexture(portraits.get("pro-listening"));
+            if (dialogLine.getMood() != null) {
+                rightPortrait.setTexture(portraits.get("ant-" + dialogLine.getMood()));
+                lastAntMood = "ant-" + dialogLine.getMood();
+            } else {
+                rightPortrait.setTexture(portraits.get("ant-talk"));
+                lastAntMood = "ant-listening";
+            }
+            leftPortrait.setTexture(portraits.get(lastMood));
             rightDialogPointer.setPosition(dialogPos.x + 302, dialogPos.y + portraitHeight - 10);
         }
         if (actors.contains("pro")) {
-
-            leftPortrait.setPosition(dialogPos.x, dialogPos.y + 4 - 60);
-            leftPortrait.setScale(0.5f);
+            leftPortrait.setPosition(dialogPos.x, dialogPos.y + 4 - 50);
             leftPortrait.draw(batch);
         }
         if (actors.contains("ant")) {
-            rightPortrait.setPosition(dialogPos.x + 348, dialogPos.y + 4);
+            rightPortrait.setPosition(dialogPos.x + 312, dialogPos.y + 4 - 50);
             rightPortrait.draw(batch);
         }
 
@@ -209,7 +228,7 @@ public class DialogContainer {
             batch.draw(dialogLineImg, dialogPos.x, dialogPos.y + 8 + (i * 32) + startHeight);
         }
 
-        if (actors.contains(dialogLine.getOwner())) {
+        if (!dialogLine.getOwner().equals("info")) {
             if (isLeft) {
                 dialogPointer.draw(batch);
             } else {
@@ -243,5 +262,9 @@ public class DialogContainer {
         font.setUseIntegerPositions(false);
         font.setColor(fontColorMain);
         return font;
+    }
+
+    public void reset() {
+        lastMood = "pro-listening";
     }
 }

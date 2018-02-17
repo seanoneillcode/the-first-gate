@@ -179,6 +179,12 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("portraits/portrait-pro-listening.png", Texture.class);
         assetManager.load("portraits/portrait-pro-angry.png", Texture.class);
         assetManager.load("portraits/portrait-pro-happy.png", Texture.class);
+        assetManager.load("portraits/portrait-pro-worried.png", Texture.class);
+        assetManager.load("portraits/portrait-ant-talking.png", Texture.class);
+        assetManager.load("portraits/portrait-ant-listening.png", Texture.class);
+        assetManager.load("portraits/portrait-ant-angry.png", Texture.class);
+        assetManager.load("portraits/portrait-ant-happy.png", Texture.class);
+        assetManager.load("portraits/portrait-ant-worried.png", Texture.class);
 
         assetManager.finishLoading();
 
@@ -562,6 +568,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
             if (conversation != null) {
                 dialogContainer.render(batch, new Vector2(camera.position.x - (VIEWPORT_WIDTH / 2.0f), camera.position.y - (VIEWPORT_HEIGHT / 2.0f)), conversation);
+            } else {
+                dialogContainer.reset();
             }
 
             if (fighting) {
