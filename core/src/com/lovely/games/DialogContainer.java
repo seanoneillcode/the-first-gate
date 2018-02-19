@@ -213,7 +213,7 @@ public class DialogContainer {
             leftPortrait.draw(batch);
         }
         if (actors.contains("ant")) {
-            rightPortrait.setPosition(dialogPos.x + 242, dialogPos.y + 4 - 110);
+            rightPortrait.setPosition(dialogPos.x + 242, dialogPos.y + 4 - 120);
             rightPortrait.draw(batch);
         }
 
