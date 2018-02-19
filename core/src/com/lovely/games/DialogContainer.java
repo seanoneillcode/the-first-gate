@@ -173,10 +173,10 @@ public class DialogContainer {
         portraits.put("ant-worried", assetManager.get("portraits/portrait-ant-worried.png"));
 //        portraits.put("ant-listening", assetManager.get("portraits/portrait-pro.png"));
         this.leftPortrait = new Sprite(portraits.get("pro-talk"));
-        this.rightPortrait = new Sprite(portraits.get("pro-listening"));
+        this.rightPortrait = new Sprite(portraits.get("ant-talk"));
         this.rightPortrait.flip(true, false);
         leftPortrait.setScale(0.6f);
-        rightPortrait.setScale(0.7f);
+        rightPortrait.setScale(0.6f);
         lastMood = "pro-listening";
         lastAntMood = "pro-listening";
     }
@@ -185,7 +185,7 @@ public class DialogContainer {
         Vector2 dialogPos = offset.cpy().add(64, 16);
         DialogElement dialogLine = conversation.getCurrentDialog();
         actors = new HashSet<>(conversation.getActors());
-        float portraitHeight = 160;
+        float portraitHeight = 170;
         boolean isLeft = dialogLine.getOwner().equals("pro");
         if (isLeft) {
             if (dialogLine.getMood() != null) {
@@ -213,7 +213,7 @@ public class DialogContainer {
             leftPortrait.draw(batch);
         }
         if (actors.contains("ant")) {
-            rightPortrait.setPosition(dialogPos.x + 312, dialogPos.y + 4 - 50);
+            rightPortrait.setPosition(dialogPos.x + 242, dialogPos.y + 4 - 110);
             rightPortrait.draw(batch);
         }
 
