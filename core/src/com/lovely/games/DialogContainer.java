@@ -171,7 +171,6 @@ public class DialogContainer {
         portraits.put("ant-angry", assetManager.get("portraits/portrait-ant-angry.png"));
         portraits.put("ant-happy", assetManager.get("portraits/portrait-ant-happy.png"));
         portraits.put("ant-worried", assetManager.get("portraits/portrait-ant-worried.png"));
-//        portraits.put("ant-listening", assetManager.get("portraits/portrait-pro.png"));
         this.leftPortrait = new Sprite(portraits.get("pro-talk"));
         this.rightPortrait = new Sprite(portraits.get("ant-talk"));
         this.rightPortrait.flip(true, false);

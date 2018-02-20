@@ -281,8 +281,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
         sceneContainer = new SceneContainer();
 
-
-
         // special
         startLevel(levels.get(28), "start");
 	}
