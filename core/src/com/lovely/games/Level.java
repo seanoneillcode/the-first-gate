@@ -42,11 +42,12 @@ class Level {
     List<SceneSource> scenes;
     Trunk trunk;
     List<Actor> actors;
+    public List<Wind> winds;
 
     Level(List<Connection> connections, boolean[][] walls, boolean[][] deaths, String name, int numXTiles,
-                 int numYTiles, List<ArrowSource> arrowSources, List<Platform> platforms, List<Block> blocks,
+          int numYTiles, List<ArrowSource> arrowSources, List<Platform> platforms, List<Block> blocks,
           List<PressureTile> pressureTiles, List<Door> doors, List<DialogSource> dialogSources,
-          List<LevelLight> lights, List<Torch> torches, List<SceneSource> scenes, Trunk trunk, List<Actor> actors) {
+          List<LevelLight> lights, List<Torch> torches, List<SceneSource> scenes, Trunk trunk, List<Actor> actors, List<Wind> winds) {
         this.connections = connections;
         this.walls = walls;
         this.deaths = deaths;
@@ -64,6 +65,7 @@ class Level {
         this.scenes = scenes;
         this.trunk = trunk;
         this.actors = actors;
+        this.winds = winds;
     }
 
     Vector2 getConnectionPosition(String name) {
@@ -196,6 +198,16 @@ class Level {
         }
     }
 
+    public Wind getWind(Vector2 playerPos) {
+        for (Wind wind : winds) {
+            Rectangle windRect = new Rectangle(wind.pos.x, wind.pos.y, wind.size.x, wind.size.y);
+            if (windRect.contains(playerPos)) {
+                return wind;
+            }
+        }
+        return null;
+    }
+
     /**
      * BUILDEr
      */
@@ -217,6 +229,7 @@ class Level {
         List<Torch> torches = new ArrayList<>();
         List<SceneSource> scenes = new ArrayList<>();
         List<Actor> actors = new ArrayList<>();
+        private List<Wind> winds = new ArrayList<>();
 
         Builder(String name, int numXTiles, int numYTiles) {
             this.name = name;
@@ -306,6 +319,11 @@ class Level {
             return this;
         }
 
+        Builder addWind(Vector2 pos, Vector2 size, String dir) {
+            this.winds.add(new Wind(pos, size, dir));
+            return this;
+        }
+
         Trunk getTrunk() {
             return this.trunk;
         }
@@ -318,8 +336,10 @@ class Level {
                 deaths = new boolean[numXTiles][numYTiles];
             }
             return new Level(connections, walls, deaths, name, numXTiles, numYTiles, arrowSources, platforms, blocks,
-                    pressureTiles, doors, dialogSources, lights, torches, scenes, trunk, actors);
+                    pressureTiles, doors, dialogSources, lights, torches, scenes, trunk, actors, winds);
         }
+
+
     }
 
     static Level loadLevel(AssetManager assetManager, String name) {
@@ -486,6 +506,16 @@ class Level {
                     isSwitch = Boolean.parseBoolean(properties.get("isSwitch").toString());
                 }
                 builder.addPressureTile(new PressureTile(pos, switchId, isSwitch));
+            }
+            if (properties.containsKey("type") && properties.get("type").equals("wind")) {
+                RectangleMapObject rectObj = (RectangleMapObject) obj;
+                Vector2 pos = new Vector2(rectObj.getRectangle().x, rectObj.getRectangle().y);
+                Vector2 size = new Vector2(rectObj.getRectangle().width, rectObj.getRectangle().height);
+                String dir = "down";
+                if (properties.containsKey("dir")) {
+                    dir = properties.get("dir").toString();
+                }
+                builder.addWind(pos, size, dir);
             }
             if (properties.containsKey("type") && properties.get("type").equals("dialog")) {
                 RectangleMapObject rectObj = (RectangleMapObject) obj;

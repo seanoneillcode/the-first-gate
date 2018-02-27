@@ -92,6 +92,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private List<String> directions;
     private float fightInputScale;
     private Sprite fightDirectionArrow;
+    private Sprite windSprite;
     private boolean fightInputLock;
 
     private FightVerb fightVerb;
@@ -104,6 +105,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private Sprite fadeSprite;
     private float gamma;
     private Color fadeColor;
+    private Animation<TextureRegion> windAnim;
+    private Animation<TextureRegion> windHorizontalAnim;
 
     @Override
 	public void create () {
@@ -140,6 +143,16 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("levels/tower-prize-fight.tmx", TiledMap.class);
         assetManager.load("levels/tower-ant-revenge.tmx", TiledMap.class);
         assetManager.load("levels/camp-fire.tmx", TiledMap.class);
+        assetManager.load("levels/wind-1.tmx", TiledMap.class);
+        assetManager.load("levels/wind-2.tmx", TiledMap.class);
+        assetManager.load("levels/bullet-01.tmx", TiledMap.class);
+        assetManager.load("levels/bullet-02.tmx", TiledMap.class);
+        assetManager.load("levels/bullet-03.tmx", TiledMap.class);
+        assetManager.load("levels/bullet-04.tmx", TiledMap.class);
+        assetManager.load("levels/bullet-05.tmx", TiledMap.class);
+        assetManager.load("levels/bullet-06.tmx", TiledMap.class);
+        assetManager.load("levels/bullet-07.tmx", TiledMap.class);
+        assetManager.load("levels/maze-1.tmx", TiledMap.class);
 
         assetManager.load("arrow.png", Texture.class);
         assetManager.load("platform.png", Texture.class);
@@ -165,6 +178,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("fade-image.png", Texture.class);
         assetManager.load("dialog-pointer.png", Texture.class);
 
+        assetManager.load("wind.png", Texture.class);
+        assetManager.load("wind-horizontal.png", Texture.class);
         assetManager.load("fight-indicator.png", Texture.class);
         assetManager.load("fight-pro-avatar.png", Texture.class);
         assetManager.load("fight-ant-avatar.png", Texture.class);
@@ -259,7 +274,16 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         levels.add(Level.loadLevel(assetManager, "levels/tower-prize-fight.tmx")); // 57 // 26
         levels.add(Level.loadLevel(assetManager, "levels/tower-ant-revenge.tmx")); // 59 // 27
         levels.add(Level.loadLevel(assetManager, "levels/camp-fire.tmx")); // start // 28
-
+        levels.add(Level.loadLevel(assetManager, "levels/wind-1.tmx")); // 61 // 29
+        levels.add(Level.loadLevel(assetManager, "levels/wind-2.tmx")); // 63 // 30
+        levels.add(Level.loadLevel(assetManager, "levels/bullet-01.tmx")); // 65 // 31
+        levels.add(Level.loadLevel(assetManager, "levels/bullet-02.tmx")); // 67 // 32
+        levels.add(Level.loadLevel(assetManager, "levels/bullet-03.tmx")); // 69 // 33
+        levels.add(Level.loadLevel(assetManager, "levels/bullet-04.tmx")); // 71 // 34
+        levels.add(Level.loadLevel(assetManager, "levels/bullet-05.tmx")); // 73 // 35
+        levels.add(Level.loadLevel(assetManager, "levels/bullet-06.tmx")); // 75 // 36
+        levels.add(Level.loadLevel(assetManager, "levels/bullet-07.tmx")); // 77 // 37
+        levels.add(Level.loadLevel(assetManager, "levels/maze-1.tmx")); // 79 // 38
 
         gamma = 0.2f;
 
@@ -269,11 +293,12 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         arrowAnim = loadAnimation(assetManager.get("arrow-sheet.png"), 8, 0.05f);
         torchAnim = loadAnimation(assetManager.get("torch-sheet.png"), 2, 0.5f);
         campfireAnim = loadAnimation(assetManager.get("campfire.png"), 8, 0.1f);
+        windAnim = loadAnimation(assetManager.get("wind.png"), 8, 0.1f);
+        windHorizontalAnim = loadAnimation(assetManager.get("wind-horizontal.png"), 8, 0.1f);
         arrowSprite = new Sprite();
         arrowSprite.setBounds(0,0,32,32);
         actorImages = new HashMap<>();
         actorImages.put("ant", assetManager.get("wizard.png"));
-
         currentScenes = new ArrayList<>();
 
         newConnectionTo = "01";
@@ -282,7 +307,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         sceneContainer = new SceneContainer();
 
         // special
-        startLevel(levels.get(28), "start");
+        startLevel(levels.get(38), "79");
 	}
 
     private Animation<TextureRegion> loadAnimation(Texture sheet, int numberOfFrames, float frameDelay) {
@@ -336,7 +361,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         moveLock = false;
         cameraTargetPos = null;
         playerDir = new Vector2(1,0);
-        if (level.name.equals("levels/tower-ant-revenge.tmx")) {
+        if (levels.indexOf(currentLevel) >= 27) {
             currentSpell = "arrow";
         }
         fightLevel = 0;
@@ -549,6 +574,19 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                     }
                 }
             }
+            for (Wind wind : currentLevel.winds) {
+                float offset = 1.0f;
+                for (Vector2 drawPos : wind.drawPositions) {
+                    if (wind.isHorizontal()) {
+                        TextureRegion windFrame = windHorizontalAnim.getKeyFrame(animationDelta + offset, true);
+                        batch.draw(windFrame, drawPos.x , drawPos.y );
+                    } else {
+                        TextureRegion windFrame = windAnim.getKeyFrame(animationDelta + offset, true);
+                        batch.draw(windFrame, drawPos.x , drawPos.y );
+                    }
+                    offset = offset + 0.4f;
+                }
+            }
 
             for (Actor actor : currentLevel.actors) {
                 if (!actor.isHidden && actor.pos.y < playerPos.y) {
@@ -658,6 +696,14 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 pressureTile.handlePressureOff();
             }
         }
+        Wind wind = currentLevel.getWind(playerPos.cpy().add(4,4));
+        if (wind != null) {
+            Vector2 dir = wind.getDir();
+            inputVector = dir.cpy();
+        }
+        for (Wind winds : currentLevel.winds) {
+            winds.update();
+        }
         if (!isMoving) {
             Platform platform = currentLevel.getPlatform(playerPos);
             if (platform != null) {
@@ -674,9 +720,10 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                     restartLevel();
                 }
             }
-            playerPos.x = MathUtils.round(playerPos.x / TILE_SIZE) * TILE_SIZE;
-            playerPos.y = MathUtils.round(playerPos.y / TILE_SIZE) * TILE_SIZE;
-
+            if (wind == null) {
+                playerPos.x = MathUtils.round(playerPos.x / TILE_SIZE) * TILE_SIZE;
+                playerPos.y = MathUtils.round(playerPos.y / TILE_SIZE) * TILE_SIZE;
+            }
         }
 
         if (fighting) {
@@ -699,6 +746,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         if (currentPlatform != null && !isMoving) {
             playerPos = currentPlatform.pos.cpy();
         }
+
 
         Connection connection = currentLevel.getConnection(playerPos.cpy().add(QUARTER_TILE_SIZE,QUARTER_TILE_SIZE));
         if (connection == null) {
