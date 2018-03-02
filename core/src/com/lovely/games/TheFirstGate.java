@@ -51,9 +51,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private Vector2 moveVector;
     private Vector2 inputVector;
     private float movementValue;
-    private String lastConnection;
+    private Connection lastConnection;
     private List<Level> levels;
-    private String newConnectionTo;
+    private Connection newConnectionTo;
     private List<Arrow> arrows;
     private Texture arrowImage;
     private Texture platformImg;
@@ -107,6 +107,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private Color fadeColor;
     private Animation<TextureRegion> windAnim;
     private Animation<TextureRegion> windHorizontalAnim;
+    private boolean levelChangeLock = false;
 
     @Override
 	public void create () {
@@ -301,13 +302,13 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         actorImages.put("ant", assetManager.get("wizard.png"));
         currentScenes = new ArrayList<>();
 
-        newConnectionTo = "01";
+        Level startLevel = levels.get(7);
         moveLock = false;
 
         sceneContainer = new SceneContainer();
 
         // special
-        startLevel(levels.get(38), "79");
+        startLevel(startLevel, startLevel.getPreviousConnection());
 	}
 
     private Animation<TextureRegion> loadAnimation(Texture sheet, int numberOfFrames, float frameDelay) {
@@ -326,11 +327,11 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
     }
 
-    private void startLevel(Level level, String startConnection) {
+    private void startLevel(Level level, Connection startConnection) {
         currentPlatform = null;
         loadLevel(level);
         currentLevel = level;
-        playerPos = level.getConnectionPosition(startConnection);
+        playerPos = startConnection.pos.cpy();
         isMoving = false;
         inputVector = new Vector2();
         moveVector = new Vector2();
@@ -346,7 +347,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         for (Block block : currentLevel.blocks) {
             block.start();
         }
-
+        for (Connection connection : currentLevel.connections) {
+            connection.reset();
+        }
         for (PressureTile pressureTile : currentLevel.pressureTiles) {
             pressureTile.start();
         }
@@ -747,16 +750,18 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             playerPos = currentPlatform.pos.cpy();
         }
 
-
-        Connection connection = currentLevel.getConnection(playerPos.cpy().add(QUARTER_TILE_SIZE,QUARTER_TILE_SIZE));
-        if (connection == null) {
-            newConnectionTo = null;
-        }
-        if (connection != null && !connection.name.equals(newConnectionTo)) {
-            if (connection.to != null && !connection.to.isEmpty()) {
-                goToConnection(connection.to);
+        for (Connection connection : currentLevel.connections) {
+            if (connection.contains(playerPos.cpy().add(QUARTER_TILE_SIZE,QUARTER_TILE_SIZE))) {
+                if (connection.active) {
+                    if (connection.to != null && !connection.to.isEmpty()) {
+                        goToConnection(connection.to);
+                    }
+                }
+            } else {
+                connection.active = true;
             }
         }
+
 
         DialogSource dialogSource = currentLevel.getDialogSource(playerPos);
         if (dialogSource != null) {
@@ -864,8 +869,21 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     }
 
     private void restartLevel() {
-        newConnectionTo = lastConnection;
         startLevel(currentLevel, lastConnection);
+    }
+
+    private void goToNextLevel() {
+        Connection connection = currentLevel.getPreviousConnection();
+        if (connection != null && connection.to != null && !connection.to.equals("")) {
+            goToConnection(connection.to);
+        }
+    }
+
+    private void goToPreviousLevel() {
+        Connection connection = currentLevel.getNextConnection();
+        if (connection != null && connection.to != null && !connection.to.equals("")) {
+            goToConnection(connection.to);
+        }
     }
 
     private Rectangle getPlayerRect() {
@@ -1011,6 +1029,17 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         if (Gdx.input.isKeyPressed(Input.Keys.R)) {
             restartLevel();
         }
+        if (!Gdx.input.isKeyPressed(Input.Keys.COMMA) && !Gdx.input.isKeyPressed(Input.Keys.PERIOD)) {
+            levelChangeLock = false;
+        }
+        if (!levelChangeLock && Gdx.input.isKeyPressed(Input.Keys.PERIOD)) {
+            goToPreviousLevel();
+            levelChangeLock = true;
+        }
+        if (!levelChangeLock && Gdx.input.isKeyPressed(Input.Keys.COMMA)) {
+            goToNextLevel();
+            levelChangeLock = true;
+        }
     }
 
     private void castCurrentSpell() {
@@ -1106,8 +1135,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     public void goToConnection(String target) {
         for (Level level : levels) {
             if (level.hasConnection(target)) {
-                startLevel(level, target);
-                newConnectionTo = target;
+                Connection connection = level.getConnection(target);
+                startLevel(level, connection);
                 break;
             }
         }

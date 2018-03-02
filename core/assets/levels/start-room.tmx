@@ -38,7 +38,7 @@
   <object id="3" name="1" type="dialog" x="96" y="128" width="32" height="32"/>
   <object id="8" name="1" type="connection" x="64" y="128" width="32" height="32">
    <properties>
-    <property name="to" value=""/>
+    <property name="to" value="98"/>
    </properties>
   </object>
  </objectgroup>

@@ -208,6 +208,49 @@ class Level {
         return null;
     }
 
+    public Connection getNextConnection() {
+        int highest = 0;
+        try {
+            highest = Integer.valueOf(connections.get(0).to);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+        Connection nextConnection = connections.get(0);
+        for (Connection connection : connections) {
+            if (Integer.valueOf(connection.to) > highest) {
+                highest = Integer.valueOf(connection.to);
+                nextConnection = connection;
+            }
+        }
+        return nextConnection;
+    }
+
+    public Connection getPreviousConnection() {
+        int lowest = 0;
+        try {
+            lowest = Integer.valueOf(connections.get(0).to);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+        Connection nextConnection = connections.get(0);
+        for (Connection connection : connections) {
+            if (Integer.valueOf(connection.to) < lowest) {
+                lowest = Integer.valueOf(connection.to);
+                nextConnection = connection;
+            }
+        }
+        return nextConnection;
+    }
+
+    public Connection getConnection(String target) {
+        for (Connection connection : connections) {
+            if (connection.name.equals(target)) {
+                return connection;
+            }
+        }
+        return null;
+    }
+
     /**
      * BUILDEr
      */

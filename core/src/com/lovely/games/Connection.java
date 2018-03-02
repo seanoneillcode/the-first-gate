@@ -10,11 +10,17 @@ public class Connection {
     String name;
     String to;
     Vector2 pos;
+    boolean active;
 
     public Connection(String name, String to, Vector2 pos) {
         this.name = name;
         this.to = to;
         this.pos = pos;
+        this.active = false;
+    }
+
+    public void reset() {
+        this.active = false;
     }
 
     public boolean contains(Vector2 other) {
