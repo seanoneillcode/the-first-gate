@@ -96,6 +96,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private Sprite fightDirectionArrow;
     private Sprite windSprite;
     private boolean fightInputLock;
+    private Sprite enemySprite;
 
     private FightVerb fightVerb;
     private float posterAlpha;
@@ -158,6 +159,12 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("levels/maze-1.tmx", TiledMap.class);
         assetManager.load("levels/enemy-1.tmx", TiledMap.class);
         assetManager.load("levels/enemy-2.tmx", TiledMap.class);
+        assetManager.load("levels/enemy-3.tmx", TiledMap.class);
+        assetManager.load("levels/enemy-4.tmx", TiledMap.class);
+        assetManager.load("levels/enemy-5.tmx", TiledMap.class);
+        assetManager.load("levels/enemy-6.tmx", TiledMap.class);
+        assetManager.load("levels/enemy-8.tmx", TiledMap.class);
+        assetManager.load("levels/enemy-9.tmx", TiledMap.class);
 
         assetManager.load("arrow.png", Texture.class);
         assetManager.load("platform.png", Texture.class);
@@ -183,6 +190,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("fade-image.png", Texture.class);
         assetManager.load("dialog-pointer.png", Texture.class);
         assetManager.load("enemy.png", Texture.class);
+        assetManager.load("enemy-ground.png", Texture.class);
         assetManager.load("lava-ball.png", Texture.class);
         assetManager.load("lazer.png", Texture.class);
         assetManager.load("lazer-horizontal.png", Texture.class);
@@ -240,9 +248,10 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         fightDirectionArrow = new Sprite((Texture) assetManager.get("direction-arrow.png"));
         fadeSprite = new Sprite((Texture) assetManager.get("fade-image.png"));
         fadeSprite.setScale(4.0f);
+        enemySprite = new Sprite((Texture) assetManager.get("enemy.png"));
+
 
         lavaBallImage = assetManager.get("lava-ball.png");
-        enemyImage = assetManager.get("enemy.png");
         lazerImage = assetManager.get("lazer.png");
         horizontalLazerImage = assetManager.get("lazer-horizontal.png");
 
@@ -300,6 +309,12 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         levels.add(Level.loadLevel(assetManager, "levels/maze-1.tmx")); // 79 // 38
         levels.add(Level.loadLevel(assetManager, "levels/enemy-1.tmx")); // 39
         levels.add(Level.loadLevel(assetManager, "levels/enemy-2.tmx")); // 40
+        levels.add(Level.loadLevel(assetManager, "levels/enemy-3.tmx")); // 41
+        levels.add(Level.loadLevel(assetManager, "levels/enemy-4.tmx")); // 42
+        levels.add(Level.loadLevel(assetManager, "levels/enemy-5.tmx")); // 43
+        levels.add(Level.loadLevel(assetManager, "levels/enemy-6.tmx")); // 44
+        levels.add(Level.loadLevel(assetManager, "levels/enemy-8.tmx")); // 45
+        levels.add(Level.loadLevel(assetManager, "levels/enemy-9.tmx")); // 46
 
         gamma = 0.2f;
 
@@ -317,7 +332,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         actorImages.put("ant", assetManager.get("wizard.png"));
         currentScenes = new ArrayList<>();
 
-        Level startLevel = levels.get(40);
+        Level startLevel = levels.get(46);
         moveLock = false;
 
         sceneContainer = new SceneContainer();
@@ -373,6 +388,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         }
         for (Actor actor : currentLevel.actors) {
             actor.start();
+        }
+        for (Door door : currentLevel.doors) {
+            door.start();
         }
         for (SceneSource sceneSource : currentLevel.scenes) {
             sceneSource.start();
@@ -547,7 +565,11 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 }
             }
             for (Enemy enemy : currentLevel.enemies) {
-                batch.draw(enemyImage, enemy.pos.x, enemy.pos.y);
+                String enemyImg = enemy.isGround() ? "enemy-ground.png" : "enemy.png";
+                enemySprite.setTexture(assetManager.get(enemyImg));
+                enemySprite.setRotation(enemy.getRotation());
+                enemySprite.setPosition(enemy.pos.x, enemy.pos.y);
+                enemySprite.draw(batch);
             }
             for (Arrow arrow : arrows) {
                 if (arrow.img.equals(arrowImage)) {
@@ -720,8 +742,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 pressureTile.handleAction();
                 handled = true;
             }
-            for (Block block : currentLevel.blocks) {
-                if (block.pos.dst2(pressureTile.pos) < 64) {
+            for (BlockLike block : currentLevel.getBlockLikes()) {
+                if (block.getPos().dst2(pressureTile.pos) < 64) {
                     pressureTile.handleAction();
                     handled = true;
                 }
@@ -848,6 +870,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             }
             if (getPlayerRect().overlaps(arrow.getRect())) {
                 restartLevel();
+                return;
             }
         }
 

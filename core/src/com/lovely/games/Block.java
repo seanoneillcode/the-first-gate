@@ -29,6 +29,14 @@ class Block implements BlockLike {
         this.color = new Color(random(0.8f, 1.0f), random(0.1f, 0.2f), random(0.1f, 0.2f), 1.0f);
     }
 
+    void start() {
+        this.pos = startPos.cpy();
+        this.isGround = false;
+        isMoving = false;
+        movementValue = 0;
+        this.dir = new Vector2();
+    }
+
     public boolean isMoving() {
         return isMoving;
     }
@@ -57,11 +65,6 @@ class Block implements BlockLike {
         this.dir = dir.cpy();
         isMoving = true;
         movementValue = TILE_SIZE / TILE_SPEED;
-    }
-
-    void start() {
-        this.pos = startPos.cpy();
-        this.isGround = false;
     }
 
     public void update() {

@@ -9,9 +9,12 @@ public class Enemy extends Block implements BlockLike {
 
     Vector2 dir;
     Color color;
+    String stringDir;
+    float targetSize = 16.0f;
 
     public Enemy(Vector2 pos, String dir) {
         super(pos);
+        this.stringDir = dir;
         this.dir = getDir(dir);
         this.color = new Color(0.4f, 0.8f, 0.7f, 1.0f);
     }
@@ -33,23 +36,39 @@ public class Enemy extends Block implements BlockLike {
     public void update(Vector2 playerPos, TheFirstGate theFirstGate) {
         super.update();
         boolean colliding = false;
-        Vector2 checkPos = pos.cpy();
-        for (int i = 0; i < 10; i++) {
-            checkPos.add(dir.cpy().scl(TILE_SIZE));
-            if (theFirstGate.isArrowBlocking(checkPos)) {
-                break;
+        if (!isGround) {
+            Vector2 checkPos = pos.cpy();
+            for (int i = 0; i < 10; i++) {
+                checkPos.add(dir.cpy().scl(TILE_SIZE));
+                if (theFirstGate.isArrowBlocking(checkPos)) {
+                    break;
+                }
+                if (contains(checkPos.cpy().add(8, 8), new Vector2(16, 16), playerPos)) {
+                    colliding = true;
+                    break;
+                }        }
+            if (colliding) {
+                theFirstGate.addLava(pos.cpy(), dir.cpy());
             }
-            if (contains(checkPos, playerPos)) {
-                colliding = true;
-                break;
-            }        }
-        if (colliding) {
-            theFirstGate.addLava(pos.cpy(), dir.cpy());
         }
     }
 
-    private boolean contains(Vector2 thisPos, Vector2 other) {
-        return other.x > thisPos.x && other.x < (thisPos.x + TILE_SIZE)
-                && other.y > thisPos.y && other.y < (thisPos.y + TILE_SIZE);
+    private boolean contains(Vector2 checkPos, Vector2 size, Vector2 player) {
+        return player.x > checkPos.x && player.x < (checkPos.x + size.x)
+                && player.y > checkPos.y && player.y < (checkPos.y + size.x);
+    }
+
+    public float getRotation() {
+        switch (stringDir) {
+            case "left":
+                return 270;
+            case "right":
+                return 90;
+            case "up":
+                return 180;
+            case "down":
+                return 0;
+        }
+        return 0;
     }
 }
