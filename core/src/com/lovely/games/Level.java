@@ -43,11 +43,13 @@ class Level {
     Trunk trunk;
     List<Actor> actors;
     public List<Wind> winds;
+    public List<Enemy> enemies;
 
     Level(List<Connection> connections, boolean[][] walls, boolean[][] deaths, String name, int numXTiles,
           int numYTiles, List<ArrowSource> arrowSources, List<Platform> platforms, List<Block> blocks,
           List<PressureTile> pressureTiles, List<Door> doors, List<DialogSource> dialogSources,
-          List<LevelLight> lights, List<Torch> torches, List<SceneSource> scenes, Trunk trunk, List<Actor> actors, List<Wind> winds) {
+          List<LevelLight> lights, List<Torch> torches, List<SceneSource> scenes, Trunk trunk, List<Actor> actors,
+          List<Wind> winds, List<Enemy> enemies) {
         this.connections = connections;
         this.walls = walls;
         this.deaths = deaths;
@@ -66,6 +68,7 @@ class Level {
         this.trunk = trunk;
         this.actors = actors;
         this.winds = winds;
+        this.enemies = enemies;
     }
 
     Vector2 getConnectionPosition(String name) {
@@ -230,7 +233,7 @@ class Level {
         try {
             lowest = Integer.valueOf(connections.get(0).to);
         } catch (NumberFormatException e) {
-            return null;
+            return connections.get(0);
         }
         Connection nextConnection = connections.get(0);
         for (Connection connection : connections) {
@@ -273,6 +276,7 @@ class Level {
         List<SceneSource> scenes = new ArrayList<>();
         List<Actor> actors = new ArrayList<>();
         private List<Wind> winds = new ArrayList<>();
+        List<Enemy> enemies = new ArrayList<>();
 
         Builder(String name, int numXTiles, int numYTiles) {
             this.name = name;
@@ -292,6 +296,11 @@ class Level {
 
         Builder setDeaths(boolean[][] deaths) {
             this.deaths = deaths;
+            return this;
+        }
+
+        Builder addEnemy(Vector2 pos, String dir) {
+            this.enemies.add(new Enemy(pos, dir));
             return this;
         }
 
@@ -379,7 +388,7 @@ class Level {
                 deaths = new boolean[numXTiles][numYTiles];
             }
             return new Level(connections, walls, deaths, name, numXTiles, numYTiles, arrowSources, platforms, blocks,
-                    pressureTiles, doors, dialogSources, lights, torches, scenes, trunk, actors, winds);
+                    pressureTiles, doors, dialogSources, lights, torches, scenes, trunk, actors, winds, enemies);
         }
 
 
@@ -459,6 +468,15 @@ class Level {
                 }
                 Platform platform = new Platform(start, end, offset, isActive, switchId);
                 builder.addPlatform(platform);
+            }
+            if (properties.containsKey("type") && properties.get("type").equals("enemy")) {
+                RectangleMapObject rectObj = (RectangleMapObject) obj;
+                Vector2 pos = new Vector2(rectObj.getRectangle().x, rectObj.getRectangle().y);
+                String dir = "down";
+                if (properties.containsKey("dir")) {
+                    dir = properties.get("dir").toString();
+                }
+                builder.addEnemy(pos, dir);
             }
             if (properties.containsKey("type") && properties.get("type").equals("block")) {
                 RectangleMapObject rectObj = (RectangleMapObject) obj;

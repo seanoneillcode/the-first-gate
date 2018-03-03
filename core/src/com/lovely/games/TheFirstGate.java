@@ -37,7 +37,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private static final float CAMERA_CATCHUP_SPEED = 2.0f;
     private static final int VIEWPORT_WIDTH = 600;
     private static final int VIEWPORT_HEIGHT = 480;
-    private static final float CAST_ARROW_COOLDOWN = 2.0f;
+    private static final float CAST_ARROW_COOLDOWN = 1.0f;
 
     private SpriteBatch batch;
     private SpriteBatch bufferBatch;
@@ -53,7 +53,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private float movementValue;
     private Connection lastConnection;
     private List<Level> levels;
-    private Connection newConnectionTo;
     private List<Arrow> arrows;
     private Texture arrowImage;
     private Texture platformImg;
@@ -62,6 +61,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private Texture pressureImage;
     private Platform currentPlatform;
     private Texture doorImage;
+    private Texture enemyImage;
+    private Texture lavaBallImage;
     private Texture openDoorImage;
     private Sprite lightHole;
     private Animation<TextureRegion> walkanim;
@@ -154,6 +155,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("levels/bullet-06.tmx", TiledMap.class);
         assetManager.load("levels/bullet-07.tmx", TiledMap.class);
         assetManager.load("levels/maze-1.tmx", TiledMap.class);
+        assetManager.load("levels/enemy-1.tmx", TiledMap.class);
 
         assetManager.load("arrow.png", Texture.class);
         assetManager.load("platform.png", Texture.class);
@@ -178,6 +180,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("ant-test.png", Texture.class);
         assetManager.load("fade-image.png", Texture.class);
         assetManager.load("dialog-pointer.png", Texture.class);
+        assetManager.load("enemy.png", Texture.class);
+        assetManager.load("lava-ball.png", Texture.class);
 
         assetManager.load("wind.png", Texture.class);
         assetManager.load("wind-horizontal.png", Texture.class);
@@ -233,6 +237,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         fadeSprite = new Sprite((Texture) assetManager.get("fade-image.png"));
         fadeSprite.setScale(4.0f);
 
+        lavaBallImage = assetManager.get("lava-ball.png");
+        enemyImage = assetManager.get("enemy.png");
+
         buffer = FrameBuffer.createFrameBuffer(Pixmap.Format.RGBA8888, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, false);
         cam = new OrthographicCamera(buffer.getWidth(), buffer.getHeight());
         cam.position.set(buffer.getWidth() / 2, buffer.getWidth() / 2, 0);
@@ -285,6 +292,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         levels.add(Level.loadLevel(assetManager, "levels/bullet-06.tmx")); // 75 // 36
         levels.add(Level.loadLevel(assetManager, "levels/bullet-07.tmx")); // 77 // 37
         levels.add(Level.loadLevel(assetManager, "levels/maze-1.tmx")); // 79 // 38
+        levels.add(Level.loadLevel(assetManager, "levels/enemy-1.tmx")); // 39
 
         gamma = 0.2f;
 
@@ -302,7 +310,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         actorImages.put("ant", assetManager.get("wizard.png"));
         currentScenes = new ArrayList<>();
 
-        Level startLevel = levels.get(7);
+        Level startLevel = levels.get(39);
         moveLock = false;
 
         sceneContainer = new SceneContainer();
@@ -461,6 +469,12 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             levelLight.setBounds(light.pos.x, light.pos.y, light.size.x, light.size.y);
             levelLight.draw(bufferBatch);
         }
+        for (Enemy enemy : currentLevel.enemies) {
+            lightHole.setColor(enemy.color);
+            lightHole.setRegion(tr);
+            lightHole.setPosition((enemy.pos.x), (enemy.pos.y));
+            lightHole.draw(bufferBatch);
+        }
         for (Torch torch : currentLevel.torches) {
             if (torch.isFire) {
                 lightHole.setColor(torch.color);
@@ -521,6 +535,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 if (block.pos.y > playerPos.y && !block.isGround) {
                     batch.draw(blockImage, block.pos.x, block.pos.y);
                 }
+            }
+            for (Enemy enemy : currentLevel.enemies) {
+                batch.draw(enemyImage, enemy.pos.x, enemy.pos.y);
             }
             for (Arrow arrow : arrows) {
                 TextureRegion currentFrame = arrowAnim.getKeyFrame(animationDelta, true);
@@ -762,6 +779,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             }
         }
 
+        for (Enemy enemy : currentLevel.enemies) {
+            enemy.update(playerPos.cpy().add(HALF_TILE_SIZE,HALF_TILE_SIZE), this);
+        }
 
         DialogSource dialogSource = currentLevel.getDialogSource(playerPos);
         if (dialogSource != null) {
@@ -1107,7 +1127,11 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     }
 
     void addArrow(Vector2 pos, Vector2 dir) {
-        arrows.add(new Arrow(arrowImage, pos, dir));
+        arrows.add(new Arrow(arrowImage, pos, dir, TILE_SIZE * 2.0f));
+    }
+
+    void addLava(Vector2 pos, Vector2 dir) {
+        arrows.add(new Arrow(lavaBallImage, pos, dir, TILE_SIZE * 10.0f));
     }
 
     public void startFight(String fightName, FightVerb fightVerb) {
