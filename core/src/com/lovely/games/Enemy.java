@@ -5,14 +5,13 @@ import com.badlogic.gdx.math.Vector2;
 
 import static com.lovely.games.TheFirstGate.TILE_SIZE;
 
-public class Enemy {
+public class Enemy extends Block implements BlockLike {
 
-    Vector2 pos;
     Vector2 dir;
     Color color;
 
     public Enemy(Vector2 pos, String dir) {
-        this.pos = pos;
+        super(pos);
         this.dir = getDir(dir);
         this.color = new Color(0.4f, 0.8f, 0.7f, 1.0f);
     }
@@ -32,6 +31,7 @@ public class Enemy {
     }
 
     public void update(Vector2 playerPos, TheFirstGate theFirstGate) {
+        super.update();
         boolean colliding = false;
         Vector2 checkPos = pos.cpy();
         for (int i = 0; i < 10; i++) {

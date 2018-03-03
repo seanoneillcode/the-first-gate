@@ -355,6 +355,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         for (Block block : currentLevel.blocks) {
             block.start();
         }
+        for (Enemy enemy : currentLevel.enemies) {
+            enemy.start();
+        }
         for (Connection connection : currentLevel.connections) {
             connection.reset();
         }
@@ -735,8 +738,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 currentPlatform = null;
             }
             if (currentPlatform == null && currentLevel.isDeath(playerPos.cpy().add(HALF_TILE_SIZE,HALF_TILE_SIZE))) {
-                Block block = currentLevel.getBlock(playerPos.cpy().add(QUARTER_TILE_SIZE,QUARTER_TILE_SIZE), false);
-                if (!(block != null && block.isGround)) {
+                BlockLike block = currentLevel.getBlockLike(playerPos.cpy().add(QUARTER_TILE_SIZE,QUARTER_TILE_SIZE), false);
+                if (!(block != null && block.isGround())) {
                     restartLevel();
                 }
             }
@@ -822,8 +825,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 arrowIterator.remove();
             }
             Vector2 nextTilePos = arrow.dir.cpy().scl(TILE_SIZE).add(arrow.pos).add(QUARTER_TILE_SIZE, QUARTER_TILE_SIZE);
-            Block block = currentLevel.getBlock(nextTilePos, true);
-            if (block!= null) {
+            BlockLike block = currentLevel.getBlockLike(nextTilePos, true);
+            if (block != null) {
                 Vector2 nextTileAgain = arrow.dir.cpy().scl(TILE_SIZE * 2.0f).add(arrow.pos).add(QUARTER_TILE_SIZE, QUARTER_TILE_SIZE);
                 if (currentLevel.isTileBlocked(nextTileAgain)) {
                     arrowIterator.remove();
@@ -848,33 +851,38 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         boolean blocksDirty = false;
         for (Block block : currentLevel.blocks) {
             block.update();
-            if (!block.isMoving && !block.isGround) {
-                Platform platform = currentLevel.getPlatform(block.pos);
+        }
+        for (BlockLike blockLike : currentLevel.getBlockLikes()) {
+            if (!blockLike.isMoving() && !blockLike.isGround()) {
+                Platform platform = currentLevel.getPlatform(blockLike.getPos());
                 if (platform == null) {
-                    block.pos.x = MathUtils.round(block.pos.x / TILE_SIZE) * TILE_SIZE;
-                    block.pos.y = MathUtils.round(block.pos.y / TILE_SIZE) * TILE_SIZE;
-                    if (currentLevel.isDeath(block.pos.cpy().add(QUARTER_TILE_SIZE, QUARTER_TILE_SIZE))) {
+                    blockLike.setPos(new Vector2(tileRound(blockLike.getPos().x), tileRound(blockLike.getPos().y)));
+                    if (currentLevel.isDeath(blockLike.getPos().cpy().add(QUARTER_TILE_SIZE, QUARTER_TILE_SIZE))) {
                         boolean alreadyGround = false;
                         for (Block otherBlock : currentLevel.blocks) {
-                            if (otherBlock.isGround) {
-                                if (block.pos.dst2(otherBlock.pos) < 64) {
+                            if (otherBlock.isGround()) {
+                                if (blockLike.getPos().dst2(otherBlock.getPos()) < 64) {
                                     alreadyGround = true;
                                 }
                             }
                         }
                         if (!alreadyGround) {
                             blocksDirty = true;
-                            block.isGround = true;
+                            blockLike.setGround(true);
                         }
                     }
                 } else {
-                    block.pos = platform.pos.cpy();
+                    blockLike.setPos(platform.pos.cpy());
                 }
             }
         }
         if (blocksDirty) {
-            currentLevel.blocks.sort((o1, o2) -> o1.isGround == o2.isGround ? 0 : (o1.isGround ? -1 : 1));
+            currentLevel.blocks.sort((o1, o2) -> o1.isGround() == o2.isGround() ? 0 : (o1.isGround() ? -1 : 1));
         }
+    }
+
+    private float tileRound(float in) {
+        return MathUtils.round(in / TILE_SIZE) * TILE_SIZE;
     }
 
     private void checkForSceneSources(Vector2 pos) {
@@ -956,7 +964,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                     moveVector = inputVector.cpy();
                     Vector2 nextTilePos = moveVector.cpy().scl(TILE_SIZE).add(playerPos).add(QUARTER_TILE_SIZE, QUARTER_TILE_SIZE);
                     if (currentLevel.isTileBlocked(nextTilePos)) {
-                        Block block = currentLevel.getBlock(nextTilePos, true);
+                        BlockLike block = currentLevel.getBlockLike(nextTilePos, true);
                         if (block == null) {
                             checkForSceneSources(nextTilePos);
                             blocked = true;

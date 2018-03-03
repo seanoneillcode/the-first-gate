@@ -90,10 +90,10 @@ class Level {
         return walls[tilex][tiley];
     }
 
-    Block getBlock(Vector2 pos, boolean noGround) {
-        for (Block block : blocks) {
-            if (!(noGround && block.isGround)) {
-                if (pos.dst2(block.pos) < 256) {
+    BlockLike getBlockLike(Vector2 pos, boolean noGround) {
+        for (BlockLike block : getBlockLikes()) {
+            if (!(noGround && block.isGround())) {
+                if (pos.dst2(block.getPos()) < 256) {
                     return block;
                 }
             }
@@ -136,9 +136,16 @@ class Level {
     }
 
     boolean isTileBlocked(Vector2 pos) {
-        Block block = getBlock(pos, true);
+        BlockLike block = getBlockLike(pos, true);
         Door door = getDoor(pos, false);
         return isWall(pos) || block != null || door != null;
+    }
+
+    public List<BlockLike> getBlockLikes() {
+        List<BlockLike> blockLikes = new ArrayList<>();
+        blockLikes.addAll(blocks);
+        blockLikes.addAll(enemies);
+        return blockLikes;
     }
 
     boolean isDeath(Vector2 pos) {

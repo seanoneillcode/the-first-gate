@@ -7,7 +7,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 
-class Block {
+class Block implements BlockLike {
 
     static final float TILE_SPEED = TILE_SIZE * 4.0f;
 
@@ -29,7 +29,28 @@ class Block {
         this.color = new Color(random(0.8f, 1.0f), random(0.1f, 0.2f), random(0.1f, 0.2f), 1.0f);
     }
 
-    void move(Vector2 dir) {
+    public boolean isMoving() {
+        return isMoving;
+    }
+
+    public boolean isGround() {
+        return isGround;
+    }
+
+    public Vector2 getPos() {
+        return pos;
+    }
+
+    public void setPos(Vector2 pos) {
+        this.pos = pos.cpy();
+    }
+
+    @Override
+    public void setGround(boolean isGround) {
+        this.isGround = isGround;
+    }
+
+    public void move(Vector2 dir) {
         if (isGround) {
             return;
         }
@@ -43,7 +64,7 @@ class Block {
         this.isGround = false;
     }
 
-    void update() {
+    public void update() {
         if (isMoving) {
             float movementDelta = Gdx.graphics.getDeltaTime();
             movementValue = movementValue - movementDelta;
