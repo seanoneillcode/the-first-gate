@@ -63,6 +63,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private Texture doorImage;
     private Texture enemyImage;
     private Texture lavaBallImage;
+    private Texture lazerImage, horizontalLazerImage;
     private Texture openDoorImage;
     private Sprite lightHole;
     private Animation<TextureRegion> walkanim;
@@ -156,6 +157,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("levels/bullet-07.tmx", TiledMap.class);
         assetManager.load("levels/maze-1.tmx", TiledMap.class);
         assetManager.load("levels/enemy-1.tmx", TiledMap.class);
+        assetManager.load("levels/enemy-2.tmx", TiledMap.class);
 
         assetManager.load("arrow.png", Texture.class);
         assetManager.load("platform.png", Texture.class);
@@ -182,6 +184,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("dialog-pointer.png", Texture.class);
         assetManager.load("enemy.png", Texture.class);
         assetManager.load("lava-ball.png", Texture.class);
+        assetManager.load("lazer.png", Texture.class);
+        assetManager.load("lazer-horizontal.png", Texture.class);
 
         assetManager.load("wind.png", Texture.class);
         assetManager.load("wind-horizontal.png", Texture.class);
@@ -239,6 +243,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
         lavaBallImage = assetManager.get("lava-ball.png");
         enemyImage = assetManager.get("enemy.png");
+        lazerImage = assetManager.get("lazer.png");
+        horizontalLazerImage = assetManager.get("lazer-horizontal.png");
 
         buffer = FrameBuffer.createFrameBuffer(Pixmap.Format.RGBA8888, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, false);
         cam = new OrthographicCamera(buffer.getWidth(), buffer.getHeight());
@@ -293,6 +299,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         levels.add(Level.loadLevel(assetManager, "levels/bullet-07.tmx")); // 77 // 37
         levels.add(Level.loadLevel(assetManager, "levels/maze-1.tmx")); // 79 // 38
         levels.add(Level.loadLevel(assetManager, "levels/enemy-1.tmx")); // 39
+        levels.add(Level.loadLevel(assetManager, "levels/enemy-2.tmx")); // 40
 
         gamma = 0.2f;
 
@@ -310,7 +317,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         actorImages.put("ant", assetManager.get("wizard.png"));
         currentScenes = new ArrayList<>();
 
-        Level startLevel = levels.get(39);
+        Level startLevel = levels.get(40);
         moveLock = false;
 
         sceneContainer = new SceneContainer();
@@ -543,10 +550,14 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 batch.draw(enemyImage, enemy.pos.x, enemy.pos.y);
             }
             for (Arrow arrow : arrows) {
-                TextureRegion currentFrame = arrowAnim.getKeyFrame(animationDelta, true);
-                arrowSprite.setPosition(arrow.pos.x, arrow.pos.y + 8);
-                arrowSprite.setRegion(currentFrame);
-                arrowSprite.draw(batch);
+                if (arrow.img.equals(arrowImage)) {
+                    TextureRegion currentFrame = arrowAnim.getKeyFrame(animationDelta, true);
+                    arrowSprite.setPosition(arrow.pos.x, arrow.pos.y + 8);
+                    arrowSprite.setRegion(currentFrame);
+                    arrowSprite.draw(batch);
+                } else {
+                    batch.draw(arrow.img, arrow.pos.x, arrow.pos.y);
+                }
             }
             for (Door door : currentLevel.doors) {
                 if (door.isOpen && door.pos.y >= playerPos.y) {
@@ -1139,7 +1150,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     }
 
     void addLava(Vector2 pos, Vector2 dir) {
-        arrows.add(new Arrow(lavaBallImage, pos, dir, TILE_SIZE * 10.0f));
+        Texture img = dir.x != 0 ? horizontalLazerImage : lazerImage;
+        arrows.add(new Arrow(img, pos, dir, TILE_SIZE * 16.0f));
     }
 
     public void startFight(String fightName, FightVerb fightVerb) {
@@ -1172,5 +1184,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 break;
             }
         }
+    }
+
+    public boolean isArrowBlocking(Vector2 checkPos) {
+        return currentLevel.isTileBlocked(checkPos);
     }
 }

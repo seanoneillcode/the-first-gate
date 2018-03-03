@@ -36,6 +36,9 @@ public class Enemy extends Block implements BlockLike {
         Vector2 checkPos = pos.cpy();
         for (int i = 0; i < 10; i++) {
             checkPos.add(dir.cpy().scl(TILE_SIZE));
+            if (theFirstGate.isArrowBlocking(checkPos)) {
+                break;
+            }
             if (contains(checkPos, playerPos)) {
                 colliding = true;
                 break;
