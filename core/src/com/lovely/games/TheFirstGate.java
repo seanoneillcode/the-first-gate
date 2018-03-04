@@ -194,6 +194,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("lava-ball.png", Texture.class);
         assetManager.load("lazer.png", Texture.class);
         assetManager.load("lazer-horizontal.png", Texture.class);
+        assetManager.load("char-style-4.png", Texture.class);
+        assetManager.load("char-style-3.png", Texture.class);
 
         assetManager.load("wind.png", Texture.class);
         assetManager.load("wind-horizontal.png", Texture.class);
@@ -329,10 +331,10 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         arrowSprite = new Sprite();
         arrowSprite.setBounds(0,0,32,32);
         actorImages = new HashMap<>();
-        actorImages.put("ant", assetManager.get("wizard.png"));
+        actorImages.put("ant", assetManager.get("char-style-4.png"));
         currentScenes = new ArrayList<>();
 
-        Level startLevel = levels.get(46);
+        Level startLevel = levels.get(28); // 28
         moveLock = false;
 
         sceneContainer = new SceneContainer();
@@ -607,7 +609,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 }
             }
             TextureRegion currentFrame = walkanim.getKeyFrame(animationDelta, true);
-            batch.draw(currentFrame, playerPos.x, playerPos.y + QUARTER_TILE_SIZE);
+            batch.draw((Texture)assetManager.get("char-style-3.png"), playerPos.x, playerPos.y + QUARTER_TILE_SIZE);
 
             for (Block block : currentLevel.blocks) {
                 if (block.pos.y <= playerPos.y && !block.isGround) {
