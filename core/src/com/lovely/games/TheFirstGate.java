@@ -38,6 +38,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private static final int VIEWPORT_WIDTH = 600;
     private static final int VIEWPORT_HEIGHT = 480;
     private static final float CAST_ARROW_COOLDOWN = 1.0f;
+    private static final float PLAYER_DEATH_TIME = 1.0f;
 
     private SpriteBatch batch;
     private SpriteBatch bufferBatch;
@@ -116,6 +117,15 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private boolean wasMoving;
     private boolean playerFacingLeft = false;
     private boolean shouldFlip = false;
+    private Animation<TextureRegion> fireDeath;
+    private Animation<TextureRegion> fallDeath;
+    private Animation<TextureRegion> pushBlock;
+    private boolean playerIsPushing = false;
+    private boolean playerWasPushing = false;
+    private float playerDeathTimer = 0;
+    private boolean playerIsDead = false;
+    private boolean isFallDeath = false;
+    private boolean isFireDeath = false;
 
     @Override
 	public void create () {
@@ -201,9 +211,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("lazer-horizontal.png", Texture.class);
         assetManager.load("char-style-4.png", Texture.class);
         assetManager.load("char-style-3.png", Texture.class);
-        assetManager.load("pro-walk-1.png", Texture.class);
-        assetManager.load("pro-walk-2.png", Texture.class);
-        assetManager.load("pro-walk-4.png", Texture.class);
+        assetManager.load("pro-simple-fall-death.png", Texture.class);
+        assetManager.load("pro-simple-fire-death.png", Texture.class);
+        assetManager.load("pro-simple-push.png", Texture.class);
         assetManager.load("pro-idle.png", Texture.class);
         assetManager.load("pro-walk-right.png", Texture.class);
         assetManager.load("pro-walk-down.png", Texture.class);
@@ -334,6 +344,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
         walkRight = loadAnimation(assetManager.get("pro-walk-right.png"), 4, 0.165f);
         walkDown = loadAnimation(assetManager.get("pro-walk-down.png"), 4, 0.165f);
+        fireDeath = loadAnimation(assetManager.get("pro-simple-fire-death.png"), 6, 0.085f);
+        fallDeath = loadAnimation(assetManager.get("pro-simple-fall-death.png"), 5, 0.08f);
+        pushBlock = loadAnimation(assetManager.get("pro-simple-push.png"), 4, 0.165f);
         idleAnim = loadAnimation(assetManager.get("pro-idle.png"), 2, 0.5f);
         lightAnim = loadAnimation(assetManager.get("light-magic.png"), 4, 0.6f);
         playerLightAnim = loadAnimation(assetManager.get("player-light.png"), 4, 0.5f);
@@ -348,7 +361,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         actorImages.put("ant", assetManager.get("char-style-4.png"));
         currentScenes = new ArrayList<>();
 
-        Level startLevel = levels.get(10); // 28
+        Level startLevel = levels.get(6); // 28
         moveLock = false;
 
         sceneContainer = new SceneContainer();
@@ -375,6 +388,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
     private void startLevel(Level level, Connection startConnection) {
         currentPlatform = null;
+        playerIsDead = false;
+        playerDeathTimer = 0;
         loadLevel(level);
         currentLevel = level;
         playerPos = startConnection.pos.cpy();
@@ -624,15 +639,22 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             }
             playerSprite.setPosition(playerPos.x, playerPos.y + QUARTER_TILE_SIZE + 4);
             TextureRegion currentFrame;
-            if (dialogLock || isMoving) {
-                if (moveVector.x != 0) {
-                    currentFrame = walkRight.getKeyFrame(walkAnimDelta, true);
+            if (!playerIsDead && (dialogLock || isMoving) ) {
+                if (playerIsPushing || playerWasPushing) {
+                    currentFrame = pushBlock.getKeyFrame(walkAnimDelta, true);
                 } else {
                     currentFrame = walkRight.getKeyFrame(walkAnimDelta, true);
                 }
             } else {
-                currentFrame = idleAnim.getKeyFrame(animationDelta, true);
-                playerSprite.setRegion(currentFrame);
+                if (playerIsDead) {
+                    if (isFallDeath) {
+                        currentFrame = fallDeath.getKeyFrame(animationDelta, false);
+                    } else {
+                        currentFrame = fireDeath.getKeyFrame(animationDelta, false);
+                    }
+                } else {
+                    currentFrame = idleAnim.getKeyFrame(animationDelta, true);
+                }
             }
             playerSprite.setRegion(currentFrame);
             if (playerFacingLeft) {
@@ -754,13 +776,26 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 	}
 
 	private void update() {
-        if (isMoving) {
+        if (playerWasPushing) {
+            playerWasPushing = false;
+        }
+        if (playerDeathTimer > 0) {
+            playerDeathTimer = playerDeathTimer - Gdx.graphics.getDeltaTime();
+
+        } else {
+            if (playerIsDead) {
+                restartLevel();
+            }
+        }
+        if (isMoving && !playerIsDead) {
             float movementDelta = Gdx.graphics.getDeltaTime();
             movementValue = movementValue - movementDelta;
             walkAnimDelta = walkAnimDelta + movementDelta;
             if (movementValue < 0) {
                 isMoving = false;
                 wasMoving = true;
+                playerWasPushing = playerIsPushing;
+                playerIsPushing = false;
                 isWalkOne = !isWalkOne;
                 movementDelta = movementDelta + movementValue;
             }
@@ -794,7 +829,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         for (Wind winds : currentLevel.winds) {
             winds.update();
         }
-        if (!isMoving) {
+        if (!isMoving && !playerIsDead) {
             Platform platform = currentLevel.getPlatform(playerPos);
             if (platform != null) {
                 currentPlatform = platform;
@@ -807,7 +842,10 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             if (currentPlatform == null && currentLevel.isDeath(playerPos.cpy().add(HALF_TILE_SIZE,HALF_TILE_SIZE))) {
                 BlockLike block = currentLevel.getBlockLike(playerPos.cpy().add(QUARTER_TILE_SIZE,QUARTER_TILE_SIZE), false);
                 if (!(block != null && block.isGround())) {
-                    restartLevel();
+                    playerDeathTimer = PLAYER_DEATH_TIME;
+                    playerIsDead = true;
+                    animationDelta = 0;
+                    isFallDeath = true;
                 }
             }
             if (wind == null) {
@@ -902,8 +940,11 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                     arrowIterator.remove();
                 }
             }
-            if (getPlayerRect().overlaps(arrow.getRect())) {
-                restartLevel();
+            if (!playerIsDead && getPlayerRect().overlaps(arrow.getRect())) {
+                playerDeathTimer = PLAYER_DEATH_TIME;
+                playerIsDead = true;
+                animationDelta = 0;
+                isFallDeath = false;
                 return;
             }
         }
@@ -1025,7 +1066,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 }
             }
         } else {
-            if (!fighting) {
+            if (!fighting && !playerIsDead) {
                 boolean sceneBlock = !currentScenes.isEmpty() && currentScenes.stream().anyMatch(Scene::isBlocking);
                 if (!moveLock && !sceneBlock && !isMoving && !inputVector.isZero()) {
                     boolean blocked = false;
@@ -1042,6 +1083,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                                 blocked = true;
                             } else {
                                 block.move(moveVector);
+                                playerIsPushing = true;
                             }
                         }
                     }
