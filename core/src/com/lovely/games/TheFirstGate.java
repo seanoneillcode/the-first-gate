@@ -204,7 +204,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("pro-walk-1.png", Texture.class);
         assetManager.load("pro-walk-2.png", Texture.class);
         assetManager.load("pro-walk-4.png", Texture.class);
-        assetManager.load("pro-idle-1.png", Texture.class);
+        assetManager.load("pro-idle.png", Texture.class);
         assetManager.load("pro-walk-right.png", Texture.class);
         assetManager.load("pro-walk-down.png", Texture.class);
 
@@ -263,7 +263,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         fadeSprite.setScale(4.0f);
         enemySprite = new Sprite((Texture) assetManager.get("enemy.png"));
         playerSprite = new Sprite();
-        playerSprite.setSize(32,48);
+        playerSprite.setSize(32,32);
 
         lavaBallImage = assetManager.get("lava-ball.png");
         lazerImage = assetManager.get("lazer.png");
@@ -332,9 +332,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
         gamma = 0.2f;
 
-        walkRight = loadAnimation(assetManager.get("pro-walk-right.png"), 8, 0.085f);
-        walkDown = loadAnimation(assetManager.get("pro-walk-down.png"), 8, 0.065f);
-        idleAnim = loadAnimation(assetManager.get("pro-idle-1.png"), 2, 0.5f);
+        walkRight = loadAnimation(assetManager.get("pro-walk-right.png"), 4, 0.165f);
+        walkDown = loadAnimation(assetManager.get("pro-walk-down.png"), 4, 0.165f);
+        idleAnim = loadAnimation(assetManager.get("pro-idle.png"), 2, 0.5f);
         lightAnim = loadAnimation(assetManager.get("light-magic.png"), 4, 0.6f);
         playerLightAnim = loadAnimation(assetManager.get("player-light.png"), 4, 0.5f);
         arrowAnim = loadAnimation(assetManager.get("arrow-sheet.png"), 8, 0.05f);
@@ -348,7 +348,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         actorImages.put("ant", assetManager.get("char-style-4.png"));
         currentScenes = new ArrayList<>();
 
-        Level startLevel = levels.get(9); // 28
+        Level startLevel = levels.get(10); // 28
         moveLock = false;
 
         sceneContainer = new SceneContainer();
@@ -552,7 +552,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         camera.update();
         batch.setProjectionMatrix(camera.combined);
         mapRenderer.setView(camera);
-        boolean wasMovin = isMoving;
 	    getInput();
 	    update();
 	    animationDelta = animationDelta + Gdx.graphics.getDeltaTime();
@@ -623,13 +622,13 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                     }
                 }
             }
-            playerSprite.setPosition(playerPos.x, playerPos.y + QUARTER_TILE_SIZE);
+            playerSprite.setPosition(playerPos.x, playerPos.y + QUARTER_TILE_SIZE + 4);
             TextureRegion currentFrame;
             if (dialogLock || isMoving) {
                 if (moveVector.x != 0) {
                     currentFrame = walkRight.getKeyFrame(walkAnimDelta, true);
                 } else {
-                    currentFrame = walkDown.getKeyFrame(walkAnimDelta, true);
+                    currentFrame = walkRight.getKeyFrame(walkAnimDelta, true);
                 }
             } else {
                 currentFrame = idleAnim.getKeyFrame(animationDelta, true);
