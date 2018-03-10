@@ -572,8 +572,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         camera.update();
         batch.setProjectionMatrix(camera.combined);
         mapRenderer.setView(camera);
+        update();
 	    getInput();
-	    update();
 	    animationDelta = animationDelta + Gdx.graphics.getDeltaTime();
 
 	    renderLightMasks();
