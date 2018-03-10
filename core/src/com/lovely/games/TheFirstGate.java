@@ -39,6 +39,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private static final int VIEWPORT_HEIGHT = 480;
     private static final float CAST_ARROW_COOLDOWN = 1.0f;
     private static final float PLAYER_DEATH_TIME = 1.0f;
+    private static final float PLAYER_SHOOTING_TIME = 0.6f;
 
     private SpriteBatch batch;
     private SpriteBatch bufferBatch;
@@ -125,7 +126,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private float playerDeathTimer = 0;
     private boolean playerIsDead = false;
     private boolean isFallDeath = false;
-    private boolean isFireDeath = false;
+    private Animation<TextureRegion> playerShoot;
+    private boolean isPlayerShooting = false;
+    private float playerShootingTimer = 0;
 
     @Override
 	public void create () {
@@ -214,6 +217,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("pro-simple-fall-death.png", Texture.class);
         assetManager.load("pro-simple-fire-death.png", Texture.class);
         assetManager.load("pro-simple-push.png", Texture.class);
+        assetManager.load("pro-simple-shoot.png", Texture.class);
         assetManager.load("pro-idle.png", Texture.class);
         assetManager.load("pro-walk-right.png", Texture.class);
         assetManager.load("pro-walk-down.png", Texture.class);
@@ -346,6 +350,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         walkDown = loadAnimation(assetManager.get("pro-walk-down.png"), 4, 0.165f);
         fireDeath = loadAnimation(assetManager.get("pro-simple-fire-death.png"), 6, 0.085f);
         fallDeath = loadAnimation(assetManager.get("pro-simple-fall-death.png"), 5, 0.08f);
+        playerShoot = loadAnimation(assetManager.get("pro-simple-shoot.png"), 6, 0.1f);
         pushBlock = loadAnimation(assetManager.get("pro-simple-push.png"), 4, 0.165f);
         idleAnim = loadAnimation(assetManager.get("pro-idle.png"), 2, 0.5f);
         lightAnim = loadAnimation(assetManager.get("light-magic.png"), 4, 0.6f);
@@ -361,7 +366,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         actorImages.put("ant", assetManager.get("char-style-4.png"));
         currentScenes = new ArrayList<>();
 
-        Level startLevel = levels.get(6); // 28
+        Level startLevel = levels.get(29); // 28
         moveLock = false;
 
         sceneContainer = new SceneContainer();
@@ -605,7 +610,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             for (Arrow arrow : arrows) {
                 if (arrow.img.equals(arrowImage)) {
                     TextureRegion currentFrame = arrowAnim.getKeyFrame(animationDelta, true);
-                    arrowSprite.setPosition(arrow.pos.x, arrow.pos.y + 8);
+                    arrowSprite.setPosition(arrow.pos.x, arrow.pos.y + 12);
                     arrowSprite.setRegion(currentFrame);
                     arrowSprite.draw(batch);
                 } else {
@@ -637,9 +642,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                     }
                 }
             }
-            playerSprite.setPosition(playerPos.x, playerPos.y + QUARTER_TILE_SIZE + 4);
+            playerSprite.setPosition(playerPos.x, playerPos.y + QUARTER_TILE_SIZE );
             TextureRegion currentFrame;
-            if (!playerIsDead && (dialogLock || isMoving) ) {
+            if (!playerIsDead && isMoving) {
                 if (playerIsPushing || playerWasPushing) {
                     currentFrame = pushBlock.getKeyFrame(walkAnimDelta, true);
                 } else {
@@ -653,7 +658,11 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                         currentFrame = fireDeath.getKeyFrame(animationDelta, false);
                     }
                 } else {
-                    currentFrame = idleAnim.getKeyFrame(animationDelta, true);
+                    if (isPlayerShooting) {
+                        currentFrame = playerShoot.getKeyFrame(animationDelta, true);
+                    } else {
+                        currentFrame = idleAnim.getKeyFrame(animationDelta, true);
+                    }
                 }
             }
             playerSprite.setRegion(currentFrame);
@@ -785,6 +794,15 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         } else {
             if (playerIsDead) {
                 restartLevel();
+            }
+        }
+        if (playerShootingTimer > 0) {
+            playerShootingTimer = playerShootingTimer - Gdx.graphics.getDeltaTime();
+            if (playerShootingTimer < 0) {
+                isPlayerShooting = false;
+            }
+            if (playerShootingTimer < 0.1f) {
+                castCurrentSpell();
             }
         }
         if (isMoving && !playerIsDead) {
@@ -1109,8 +1127,11 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                     }
                 }
                 if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-                    if (!sceneBlock && !castLock) {
-                        castCurrentSpell();
+                    if (!sceneBlock && !castLock && !isPlayerShooting) {
+//                        castCurrentSpell();
+                        isPlayerShooting = true;
+                        playerShootingTimer = PLAYER_SHOOTING_TIME;
+                        animationDelta = 0;
                     }
                     castLock = true;
                 } else {
