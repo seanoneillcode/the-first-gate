@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="1.1.2" orientation="orthogonal" renderorder="right-down" width="15" height="15" tilewidth="32" tileheight="32" infinite="0" nextobjectid="77">
+<map version="1.0" tiledversion="1.1.3" orientation="orthogonal" renderorder="right-down" width="15" height="15" tilewidth="32" tileheight="32" infinite="0" nextobjectid="77">
  <tileset firstgid="1" source="tower-tileset.tsx"/>
  <layer name="ground" width="15" height="15">
   <data encoding="csv">
@@ -13,7 +13,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,2,2,2,2,2,2,2,2,2,2,2,2,0,0,
+0,2,57,57,57,57,57,57,57,57,57,57,2,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -33,8 +33,8 @@
 0,0,4,4,4,4,4,4,4,4,4,4,0,0,0,
 0,0,4,4,4,4,4,4,4,4,4,4,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,3,3,3,3,3,3,3,3,3,3,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,75,75,75,75,75,75,75,75,75,75,0,0,0,
+75,75,0,0,0,0,0,0,0,0,0,0,75,75,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
