@@ -1,5 +1,6 @@
 package com.lovely.games;
 
+import static com.lovely.games.TheFirstGate.ARROW_SPEED;
 import static com.lovely.games.TheFirstGate.TILE_SIZE;
 
 import com.badlogic.gdx.Gdx;
@@ -38,7 +39,7 @@ public class ArrowSource implements Switchable {
             if (timer > delay) {
                 timer = 0;
                 Vector2 startPos = pos.cpy().add(dir.cpy().scl(TILE_SIZE));
-                theFirstGate.addArrow(startPos, dir);
+                theFirstGate.addArrow(startPos, dir, ARROW_SPEED);
             }
         }
     }

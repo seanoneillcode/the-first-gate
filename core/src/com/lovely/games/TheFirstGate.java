@@ -29,6 +29,7 @@ import com.lovely.games.scene.*;
 public class TheFirstGate extends ApplicationAdapter implements Stage {
 
     public static final float TILE_SIZE = 32f;
+    public static final float ARROW_SPEED = TILE_SIZE * 2.0f;
 
     private static final float HALF_TILE_SIZE = 16f;
     private static final float QUARTER_TILE_SIZE = 8f;
@@ -37,9 +38,10 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private static final float CAMERA_CATCHUP_SPEED = 2.0f;
     private static final int VIEWPORT_WIDTH = 600;
     private static final int VIEWPORT_HEIGHT = 480;
-    private static final float CAST_ARROW_COOLDOWN = 1.0f;
+    private static final float CAST_ARROW_COOLDOWN = 0.6f;
     private static final float PLAYER_DEATH_TIME = 1.0f;
-    private static final float PLAYER_SHOOTING_TIME = 0.6f;
+    private static final float PLAYER_SHOOTING_TIME = 0.3f;
+    private static final float PLAYER_ARROW_SPEED = TILE_SIZE * 4.0f;
 
     private SpriteBatch batch;
     private SpriteBatch bufferBatch;
@@ -135,6 +137,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private List<String> titleOptions = Arrays.asList("new", "continue", "options", "quit");
     private Sprite titleSelectionSprite;
     private boolean titleLock = false;
+    private Animation<TextureRegion> arrowExplodeAnim;
+    private List<Explosion> explosions;
 
     @Override
 	public void create () {
@@ -227,6 +231,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("pro-idle.png", Texture.class);
         assetManager.load("pro-walk-right.png", Texture.class);
         assetManager.load("pro-walk-down.png", Texture.class);
+        assetManager.load("arrow-explode.png", Texture.class);
 
         assetManager.load("title.png", Texture.class);
         assetManager.load("title-new.png", Texture.class);
@@ -274,6 +279,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 		batch = new SpriteBatch();
         bufferBatch = new SpriteBatch();
         fighting = false;
+
+        explosions = new ArrayList<>();
 
 		arrowImage = assetManager.get("arrow.png");
         platformImg = assetManager.get("platform.png");
@@ -375,6 +382,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         lightAnim = loadAnimation(assetManager.get("light-magic.png"), 4, 0.6f);
         playerLightAnim = loadAnimation(assetManager.get("player-light.png"), 4, 0.5f);
         arrowAnim = loadAnimation(assetManager.get("arrow-sheet.png"), 8, 0.05f);
+        arrowExplodeAnim = loadAnimation(assetManager.get("arrow-explode.png"), 8, 0.05f);
         torchAnim = loadAnimation(assetManager.get("torch-sheet.png"), 2, 0.5f);
         campfireAnim = loadAnimation(assetManager.get("campfire.png"), 8, 0.1f);
         windAnim = loadAnimation(assetManager.get("wind.png"), 8, 0.1f);
@@ -385,7 +393,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         actorImages.put("ant", assetManager.get("char-style-4.png"));
         currentScenes = new ArrayList<>();
 
-        Level startLevel = levels.get(28); // 28
+        Level startLevel = levels.get(14); // 28
         moveLock = false;
 
         sceneContainer = new SceneContainer();
@@ -532,6 +540,16 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             lightHole.setPosition((arrow.pos.x), (arrow.pos.y));
             lightHole.draw(bufferBatch);
         }
+        for (Explosion explosion : explosions) {
+            lightHole.setColor(explosion.color);
+            lightHole.setAlpha(1 - explosion.getAlpha() * 0.8f);
+            lightHole.setRegion(tr);
+            lightHole.setPosition((explosion.pos.x - 12), (explosion.pos.y));
+            lightHole.setScale((explosion.getAlpha() * 4) * 6.0f);
+            lightHole.draw(bufferBatch);
+        }
+        lightHole.setScale(6.0f);
+
 
         for (PressureTile tile : currentLevel.pressureTiles) {
             lightHole.setColor(tile.color);
@@ -721,18 +739,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                     }
                 }
             }
-            for (Wind wind : currentLevel.winds) {
-                float offset = 1.0f;
-                for (Vector2 drawPos : wind.drawPositions) {
-                    if (wind.isHorizontal()) {
-                        TextureRegion windFrame = windHorizontalAnim.getKeyFrame(animationDelta + offset, true);
-                        batch.draw(windFrame, drawPos.x , drawPos.y );
-                    } else {
-                        TextureRegion windFrame = windAnim.getKeyFrame(animationDelta + offset, true);
-                        batch.draw(windFrame, drawPos.x , drawPos.y );
-                    }
-                    offset = offset + 0.4f;
-                }
+            for (Explosion explosion : explosions) {
+                TextureRegion frame = arrowExplodeAnim.getKeyFrame(explosion.getTimer(), false);
+                batch.draw(frame, explosion.pos.x - 12, explosion.pos.y );
             }
 
             for (Actor actor : currentLevel.actors) {
@@ -893,6 +902,10 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         for (Wind winds : currentLevel.winds) {
             winds.update();
         }
+        for (Explosion explosion : explosions) {
+            explosion.update();
+        }
+        explosions.removeIf(Explosion::isDone);
         if (!isMoving && !playerIsDead) {
             Platform platform = currentLevel.getPlatform(playerPos);
             if (platform != null) {
@@ -991,12 +1004,14 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             Arrow arrow = arrowIterator.next();
             arrow.update(this);
             if (currentLevel.isWall(arrow.pos) || currentLevel.isOutOfBounds(arrow.pos)) {
+                explosions.add(new Explosion(arrow.pos.cpy()));
                 arrowIterator.remove();
             }
             Vector2 nextTilePos = arrow.dir.cpy().scl(TILE_SIZE).add(arrow.pos).add(QUARTER_TILE_SIZE, QUARTER_TILE_SIZE);
             BlockLike block = currentLevel.getBlockLike(nextTilePos, true);
             if (block != null) {
                 Vector2 nextTileAgain = arrow.dir.cpy().scl(TILE_SIZE * 2.0f).add(arrow.pos).add(QUARTER_TILE_SIZE, QUARTER_TILE_SIZE);
+                explosions.add(new Explosion(arrow.pos.cpy()));
                 if (currentLevel.isTileBlocked(nextTileAgain)) {
                     arrowIterator.remove();
                 } else {
@@ -1286,7 +1301,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         }
         if (currentSpell != null && currentSpell.equals("arrow")) {
             Vector2 nextTilePos = playerDir.cpy().scl(TILE_SIZE).add(playerPos);
-            addArrow(nextTilePos, playerDir);
+            addArrow(nextTilePos, playerDir, PLAYER_ARROW_SPEED);
             castCooldown = CAST_ARROW_COOLDOWN;
         }
     }
@@ -1344,8 +1359,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 	    return currentLevel.trunk;
     }
 
-    void addArrow(Vector2 pos, Vector2 dir) {
-        arrows.add(new Arrow(arrowImage, pos, dir, TILE_SIZE * 2.0f));
+    void addArrow(Vector2 pos, Vector2 dir, float speed) {
+        arrows.add(new Arrow(arrowImage, pos, dir, speed));
     }
 
     void addLava(Vector2 pos, Vector2 dir) {
