@@ -1,6 +1,7 @@
 package com.lovely.games;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -193,6 +194,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("levels/enemy-6.tmx", TiledMap.class);
         assetManager.load("levels/enemy-8.tmx", TiledMap.class);
         assetManager.load("levels/enemy-9.tmx", TiledMap.class);
+        assetManager.load("levels/block-test.tmx", TiledMap.class);
 
         assetManager.load("arrow.png", Texture.class);
         assetManager.load("platform.png", Texture.class);
@@ -369,6 +371,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         levels.add(Level.loadLevel(assetManager, "levels/enemy-6.tmx")); // 44
         levels.add(Level.loadLevel(assetManager, "levels/enemy-8.tmx")); // 45
         levels.add(Level.loadLevel(assetManager, "levels/enemy-9.tmx")); // 46
+        levels.add(Level.loadLevel(assetManager, "levels/block-test.tmx")); // 47
 
         gamma = 0.2f;
 
@@ -393,13 +396,13 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         actorImages.put("ant", assetManager.get("char-style-4.png"));
         currentScenes = new ArrayList<>();
 
-        Level startLevel = levels.get(14); // 28
+        Level startLevel = levels.get(40); // 28
         moveLock = false;
 
         sceneContainer = new SceneContainer();
 
-        isTitleMenu = true;
-        fadeScreen(1.0f, Color.BLACK);
+        isTitleMenu = false;
+//        fadeScreen(1.0f, Color.BLACK);
 
         // special
         startLevel(startLevel, startLevel.getPreviousConnection());
@@ -628,6 +631,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+		Vector2 threeDeeLinePos = playerPos.cpy().add(HALF_TILE_SIZE, HALF_TILE_SIZE);
+
         if (!isLevelDirty && !isTitleMenu) {
             mapRenderer.render();
             batch.setProjectionMatrix(camera.combined);
@@ -639,20 +644,22 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             for (Platform platform : currentLevel.getPlatforms()) {
                 batch.draw(platformImg, platform.pos.x, platform.pos.y);
             }
-            for (Block block : currentLevel.blocks) {
-                if (block.isGround) {
-                    batch.draw(groundBlockImage, block.pos.x, block.pos.y);
+            List<BlockLike> blockLikes = currentLevel.getBlockLikes();
+            blockLikes.sort((o1, o2) -> (int)(o2.getPos().y - o1.getPos().y));
+            for (BlockLike blockLike : blockLikes) {
+                if (!(blockLike instanceof Enemy)) {
+                    if (blockLike.isGround()) {
+                        batch.draw(groundBlockImage, blockLike.getPos().x, blockLike.getPos().y);
+                    }
+                    if (blockLike.getPos().y > threeDeeLinePos.y && !blockLike.isGround()) {
+                        batch.draw(blockImage, blockLike.getPos().x, blockLike.getPos().y);
+                    }
                 }
-                if (block.pos.y > playerPos.y && !block.isGround) {
-                    batch.draw(blockImage, block.pos.x, block.pos.y);
+                if (blockLike instanceof Enemy) {
+                    if (blockLike.getPos().y > threeDeeLinePos.y && !blockLike.isGround()) {
+                        drawEnemy((Enemy) blockLike);
+                    }
                 }
-            }
-            for (Enemy enemy : currentLevel.enemies) {
-                String enemyImg = enemy.isGround() ? "enemy-ground.png" : "enemy.png";
-                enemySprite.setTexture(assetManager.get(enemyImg));
-                enemySprite.setRotation(enemy.getRotation());
-                enemySprite.setPosition(enemy.pos.x, enemy.pos.y);
-                enemySprite.draw(batch);
             }
             for (Arrow arrow : arrows) {
                 if (arrow.img.equals(arrowImage)) {
@@ -665,7 +672,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 }
             }
             for (Door door : currentLevel.doors) {
-                if (door.isOpen && door.pos.y >= playerPos.y) {
+                if (door.isOpen && door.pos.y >= threeDeeLinePos.y) {
                     batch.draw(openDoorImage, door.pos.x, door.pos.y);
                 }
                 if (!door.isOpen) {
@@ -673,13 +680,13 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 }
             }
             for (Actor actor : currentLevel.actors) {
-                if (!actor.isHidden && actor.pos.y >= playerPos.y) {
+                if (!actor.isHidden && actor.pos.y >= threeDeeLinePos.y) {
                     Texture actorImage = actorImages.get(actor.id);
                     batch.draw(actorImage, actor.pos.x, actor.pos.y + 12);
                 }
             }
             for (Torch torch : currentLevel.torches) {
-                if (torch.pos.y >= playerPos.y) {
+                if (torch.pos.y >= threeDeeLinePos.y) {
                     if (torch.isFire) {
                         TextureRegion torchFrame = campfireAnim.getKeyFrame(animationDelta, true);
                         batch.draw(torchFrame, torch.pos.x - 20, torch.pos.y - 10);
@@ -718,18 +725,25 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             }
             playerSprite.draw(batch);
 
-            for (Block block : currentLevel.blocks) {
-                if (block.pos.y <= playerPos.y && !block.isGround) {
-                    batch.draw(blockImage, block.pos.x, block.pos.y);
+            for (BlockLike blockLike : blockLikes) {
+                if (!(blockLike instanceof Enemy)) {
+                    if (blockLike.getPos().y <= threeDeeLinePos.y && !blockLike.isGround()) {
+                        batch.draw(blockImage, blockLike.getPos().x, blockLike.getPos().y);
+                    }
+                }
+                if (blockLike instanceof Enemy) {
+                    if (blockLike.getPos().y <= threeDeeLinePos.y && !blockLike.isGround()) {
+                        drawEnemy((Enemy) blockLike);
+                    }
                 }
             }
             for (Door door : currentLevel.doors) {
-                if (door.pos.y < playerPos.y && door.isOpen) {
+                if (door.pos.y < threeDeeLinePos.y && door.isOpen) {
                     batch.draw(openDoorImage, door.pos.x, door.pos.y);
                 }
             }
             for (Torch torch : currentLevel.torches) {
-                if (torch.pos.y < playerPos.y) {
+                if (torch.pos.y < threeDeeLinePos.y) {
                     if (torch.isFire) {
                         TextureRegion torchFrame = campfireAnim.getKeyFrame(animationDelta, true);
                         batch.draw(torchFrame, torch.pos.x - 20, torch.pos.y - 10);
@@ -745,7 +759,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             }
 
             for (Actor actor : currentLevel.actors) {
-                if (!actor.isHidden && actor.pos.y < playerPos.y) {
+                if (!actor.isHidden && actor.pos.y < threeDeeLinePos.y) {
                     Texture actorImage = actorImages.get(actor.id);
                     batch.draw(actorImage, actor.pos.x, actor.pos.y + 12);
                 }
@@ -830,7 +844,15 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
         isLevelDirty = false;
 	}
-	
+
+    private void drawEnemy(Enemy enemy) {
+        String enemyImg = enemy.isGround() ? "enemy-ground.png" : "enemy.png";
+        enemySprite.setTexture(assetManager.get(enemyImg));
+        enemySprite.setRotation(enemy.getRotation());
+        enemySprite.setPosition(enemy.pos.x, enemy.pos.y + 8);
+        enemySprite.draw(batch);
+    }
+
 	@Override
 	public void dispose () {
 		batch.dispose();
@@ -840,6 +862,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 	}
 
 	private void update() {
+        boolean blocksDirty = false;
         if (playerWasPushing) {
             playerWasPushing = false;
         }
@@ -1010,6 +1033,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             Vector2 nextTilePos = arrow.dir.cpy().scl(TILE_SIZE).add(arrow.pos).add(QUARTER_TILE_SIZE, QUARTER_TILE_SIZE);
             BlockLike block = currentLevel.getBlockLike(nextTilePos, true);
             if (block != null) {
+                blocksDirty = true;
                 Vector2 nextTileAgain = arrow.dir.cpy().scl(TILE_SIZE * 2.0f).add(arrow.pos).add(QUARTER_TILE_SIZE, QUARTER_TILE_SIZE);
                 explosions.add(new Explosion(arrow.pos.cpy()));
                 if (currentLevel.isTileBlocked(nextTileAgain)) {
@@ -1036,7 +1060,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             castCooldown = castCooldown - Gdx.graphics.getDeltaTime();
         }
 
-        boolean blocksDirty = false;
         for (Block block : currentLevel.blocks) {
             block.update();
         }
@@ -1064,9 +1087,26 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 }
             }
         }
+        sortBlockLikes();
         if (blocksDirty) {
+//            currentLevel.getBlockLikes().sort((o1, o2) -> (int)(o2.getPos().y - o1.getPos().y));
             currentLevel.blocks.sort((o1, o2) -> o1.isGround() == o2.isGround() ? 0 : (o1.isGround() ? -1 : 1));
         }
+    }
+
+    private void sortBlockLikes() {
+//        currentLevel.blocks.sort((o1, o2) -> (int)(o2.getPos().y - o1.getPos().y));
+//        currentLevel.enemies.sort((o1, o2) -> (int)(o2.getPos().y - o1.getPos().y));
+
+//        List<BlockLike> blockLikes = currentLevel.getBlockLikes();
+//        blockLikes.sort((o1, o2) -> (int)(o2.getPos().y - o1.getPos().y));
+//        blockLikes.forEach(bl -> {
+//            if (currentLevel.blocks.contains(bl)) {
+//                currentLevel.blocks.
+//            }
+//        });
+//        currentLevel.enemies = blockLikes.stream().filter(bl -> bl instanceof Enemy).map(bl -> (Enemy)bl).collect(Collectors.toList());
+//        currentLevel.blocks = blockLikes.stream().filter(bl -> bl instanceof Block).map(bl -> (Block)bl).collect(Collectors.toList());
     }
 
     private float tileRound(float in) {
@@ -1185,6 +1225,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                             } else {
                                 block.move(moveVector);
                                 playerIsPushing = true;
+//                                currentLevel.blocks.sort((o1, o2) -> (int)(o2.pos.y - o1.pos.y));
+                                sortBlockLikes();
                             }
                         }
                     }
