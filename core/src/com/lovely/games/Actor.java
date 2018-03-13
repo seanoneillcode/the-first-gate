@@ -9,6 +9,7 @@ public class Actor {
     boolean isHidden;
     Vector2 originalPos;
     boolean originalIsHide;
+    boolean isWalking;
 
     public Actor(Vector2 pos, String id, boolean isHide) {
         this.pos = pos;
@@ -16,6 +17,7 @@ public class Actor {
         this.originalIsHide = isHide;
         this.isHidden = isHide;
         this.originalPos = pos.cpy();
+        this.isWalking = false;
     }
 
     public void start() {
