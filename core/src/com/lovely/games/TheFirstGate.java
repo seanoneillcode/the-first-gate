@@ -397,7 +397,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         actorImages.put("ant", assetManager.get("char-style-4.png"));
         currentScenes = new ArrayList<>();
 
-        Level startLevel = levels.get(28); // 28 -> 22 ->
+        Level startLevel = levels.get(22); // 28 -> 22 ->
         moveLock = false;
 
         sceneContainer = new SceneContainer();
@@ -657,7 +657,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                     }
                 }
                 if (blockLike instanceof Enemy) {
-                    if (blockLike.getPos().y > threeDeeLinePos.y && !blockLike.isGround()) {
+                    if (blockLike.getPos().y > threeDeeLinePos.y) {
                         drawEnemy((Enemy) blockLike);
                     }
                 }
@@ -853,6 +853,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         }
         antSprite.setPosition(actor.pos.x, actor.pos.y + 12);
         antSprite.setRegion(currentFrame);
+        antSprite.flip(!actor.isFacingRight, false);
         antSprite.draw(batch);
     }
 
@@ -1373,6 +1374,12 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             if (levelActor.id.equals(actor)) {
                 levelActor.pos.add(value);
                 levelActor.isWalking = true;
+                if (value.x > 0) {
+                    levelActor.isFacingRight = true;
+                }
+                if (value.x < 0) {
+                    levelActor.isFacingRight = false;
+                }
             }
         }
     }
