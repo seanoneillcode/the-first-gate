@@ -48,7 +48,7 @@ public class Enemy extends Block implements BlockLike {
                     break;
                 }        }
             if (colliding) {
-                theFirstGate.addLava(pos.cpy(), dir.cpy());
+                theFirstGate.addLazer(pos.cpy(), dir.cpy());
             }
         }
     }

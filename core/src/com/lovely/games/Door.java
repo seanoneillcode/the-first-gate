@@ -12,13 +12,15 @@ public class Door implements Switchable {
     String switchId;
     Color color;
     private boolean originalIsOpen;
+    SoundPlayer soundPlayer;
 
-    public Door(Vector2 pos, boolean isOpen, String switchId) {
+    public Door(Vector2 pos, boolean isOpen, String switchId, SoundPlayer soundPlayer) {
         this.pos = pos;
         this.isOpen = isOpen;
         this.originalIsOpen = isOpen;
         this.switchId = switchId;
         this.color = new Color(random(0.2f, 0.4f), random(0.2f, 0.4f), random(0.8f, 1.0f), 1.0f);
+        this.soundPlayer = soundPlayer;
     }
 
     public void start() {
@@ -29,6 +31,7 @@ public class Door implements Switchable {
     public void handleMessage(String id) {
         if (switchId != null && switchId.equals(id)) {
             isOpen = !isOpen;
+            soundPlayer.playSound("sound/block-0.ogg", false, 1.0f);
         }
     }
 }

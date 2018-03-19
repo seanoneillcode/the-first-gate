@@ -8,8 +8,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
+import com.badlogic.gdx.assets.loaders.SoundLoader;
 import com.badlogic.gdx.assets.loaders.TextureLoader;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -43,6 +45,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private static final float PLAYER_DEATH_TIME = 1.0f;
     private static final float PLAYER_SHOOTING_TIME = 0.3f;
     private static final float PLAYER_ARROW_SPEED = TILE_SIZE * 4.0f;
+
+    private float lazerSoundTimer = 0;
+    private float stepTimer = 0;
 
     private SpriteBatch batch;
     private SpriteBatch bufferBatch;
@@ -138,6 +143,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private Animation<TextureRegion> antWalk;
     private Animation<TextureRegion> antIdle;
     private Sprite antSprite;
+    private SoundPlayer soundPlayer;
 
     @Override
 	public void create () {
@@ -145,6 +151,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         FileHandleResolver fileHandleResolver = new InternalFileHandleResolver();
         assetManager.setLoader(TiledMap.class, new TmxMapLoader(fileHandleResolver));
         assetManager.setLoader(Texture.class, new TextureLoader(fileHandleResolver));
+        assetManager.setLoader(Sound.class, new SoundLoader(fileHandleResolver));
         assetManager.load("levels/tower-01.tmx", TiledMap.class);
         assetManager.load("levels/tower-02.tmx", TiledMap.class);
         assetManager.load("levels/tower-arrow-01.tmx", TiledMap.class);
@@ -267,6 +274,16 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("portraits/portrait-ant-happy.png", Texture.class);
         assetManager.load("portraits/portrait-ant-worried.png", Texture.class);
 
+        assetManager.load("sound/step-2.ogg", Sound.class);
+        assetManager.load("sound/block-0.ogg", Sound.class);
+        assetManager.load("sound/chirp-1.ogg", Sound.class);
+        assetManager.load("sound/cricket-2.ogg", Sound.class);
+        assetManager.load("sound/fall-0.ogg", Sound.class);
+        assetManager.load("sound/flame-0.ogg", Sound.class);
+        assetManager.load("sound/blast-1.ogg", Sound.class);
+        assetManager.load("sound/block-3.ogg", Sound.class);
+        assetManager.load("sound/lazer-4.ogg", Sound.class);
+
         assetManager.finishLoading();
 
         dialogContainer = new DialogContainer(assetManager);
@@ -283,6 +300,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         fighting = false;
 
         explosions = new ArrayList<>();
+
+        soundPlayer = new SoundPlayer(assetManager);
 
 		arrowImage = assetManager.get("arrow.png");
         platformImg = assetManager.get("platform.png");
@@ -326,54 +345,54 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         screenFade = 0f;
 
         levels = new ArrayList<>();
-        levels.add(Level.loadLevel(assetManager, "levels/tower-01.tmx")); // 01
-        levels.add(Level.loadLevel(assetManager, "levels/tower-02.tmx"));
-        levels.add(Level.loadLevel(assetManager, "levels/tower-arrow-01.tmx")); // 05
-        levels.add(Level.loadLevel(assetManager, "levels/tower-arrow-02.tmx")); // 07
-        levels.add(Level.loadLevel(assetManager, "levels/tower-arrow-03.tmx")); // 09
-        levels.add(Level.loadLevel(assetManager, "levels/tower-arrow-04.tmx")); // 11
-        levels.add(Level.loadLevel(assetManager, "levels/tower-platform-01.tmx")); // 13
-        levels.add(Level.loadLevel(assetManager, "levels/tower-platform-02.tmx")); // 15
-        levels.add(Level.loadLevel(assetManager, "levels/tower-platform-03.tmx")); // 17
-        levels.add(Level.loadLevel(assetManager, "levels/tower-platform-04.tmx")); // 19
-        levels.add(Level.loadLevel(assetManager, "levels/tower-block-01.tmx")); // 21 // 10
-        levels.add(Level.loadLevel(assetManager, "levels/tower-block-02.tmx")); // 23
-        levels.add(Level.loadLevel(assetManager, "levels/tower-block-03.tmx")); // 25
-        levels.add(Level.loadLevel(assetManager, "levels/tower-block-04.tmx")); // 27
-        levels.add(Level.loadLevel(assetManager, "levels/tower-switch-01.tmx")); // 29
-        levels.add(Level.loadLevel(assetManager, "levels/tower-switch-02.tmx")); // 31
-        levels.add(Level.loadLevel(assetManager, "levels/tower-switch-03.tmx")); // 33
-        levels.add(Level.loadLevel(assetManager, "levels/tower-arrow-05.tmx")); // 35
-        levels.add(Level.loadLevel(assetManager, "levels/tower-switch-04.tmx")); // 37
-        levels.add(Level.loadLevel(assetManager, "levels/tower-switch-05.tmx")); // 39
-        levels.add(Level.loadLevel(assetManager, "levels/start-room.tmx")); // 1 // 20
-        levels.add(Level.loadLevel(assetManager, "levels/end-room.tmx")); // 41 // 21
-        levels.add(Level.loadLevel(assetManager, "levels/scene-test.tmx")); // 1 // 22
-        levels.add(Level.loadLevel(assetManager, "levels/tower-broken-level.tmx")); // 51 // 23
-        levels.add(Level.loadLevel(assetManager, "levels/tower-arrow-06.tmx")); // 53 // 24
-        levels.add(Level.loadLevel(assetManager, "levels/tower-bridge-1.tmx")); // 55 // 25
-        levels.add(Level.loadLevel(assetManager, "levels/tower-prize-fight.tmx")); // 57 // 26
-        levels.add(Level.loadLevel(assetManager, "levels/tower-ant-revenge.tmx")); // 59 // 27
-        levels.add(Level.loadLevel(assetManager, "levels/camp-fire.tmx")); // start // 28
-        levels.add(Level.loadLevel(assetManager, "levels/wind-1.tmx")); // 61 // 29
-        levels.add(Level.loadLevel(assetManager, "levels/wind-2.tmx")); // 63 // 30
-        levels.add(Level.loadLevel(assetManager, "levels/bullet-01.tmx")); // 65 // 31
-        levels.add(Level.loadLevel(assetManager, "levels/bullet-02.tmx")); // 67 // 32
-        levels.add(Level.loadLevel(assetManager, "levels/bullet-03.tmx")); // 69 // 33
-        levels.add(Level.loadLevel(assetManager, "levels/bullet-04.tmx")); // 71 // 34
-        levels.add(Level.loadLevel(assetManager, "levels/bullet-05.tmx")); // 73 // 35
-        levels.add(Level.loadLevel(assetManager, "levels/bullet-06.tmx")); // 75 // 36
-        levels.add(Level.loadLevel(assetManager, "levels/bullet-07.tmx")); // 77 // 37
-        levels.add(Level.loadLevel(assetManager, "levels/maze-1.tmx")); // 79 // 38
-        levels.add(Level.loadLevel(assetManager, "levels/enemy-1.tmx")); // 39
-        levels.add(Level.loadLevel(assetManager, "levels/enemy-2.tmx")); // 40
-        levels.add(Level.loadLevel(assetManager, "levels/enemy-3.tmx")); // 41
-        levels.add(Level.loadLevel(assetManager, "levels/enemy-4.tmx")); // 42
-        levels.add(Level.loadLevel(assetManager, "levels/enemy-5.tmx")); // 43
-        levels.add(Level.loadLevel(assetManager, "levels/enemy-6.tmx")); // 44
-        levels.add(Level.loadLevel(assetManager, "levels/enemy-8.tmx")); // 45
-        levels.add(Level.loadLevel(assetManager, "levels/enemy-9.tmx")); // 46
-        levels.add(Level.loadLevel(assetManager, "levels/block-test.tmx")); // 47
+        levels.add(Level.loadLevel(assetManager, "levels/tower-01.tmx", soundPlayer)); // 01
+        levels.add(Level.loadLevel(assetManager, "levels/tower-02.tmx", soundPlayer));
+        levels.add(Level.loadLevel(assetManager, "levels/tower-arrow-01.tmx", soundPlayer)); // 05
+        levels.add(Level.loadLevel(assetManager, "levels/tower-arrow-02.tmx", soundPlayer)); // 07
+        levels.add(Level.loadLevel(assetManager, "levels/tower-arrow-03.tmx", soundPlayer)); // 09
+        levels.add(Level.loadLevel(assetManager, "levels/tower-arrow-04.tmx", soundPlayer)); // 11
+        levels.add(Level.loadLevel(assetManager, "levels/tower-platform-01.tmx", soundPlayer)); // 13
+        levels.add(Level.loadLevel(assetManager, "levels/tower-platform-02.tmx", soundPlayer)); // 15
+        levels.add(Level.loadLevel(assetManager, "levels/tower-platform-03.tmx", soundPlayer)); // 17
+        levels.add(Level.loadLevel(assetManager, "levels/tower-platform-04.tmx", soundPlayer)); // 19
+        levels.add(Level.loadLevel(assetManager, "levels/tower-block-01.tmx", soundPlayer)); // 21 // 10
+        levels.add(Level.loadLevel(assetManager, "levels/tower-block-02.tmx", soundPlayer)); // 23
+        levels.add(Level.loadLevel(assetManager, "levels/tower-block-03.tmx", soundPlayer)); // 25
+        levels.add(Level.loadLevel(assetManager, "levels/tower-block-04.tmx", soundPlayer)); // 27
+        levels.add(Level.loadLevel(assetManager, "levels/tower-switch-01.tmx", soundPlayer)); // 29
+        levels.add(Level.loadLevel(assetManager, "levels/tower-switch-02.tmx", soundPlayer)); // 31
+        levels.add(Level.loadLevel(assetManager, "levels/tower-switch-03.tmx", soundPlayer)); // 33
+        levels.add(Level.loadLevel(assetManager, "levels/tower-arrow-05.tmx", soundPlayer)); // 35
+        levels.add(Level.loadLevel(assetManager, "levels/tower-switch-04.tmx", soundPlayer)); // 37
+        levels.add(Level.loadLevel(assetManager, "levels/tower-switch-05.tmx", soundPlayer)); // 39
+        levels.add(Level.loadLevel(assetManager, "levels/start-room.tmx", soundPlayer)); // 1 // 20
+        levels.add(Level.loadLevel(assetManager, "levels/end-room.tmx", soundPlayer)); // 41 // 21
+        levels.add(Level.loadLevel(assetManager, "levels/scene-test.tmx", soundPlayer)); // 1 // 22
+        levels.add(Level.loadLevel(assetManager, "levels/tower-broken-level.tmx", soundPlayer)); // 51 // 23
+        levels.add(Level.loadLevel(assetManager, "levels/tower-arrow-06.tmx", soundPlayer)); // 53 // 24
+        levels.add(Level.loadLevel(assetManager, "levels/tower-bridge-1.tmx", soundPlayer)); // 55 // 25
+        levels.add(Level.loadLevel(assetManager, "levels/tower-prize-fight.tmx", soundPlayer)); // 57 // 26
+        levels.add(Level.loadLevel(assetManager, "levels/tower-ant-revenge.tmx", soundPlayer)); // 59 // 27
+        levels.add(Level.loadLevel(assetManager, "levels/camp-fire.tmx", soundPlayer)); // start // 28
+        levels.add(Level.loadLevel(assetManager, "levels/wind-1.tmx", soundPlayer)); // 61 // 29
+        levels.add(Level.loadLevel(assetManager, "levels/wind-2.tmx", soundPlayer)); // 63 // 30
+        levels.add(Level.loadLevel(assetManager, "levels/bullet-01.tmx", soundPlayer)); // 65 // 31
+        levels.add(Level.loadLevel(assetManager, "levels/bullet-02.tmx", soundPlayer)); // 67 // 32
+        levels.add(Level.loadLevel(assetManager, "levels/bullet-03.tmx", soundPlayer)); // 69 // 33
+        levels.add(Level.loadLevel(assetManager, "levels/bullet-04.tmx", soundPlayer)); // 71 // 34
+        levels.add(Level.loadLevel(assetManager, "levels/bullet-05.tmx", soundPlayer)); // 73 // 35
+        levels.add(Level.loadLevel(assetManager, "levels/bullet-06.tmx", soundPlayer)); // 75 // 36
+        levels.add(Level.loadLevel(assetManager, "levels/bullet-07.tmx", soundPlayer)); // 77 // 37
+        levels.add(Level.loadLevel(assetManager, "levels/maze-1.tmx", soundPlayer)); // 79 // 38
+        levels.add(Level.loadLevel(assetManager, "levels/enemy-1.tmx", soundPlayer)); // 39
+        levels.add(Level.loadLevel(assetManager, "levels/enemy-2.tmx", soundPlayer)); // 40
+        levels.add(Level.loadLevel(assetManager, "levels/enemy-3.tmx", soundPlayer)); // 41
+        levels.add(Level.loadLevel(assetManager, "levels/enemy-4.tmx", soundPlayer)); // 42
+        levels.add(Level.loadLevel(assetManager, "levels/enemy-5.tmx", soundPlayer)); // 43
+        levels.add(Level.loadLevel(assetManager, "levels/enemy-6.tmx", soundPlayer)); // 44
+        levels.add(Level.loadLevel(assetManager, "levels/enemy-8.tmx", soundPlayer)); // 45
+        levels.add(Level.loadLevel(assetManager, "levels/enemy-9.tmx", soundPlayer)); // 46
+        levels.add(Level.loadLevel(assetManager, "levels/block-test.tmx", soundPlayer)); // 47
 
         gamma = 0.2f;
 
@@ -397,7 +416,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         actorImages.put("ant", assetManager.get("char-style-4.png"));
         currentScenes = new ArrayList<>();
 
-        Level startLevel = levels.get(22); // 28 -> 22 ->
+        Level startLevel = levels.get(28); // 28 -> 22 ->
         moveLock = false;
 
         sceneContainer = new SceneContainer();
@@ -442,7 +461,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             arrowSource.start();
         }
         for (Platform platform : currentLevel.getPlatforms()) {
-            platform.start();
+            platform.start(soundPlayer);
         }
         for (Block block : currentLevel.blocks) {
             block.start();
@@ -473,7 +492,11 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         fightLevel = 0;
         if (level.name.equals("levels/camp-fire.tmx")) {
             staticLevel = true;
+            soundPlayer.playSound("sound/chirp-1.ogg", true, 0.2f);
+            soundPlayer.playSound("sound/cricket-2.ogg", true, 0.2f);
         } else {
+            soundPlayer.stopSound("sound/chirp-1.ogg");
+            soundPlayer.stopSound("sound/cricket-2.ogg");
             staticLevel = false;
         }
         if (currentLevel.name.equals("levels/tower-ant-revenge.tmx")) {
@@ -913,6 +936,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 playerPos.add(currentPlatform.getMovement());
             }
         }
+        if (lazerSoundTimer > 0) {
+            lazerSoundTimer = lazerSoundTimer - Gdx.graphics.getDeltaTime();
+        }
         for (PressureTile pressureTile : currentLevel.pressureTiles) {
             boolean handled = false;
             if (playerPos.dst2(pressureTile.pos) < 64) {
@@ -955,6 +981,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 BlockLike block = currentLevel.getBlockLike(playerPos.cpy().add(QUARTER_TILE_SIZE,QUARTER_TILE_SIZE), false);
                 if (!(block != null && block.isGround())) {
                     playerDeathTimer = PLAYER_DEATH_TIME;
+                    soundPlayer.playSound("sound/fall-0.ogg", false, 0.8f);
                     playerIsDead = true;
                     animationDelta = 0;
                     isFallDeath = true;
@@ -1003,6 +1030,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             actor.isWalking = false;
         }
 
+        soundPlayer.update(playerPos);
+
         for (Enemy enemy : currentLevel.enemies) {
             enemy.update(playerPos.cpy().add(HALF_TILE_SIZE,HALF_TILE_SIZE), this);
         }
@@ -1044,6 +1073,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             arrow.update(this);
             if (currentLevel.isWall(arrow.pos) || currentLevel.isOutOfBounds(arrow.pos)) {
                 explosions.add(new Explosion(arrow.pos.cpy()));
+                soundPlayer.playSound("sound/blast-1.ogg", false, 0.3f,  MathUtils.random(0.7f, 1.3f));
                 arrowIterator.remove();
             }
             Vector2 nextTilePos = arrow.dir.cpy().scl(TILE_SIZE).add(arrow.pos).add(QUARTER_TILE_SIZE, QUARTER_TILE_SIZE);
@@ -1058,10 +1088,12 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                     block.move(arrow.dir);
                     arrowIterator.remove();
                 }
+                soundPlayer.playSound("sound/blast-1.ogg", false, 0.3f,  MathUtils.random(0.7f, 1.3f));
             }
             if (!playerIsDead && getPlayerRect().overlaps(arrow.getRect())) {
                 playerDeathTimer = PLAYER_DEATH_TIME;
                 playerIsDead = true;
+                soundPlayer.playSound("sound/flame-0.ogg", false, 0.8f,  MathUtils.random(0.7f, 1.3f));
                 animationDelta = 0;
                 isFallDeath = false;
                 return;
@@ -1069,7 +1101,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         }
 
         for (Platform platform : currentLevel.getPlatforms()) {
-            platform.update();
+            platform.update(soundPlayer);
         }
 
         if (castCooldown > 0) {
@@ -1225,11 +1257,17 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                             } else {
                                 block.move(moveVector);
                                 playerIsPushing = true;
+                                soundPlayer.playSound("sound/block-3.ogg", false, 0.5f, MathUtils.random(0.9f, 1.1f));
                             }
                         }
                     }
                     if (!blocked) {
                         isMoving = true;
+                        float pitch = MathUtils.random(0.75f, 1.25f);
+                        if (stepTimer < 0) {
+                            soundPlayer.playSound("sound/step-2.ogg", false, 0.7f, pitch);
+                            stepTimer = 0.72f;
+                        }
                         if (!wasMoving) {
                             walkAnimDelta = 0;
                         }
@@ -1407,11 +1445,16 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     }
 
     void addArrow(Vector2 pos, Vector2 dir, float speed) {
+        soundPlayer.playSound("sound/blast-1.ogg", false, 0.3f,  MathUtils.random(0.6f, 1.4f));
         arrows.add(new Arrow(arrowImage, pos, dir, speed));
     }
 
-    void addLava(Vector2 pos, Vector2 dir) {
+    void addLazer(Vector2 pos, Vector2 dir) {
         Texture img = dir.x != 0 ? horizontalLazerImage : lazerImage;
+        if (lazerSoundTimer <= 0) {
+            soundPlayer.playSound("sound/lazer-4.ogg", false, 6.0f, 1.0f);
+            lazerSoundTimer = 0.5f;
+        }
         arrows.add(new Arrow(img, pos, dir, TILE_SIZE * 16.0f));
     }
 

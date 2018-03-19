@@ -21,6 +21,7 @@ public class Platform implements Switchable {
     String switchId;
     boolean initialIsActive;
     Color color;
+    private long soundId;
 
     public Platform(Vector2 start, Vector2 end, float offset, boolean isActive, String switchId) {
         this.pos = start.cpy();
@@ -35,14 +36,15 @@ public class Platform implements Switchable {
         this.color = new Color(random(0.8f, 1.0f), random(0.2f, 0.4f), random(0.8f, 1.0f), 1.0f);
     }
 
-    void start() {
+    void start(SoundPlayer soundPlayer) {
         timer = -offset;
         pos = start.cpy();
         destination = end;
         isActive = initialIsActive;
+//        soundId = soundPlayer.playSound("sound/mechanical-1.ogg", true, 0.0f, 1.0f);
     }
 
-    public void update() {
+    public void update(SoundPlayer soundPlayer) {
         if (isActive) {
             if (timer < 0) {
                 timer = timer + Gdx.graphics.getDeltaTime();
@@ -57,6 +59,7 @@ public class Platform implements Switchable {
                     }
                 }
             }
+//            soundPlayer.updateVolume(soundId, "sound/mechanical-1.ogg", pos);
         }
     }
 

@@ -401,7 +401,7 @@ class Level {
 
     }
 
-    static Level loadLevel(AssetManager assetManager, String name) {
+    static Level loadLevel(AssetManager assetManager, String name, SoundPlayer soundPlayer) {
         TiledMap tiledMap = assetManager.get(name);
         MapProperties mapProperties = tiledMap.getProperties();
         int levelWidth = (Integer) mapProperties.get("width");
@@ -527,7 +527,7 @@ class Level {
                 if (properties.containsKey("isOpen")) {
                     isOpen = Boolean.parseBoolean(properties.get("isOpen").toString());
                 }
-                builder.addDoor(new Door(pos, isOpen, switchId));
+                builder.addDoor(new Door(pos, isOpen, switchId, soundPlayer));
             }
             if (properties.containsKey("type") && properties.get("type").equals("light")) {
                 RectangleMapObject rectObj = (RectangleMapObject) obj;
