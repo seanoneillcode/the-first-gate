@@ -416,7 +416,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         actorImages.put("ant", assetManager.get("char-style-4.png"));
         currentScenes = new ArrayList<>();
 
-        Level startLevel = levels.get(28); // 28 -> 22 ->
+        Level startLevel = levels.get(4); // 28 -> 22 ->
         moveLock = false;
 
         sceneContainer = new SceneContainer();
@@ -448,6 +448,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         currentPlatform = null;
         playerIsDead = false;
         playerDeathTimer = 0;
+        stepTimer = -1;
         loadLevel(level);
         currentLevel = level;
         playerPos = startConnection.pos.cpy();
@@ -939,6 +940,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         if (lazerSoundTimer > 0) {
             lazerSoundTimer = lazerSoundTimer - Gdx.graphics.getDeltaTime();
         }
+        if (stepTimer > 0) {
+            stepTimer = stepTimer - Gdx.graphics.getDeltaTime();
+        }
         for (PressureTile pressureTile : currentLevel.pressureTiles) {
             boolean handled = false;
             if (playerPos.dst2(pressureTile.pos) < 64) {
@@ -1263,11 +1267,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                     }
                     if (!blocked) {
                         isMoving = true;
-                        float pitch = MathUtils.random(0.75f, 1.25f);
-                        if (stepTimer < 0) {
-                            soundPlayer.playSound("sound/step-2.ogg", false, 0.7f, pitch);
-                            stepTimer = 0.72f;
-                        }
+
                         if (!wasMoving) {
                             walkAnimDelta = 0;
                         }
@@ -1337,6 +1337,13 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         }
         if ((inputVector.x != 0 || inputVector.y != 0)) {
             dialogLock = true;
+            if (isMoving) {
+                float pitch = MathUtils.random(0.75f, 1.25f);
+                if (stepTimer < 0) {
+                    soundPlayer.playSound("sound/step-2.ogg", false, 0.7f, pitch);
+                    stepTimer = 0.165f * 2f;
+                }
+            }
         } else {
             dialogLock = false;
             moveLock = false;
