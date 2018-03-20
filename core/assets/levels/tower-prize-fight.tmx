@@ -8,7 +8,7 @@
 12,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,13,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,13,0,55,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -61,7 +61,7 @@
  <objectgroup name="objects">
   <object id="9" name="57" type="connection" x="32" y="32" width="32" height="32">
    <properties>
-    <property name="to" value="56"/>
+    <property name="to" value="52"/>
    </properties>
   </object>
   <object id="17" name="58" type="connection" x="576" y="416" width="32" height="32">
@@ -89,14 +89,13 @@
   <object id="49" type="torch" x="416" y="0" width="32" height="32"/>
   <object id="50" type="torch" x="320" y="0" width="32" height="32"/>
   <object id="51" type="torch" x="32" y="0" width="32" height="32"/>
-  <object id="52" name="8" type="scene" x="256" y="64" width="32" height="32"/>
-  <object id="53" name="ant" type="actor" x="0" y="32" width="32" height="32">
+  <object id="52" name="8" type="scene" x="320" y="160" width="32" height="32"/>
+  <object id="53" name="ant" type="actor" x="320" y="160" width="32" height="32">
    <properties>
-    <property name="isHide" value="true"/>
+    <property name="isHide" value="false"/>
    </properties>
   </object>
-  <object id="54" name="9" type="scene" x="256" y="96" width="32" height="32"/>
   <object id="55" type="torch" x="608" y="384" width="32" height="32"/>
-  <object id="56" name="14" type="scene" x="256" y="128" width="32" height="32"/>
+  <object id="56" name="14" type="scene" x="256" y="160" width="32" height="32"/>
  </objectgroup>
 </map>

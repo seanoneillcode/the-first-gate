@@ -69,14 +69,30 @@ public class DialogContainer {
                 line(ant, "You've gone far enough, I've sabotaged this trial to make sure", "happy")
         ));
         dialogs.put("12", Arrays.asList(
-                line(ant, "Stop! damn it!", "angry"),
-                line(ant, "It's mine, get out of the way.", "worried"),
-                line(pro, "No"),
-                line(pro, "I completed these trials, despite your sabotage, and I did it first."),
-                line(ant, "Are you forgetting who I am? I have more estates and money then all of the peasants in your shitty village.", "angry"),
-                line(ant, "I will ruin you before I kill you, so you and no one else can forget.", "angry"),
-                line(pro, "Do it."),
-                line(pro, "I'm getting what I earned.")
+                line(ant, "Who are you?"),
+                line(pro, "I'm...", "worried"),
+                line(pro, "...eh...I'm..."),
+                line(ant, "Well, I am Rothfus"),
+                line(ant, "I take care of the Caen"),
+                line(pro, "care...of..."),
+                line(ant, "The platforms break down sometimes you know?"),
+                line(pro, "Yes...?"),
+                line(ant, "Yes.."),
+                line(ant, "Well I am glad you came"),
+                line(ant, "I'm very lonely here"),
+                line(pro, "Sorry", "worried"),
+                line(ant, "Don't say sorry."),
+                line(pro, "Sorry", "worried"),
+                line(ant, "Well go ahead and take the stone"),
+                line(ant, "It's magic you know?", "happy"),
+                line(ant, "You'll need it to get through the rest of the Caen.", "talk"),
+                line(pro, "I will?"),
+                line(ant, "Yes!", "happy"),
+                line(ant, "It's not a goal but a means", "talk"),
+                line(pro, "...eh...that's nice..."),
+                line(ant, "I'll see you later", "happy"),
+                line(ant, "...hopefully", "listening"),
+                line(ant, "Wouldn't want to miss your riveting conversation.")
         ));
         dialogs.put("13", Arrays.asList(
                 line(pro, "My bones feel like they're going to burst", "worried"),

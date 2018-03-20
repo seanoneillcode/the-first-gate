@@ -46,7 +46,7 @@
  <objectgroup name="objects">
   <object id="9" name="13" type="connection" x="32" y="128" width="32" height="32">
    <properties>
-    <property name="to" value="12"/>
+    <property name="to" value="10"/>
    </properties>
   </object>
   <object id="10" name="14" type="connection" x="416" y="128" width="32" height="32">

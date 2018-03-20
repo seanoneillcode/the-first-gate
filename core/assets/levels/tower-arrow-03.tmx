@@ -51,7 +51,7 @@
   </object>
   <object id="10" name="10" type="connection" x="416" y="192" width="32" height="32">
    <properties>
-    <property name="to" value="11"/>
+    <property name="to" value="13"/>
    </properties>
   </object>
   <object id="13" type="arrowSource" x="160" y="64" width="32" height="32">

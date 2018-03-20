@@ -78,16 +78,13 @@ public class SceneContainer {
                 .verb(new HideShowActorVerb(true, "ant"))
                 .build());
 
-        // prize fight - before confrontation
+        // old man at magic stone
         scenes.put("8", builder()
-                .verb(new HideShowActorVerb(false, "ant"))
-                .verb(new MoveVerb(new Vector2(32 * 8, 0), "ant", true))
                 .verb(new DialogVerb("12"))
                 .build());
 
         scenes.put("9", builder()
                 .verb(new MoveVerb(new Vector2(0, 32 * -2), "ant", true))
-                .verb(new SendEventVerb("a"))
                 .verb(new FightVerb("prize"))
                 .build());
 
@@ -122,6 +119,7 @@ public class SceneContainer {
         scenes.put("14", builder()
                 .verb(new DialogVerb("18"))
                 .verb(new PosterVerb("poster-prize.png"))
+                .verb(new SendEventVerb("a"))
                 .build());
 
         scenes.put("15", builder()

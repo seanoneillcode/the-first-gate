@@ -66,7 +66,7 @@
   </object>
   <object id="10" name="34" type="connection" x="416" y="416" width="32" height="32">
    <properties>
-    <property name="to" value="37"/>
+    <property name="to" value="27"/>
    </properties>
   </object>
   <object id="17" type="platform" x="128" y="320" width="32" height="32">

@@ -416,7 +416,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         actorImages.put("ant", assetManager.get("char-style-4.png"));
         currentScenes = new ArrayList<>();
 
-        Level startLevel = levels.get(4); // 28 -> 22 ->
+        Level startLevel = levels.get(26); // 28 -> 22 ->
         moveLock = false;
 
         sceneContainer = new SceneContainer();
