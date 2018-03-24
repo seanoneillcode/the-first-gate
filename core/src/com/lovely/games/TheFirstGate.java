@@ -200,6 +200,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("levels/enemy-8.tmx", TiledMap.class);
         assetManager.load("levels/enemy-9.tmx", TiledMap.class);
         assetManager.load("levels/block-test.tmx", TiledMap.class);
+        assetManager.load("levels/crossy-road-1.tmx", TiledMap.class);
+        assetManager.load("levels/crossy-road-2.tmx", TiledMap.class);
 
         assetManager.load("arrow.png", Texture.class);
         assetManager.load("platform.png", Texture.class);
@@ -393,7 +395,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         levels.add(Level.loadLevel(assetManager, "levels/enemy-8.tmx", soundPlayer)); // 45
         levels.add(Level.loadLevel(assetManager, "levels/enemy-9.tmx", soundPlayer)); // 46
         levels.add(Level.loadLevel(assetManager, "levels/block-test.tmx", soundPlayer)); // 47
-
+        levels.add(Level.loadLevel(assetManager, "levels/crossy-road-1.tmx", soundPlayer)); // 48
+        levels.add(Level.loadLevel(assetManager, "levels/crossy-road-2.tmx", soundPlayer)); // 49
         gamma = 0.2f;
 
         antWalk = loadAnimation(assetManager.get("ant-walk.png"), 4, 0.165f);
@@ -416,7 +419,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         actorImages.put("ant", assetManager.get("char-style-4.png"));
         currentScenes = new ArrayList<>();
 
-        Level startLevel = levels.get(26); // 28 -> 22 ->
+        Level startLevel = levels.get(48); // 28 -> 22 ->
         moveLock = false;
 
         sceneContainer = new SceneContainer();

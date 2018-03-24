@@ -69,30 +69,17 @@ public class DialogContainer {
                 line(ant, "You've gone far enough, I've sabotaged this trial to make sure", "happy")
         ));
         dialogs.put("12", Arrays.asList(
-                line(ant, "Who are you?"),
-                line(pro, "I'm...", "worried"),
-                line(pro, "...eh...I'm..."),
-                line(ant, "Well, I am Rothfus"),
-                line(ant, "I take care of the Caen"),
-                line(pro, "care...of..."),
+                line(ant, "Don't mind me, I take care of the place."),
                 line(ant, "The platforms break down sometimes you know?"),
-                line(pro, "Yes...?"),
-                line(ant, "Yes.."),
-                line(ant, "Well I am glad you came"),
-                line(ant, "I'm very lonely here"),
                 line(pro, "Sorry", "worried"),
-                line(ant, "Don't say sorry."),
+                line(ant, "Don't be"),
                 line(pro, "Sorry", "worried"),
                 line(ant, "Well go ahead and take the stone"),
-                line(ant, "It's magic you know?", "happy"),
-                line(ant, "You'll need it to get through the rest of the Caen.", "talk"),
-                line(pro, "I will?"),
-                line(ant, "Yes!", "happy"),
-                line(ant, "It's not a goal but a means", "talk"),
-                line(pro, "...eh...that's nice..."),
+                line(ant, "It's magic you know", "happy"),
+                line(ant, "You'll need it to get through the rest of the tests.", "talk"),
                 line(ant, "I'll see you later", "happy"),
                 line(ant, "...hopefully", "listening"),
-                line(ant, "Wouldn't want to miss your riveting conversation.")
+                line(ant, "Wouldn't want to miss your lovely conversation.")
         ));
         dialogs.put("13", Arrays.asList(
                 line(pro, "My bones feel like they're going to burst", "worried"),
