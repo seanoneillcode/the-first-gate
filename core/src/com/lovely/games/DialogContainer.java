@@ -152,12 +152,12 @@ public class DialogContainer {
                 line(pro, "It is a curse", "angry"),
                 line(ant, "Yes, now you understand.", "happy"),
                 line(ant, "I am satisfied with you. Listen to me.", "talk"),
-                line(ant, "I can take you to Bryn, the hearth of Mages. There you can learn to control the power, to use it correctly."),
+                line(ant, "I can take you to Bryn, the hearth of Mages. There you can learn to control the power, to use it ethically."),
                 line(pro, "You would turn me, a peasant, into a Mage?", "worried"),
-                line(ant, "Yes, anyone who survive the Caen can enter Bryn."),
-                line(ant, "It is another set of trials though. Not of stone but people, not in rooms but in the mind. It is much worse than the Caen."),
-                line(pro, "But does the reward match the risk..."),
-                line(ant, "A Mage will not go hungry. A Mage will not become a criminal or a tyrant."),
+                line(ant, "Yes, anyone who survives the Caen can enter Bryn."),
+                line(ant, "It is another set of trials though. Not of block and switches but of people. Not in rooms but in the mind. It is much harder than the Caen."),
+                line(pro, "But does the reward demand the risk...?"),
+                line(ant, "A Mage will not go hungry..."),
                 line(ant, "Take the night to rest and think on it.")
         ));
 //        dialogs.put("21", Arrays.asList(
