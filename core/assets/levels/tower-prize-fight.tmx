@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="1.1.3" orientation="orthogonal" renderorder="right-down" width="20" height="15" tilewidth="32" tileheight="32" infinite="0" nextobjectid="57">
+<map version="1.0" tiledversion="1.1.3" orientation="orthogonal" renderorder="right-down" width="20" height="15" tilewidth="32" tileheight="32" infinite="0" nextobjectid="59">
  <tileset firstgid="1" source="tower-tileset.tsx"/>
  <layer name="walls" width="20" height="15">
   <data encoding="csv">
 12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,0,0,0,0,0,
 2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 12,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,46,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,13,0,55,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,13,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -41,18 +41,18 @@
  </layer>
  <layer name="death" width="20" height="15">
   <data encoding="csv">
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,75,75,75,75,75,75,0,75,75,75,75,75,76,0,0,0,0,0,
-68,68,0,0,4,4,0,0,0,0,0,4,4,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,4,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,
+0,0,75,75,75,75,75,75,0,75,75,75,75,75,76,4,0,0,0,0,
+68,68,4,0,4,4,0,0,0,0,0,4,4,0,0,0,0,0,0,0,
 0,0,0,0,4,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,
 0,0,0,0,4,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,
 0,0,0,0,4,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,
 0,0,0,0,4,74,0,0,0,0,0,76,4,0,0,0,0,0,0,0,
-0,0,0,0,0,4,74,75,0,75,76,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,4,68,4,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,4,74,75,0,75,76,4,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,4,75,4,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,4,4,4,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,4,4,4,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,4,4,4,4,4,4,4,4,4,4,4,0,0,
 0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,4,74,75,75,75,75,75,75,75,75,75,0,0
@@ -66,7 +66,7 @@
   </object>
   <object id="17" name="58" type="connection" x="576" y="416" width="32" height="32">
    <properties>
-    <property name="to" value="59"/>
+    <property name="to" value="112"/>
    </properties>
   </object>
   <object id="37" type="platform" x="256" y="384" width="32" height="32">
@@ -89,13 +89,19 @@
   <object id="49" type="torch" x="416" y="0" width="32" height="32"/>
   <object id="50" type="torch" x="320" y="0" width="32" height="32"/>
   <object id="51" type="torch" x="32" y="0" width="32" height="32"/>
-  <object id="52" name="8" type="scene" x="320" y="160" width="32" height="32"/>
-  <object id="53" name="ant" type="actor" x="320" y="160" width="32" height="32">
+  <object id="52" name="8" type="scene" x="320" y="96" width="32" height="32"/>
+  <object id="53" name="ant" type="actor" x="320" y="96" width="32" height="32">
    <properties>
     <property name="isHide" value="false"/>
    </properties>
   </object>
   <object id="55" type="torch" x="608" y="384" width="32" height="32"/>
   <object id="56" name="14" type="scene" x="256" y="160" width="32" height="32"/>
+  <object id="58" name="11" type="scene" x="320" y="96" width="32" height="32">
+   <properties>
+    <property name="isActive" value="false"/>
+    <property name="switch" value="a"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>

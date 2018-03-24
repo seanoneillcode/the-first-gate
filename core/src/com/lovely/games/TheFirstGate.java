@@ -261,6 +261,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("direction-arrow.png", Texture.class);
         assetManager.load("poster-prize.png", Texture.class);
         assetManager.load("poster-help-ant.png", Texture.class);
+        assetManager.load("ending-poster.png", Texture.class);
         assetManager.load("poster-fuck-ant.png", Texture.class);
         assetManager.load("campfire.png", Texture.class);
         assetManager.load("option-pointer.png", Texture.class);
@@ -419,7 +420,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         actorImages.put("ant", assetManager.get("char-style-4.png"));
         currentScenes = new ArrayList<>();
 
-        Level startLevel = levels.get(48); // 28 -> 22 ->
+        Level startLevel = levels.get(28); // 28 -> 22 ->
         moveLock = false;
 
         sceneContainer = new SceneContainer();
@@ -503,9 +504,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             soundPlayer.stopSound("sound/cricket-2.ogg");
             staticLevel = false;
         }
-        if (currentLevel.name.equals("levels/tower-ant-revenge.tmx")) {
-            currentSpell = "arrow";
-        }
+//        if (currentLevel.name.equals("levels/tower-ant-revenge.tmx")) {
+//            currentSpell = "arrow";
+//        }
     }
 
     private Vector3 getCameraPosition() {
@@ -1482,6 +1483,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     public void showPoster(float alpha, String poster) {
         posterAlpha = alpha;
         posterImageName = poster;
+        if (poster != null && poster.equals("poster-prize.png")) {
+            currentSpell = "arrow";
+        }
     }
 
     public void fadeScreen(float amount, Color color) {

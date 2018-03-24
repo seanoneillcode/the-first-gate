@@ -19,7 +19,7 @@ public class Actor {
         this.isHidden = isHide;
         this.originalPos = pos.cpy();
         this.isWalking = false;
-        this.isFacingRight = true;
+        this.isFacingRight = false;
     }
 
     public void start() {

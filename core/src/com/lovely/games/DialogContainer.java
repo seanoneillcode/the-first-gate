@@ -32,13 +32,14 @@ public class DialogContainer {
                 line(info, "( press 'R' to restart a level )")
         ));
         dialogs.put("3", Arrays.asList(
-                line(pro, "I've never seen a flying ball of fire before. Magic!", "happy")
+                line(pro, "I've never seen a flying ball of fire before. Magic!", "happy"),
+                line(pro, "I better not let it touch me though", "worried")
         ));
         dialogs.put("4", Arrays.asList(
                 line(pro, "( press 'R' to restart a level )")
         ));
         dialogs.put("5", Arrays.asList(
-                line(pro, "There it is. The magic stone.", "happy")
+                line(pro, "There it is. The magic stone.")
         ));
         dialogs.put("6", Arrays.asList(
                 line(pro, "Okay I got you here. I'm leaving now."),
@@ -66,31 +67,36 @@ public class DialogContainer {
                 line(pro, "I'll go back if you go with me and let me out.")
         ));
         dialogs.put("11", Arrays.asList(
-                line(ant, "You've gone far enough, I've sabotaged this trial to make sure", "happy")
+                line(pro, "I can shoot fire with this stone!", "happy"),
+                line(pro, "My blood hurts though", "worried"),
+                line(ant, "You will learn to live with the pain in time.", "talk"),
+                line(ant, "The next tests will teach you how to use the stone.", "talk"),
+                line(ant, "You must also think about the power you hold. Will you use it to kill? To take what is not yours?", "talk"),
+                line(pro, "I... I don't know...", "worried"),
+                line(ant, "You must know these things!", "angry"),
+                line(ant, "This is great power, a force to create or destroy. A power over others.", "angry")
         ));
         dialogs.put("12", Arrays.asList(
-                line(ant, "Don't mind me, I take care of the place."),
-                line(ant, "The platforms break down sometimes you know?"),
-                line(pro, "Sorry", "worried"),
-                line(ant, "Don't be"),
-                line(pro, "Sorry", "worried"),
-                line(ant, "Well go ahead and take the stone"),
-                line(ant, "It's magic you know", "happy"),
-                line(ant, "You'll need it to get through the rest of the tests.", "talk"),
-                line(ant, "I'll see you later", "happy"),
-                line(ant, "...hopefully", "listening"),
-                line(ant, "Wouldn't want to miss your lovely conversation.")
+                line(pro, "Those tests almost killed me!", "angry"),
+                line(ant, "Those tests have killed most. Be glad, you are alive.", "happy"),
+                line(ant, "And the reward demands the risk.", "talk"),
+                line(pro, "Reward? I hope it is gold.", "angry"),
+                line(ant, "Why?", "talk"),
+                line(pro, "I am a landless peasant. I have nothing", "angry"),
+                line(ant, "There is no gold here.", "talk"),
+                line(pro, "What? Then what is the reward!?", "angry"),
+                line(ant, "Power. See for yourself. Take the stone.", "talk")
         ));
         dialogs.put("13", Arrays.asList(
                 line(pro, "My bones feel like they're going to burst", "worried"),
                 line(info, "(press 'spacebar' to cast a spell)")
         ));
         dialogs.put("14", Arrays.asList(
-                line(ant, "Wait! don't leave me here.", "worried"),
-                line(ant, "Step on the switch so I can cross", "worried"),
-                options(info)
-                        .opt("help him", "13")
-                        .opt("walk away", "12")
+                line(ant, "Yes?"),
+                options(pro)
+                        .opt("Is this the Caen?", "18")
+                        .opt("Who are you?", "19")
+                        .opt("What should I do?", "20")
                         .build()
         ));
         dialogs.put("15", Arrays.asList(
@@ -103,7 +109,7 @@ public class DialogContainer {
                 line(ant, "Fool, now I'll take what's mine.", "happy")
         ));
         dialogs.put("18", Arrays.asList(
-                line(pro, "Now to take the stone", "happy")
+                line(pro, "Now to take the stone")
         ));
         dialogs.put("19", Arrays.asList(
                 line(ant, "Yes?"),
@@ -115,21 +121,61 @@ public class DialogContainer {
                         .build()
         ));
         dialogs.put("21", Arrays.asList(
-                line(ant, "Only a day or two more. Over the nearest peak and through a valley."),
-                line(pro, "We will run out of supplies for the return journey if we go too far.", "worried"),
-                line(ant, "I have something planned, don't worry.", "happy")
+                line(ant, "Yes. This is the Caen."),
+                line(ant, "The Caen is a series or rooms that require careful thinking and skillful action to pass through."),
+                line(ant, "Make no mistake though, this is not a simple test."),
+                line(ant, "They are dangerous. Any hesitation or incorrect action will kill you.")
         ));
         dialogs.put("22", Arrays.asList(
-                line(ant, "Because I'm paying you to. You need the money and I can't be bothered to carry it myself"),
-                line(pro, "That's true", "happy")
+                line(ant, "I am the caretaker of the Caen."),
+                line(ant, "My role is to rebuke the foolish and the curious."),
+                line(ant, "To encourage the brave and worthy."),
+                line(ant, "And to clean and maintain the Caen.")
         ));
         dialogs.put("23", Arrays.asList(
-                line(ant, "I told you several times, a small castle belonging to my cousin."),
-                line(pro, "But I haven't heard of any castles out this far.", "worried"),
-                line(ant, "That's no surprise with your education, or lack thereof. There are many wonderful things outside of your village."),
-                line(pro, "No I just...", "worried"),
-                line(ant, "Trust me, my uncle will put us up and provide food and drink plenty.", "happy")
+                line(ant, "That's for you figure out."),
+                line(ant, "Have a look around."),
+                line(pro, "Thanks..."),
+                line(ant, "I could say, that you are aiming for the exit to the north."),
+                line(ant, "But the tests are taken in a linear fashion")
         ));
+        dialogs.put("24", Arrays.asList(
+                line(pro, "What next?"),
+                line(ant, "You can rest here for a while. The Caen is not easy."),
+                line(pro, "And after that?"),
+                line(ant, "As always, that is up to you. You may leave with the stone."),
+                line(pro, "So ... there's no gold?"),
+                line(ant, "There is no gold."),
+                line(pro, "I cannot eat the stone.", "angry"),
+                line(ant, "Why not sell it?"),
+                line(pro, "Is this a trick question? This could turn a peasant into criminal. It could turn a noble into a tyrant.", "angry"),
+                line(pro, "It is a curse", "angry"),
+                line(ant, "Yes, now you understand.", "happy"),
+                line(ant, "I am satisfied with you. Listen to me.", "talk"),
+                line(ant, "I can take you to Bryn, the hearth of Mages. There you can learn to control the power, to use it correctly."),
+                line(pro, "You would turn me, a peasant, into a Mage?", "worried"),
+                line(ant, "Yes, anyone who survive the Caen can enter Bryn."),
+                line(ant, "It is another set of trials though. Not of stone but people, not in rooms but in the mind. It is much worse than the Caen."),
+                line(pro, "But does the reward match the risk..."),
+                line(ant, "A Mage will not go hungry. A Mage will not become a criminal or a tyrant."),
+                line(ant, "Take the night to rest and think on it.")
+        ));
+//        dialogs.put("21", Arrays.asList(
+//                line(ant, "Only a day or two more. Over the nearest peak and through a valley."),
+//                line(pro, "We will run out of supplies for the return journey if we go too far.", "worried"),
+//                line(ant, "I have something planned, don't worry.", "happy")
+//        ));
+//        dialogs.put("22", Arrays.asList(
+//                line(ant, "Because I'm paying you to. You need the money and I can't be bothered to carry it myself"),
+//                line(pro, "That's true", "happy")
+//        ));
+//        dialogs.put("23", Arrays.asList(
+//                line(ant, "I told you several times, a small castle belonging to my cousin."),
+//                line(pro, "But I haven't heard of any castles out this far.", "worried"),
+//                line(ant, "That's no surprise with your education, or lack thereof. There are many wonderful things outside of your village."),
+//                line(pro, "No I just...", "worried"),
+//                line(ant, "Trust me, my uncle will put us up and provide food and drink plenty.", "happy")
+//        ));
         dialogs.put("20", Arrays.asList(
                 options(info)
                         .opt("sleep", "17")
@@ -180,7 +226,7 @@ public class DialogContainer {
         leftPortrait.setScale(0.6f);
         rightPortrait.setScale(0.6f);
         lastMood = "pro-listening";
-        lastAntMood = "pro-listening";
+        lastAntMood = "ant-listening";
     }
 
     void render(SpriteBatch batch, Vector2 offset, Conversation conversation) {

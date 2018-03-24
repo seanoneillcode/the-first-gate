@@ -101,7 +101,7 @@ public class SceneContainer {
 
         // pro feels the magic
         scenes.put("11", builder()
-                .verb(new DialogVerb("13"))
+                .verb(new DialogVerb("11"))
                 .build());
 
         // pro walks away to leave ant to die
@@ -120,10 +120,11 @@ public class SceneContainer {
                 .verb(new DialogVerb("18"))
                 .verb(new PosterVerb("poster-prize.png"))
                 .verb(new SendEventVerb("a"))
+                .verb(new DialogVerb("13"))
                 .build());
 
         scenes.put("15", builder()
-                .verb(new DialogVerb("19"))
+                .verb(new DialogVerb("14"))
                 .build());
 
         // standing in fire
@@ -143,7 +144,9 @@ public class SceneContainer {
         // go to sleep
         scenes.put("17", builder()
                 .verb(new FadeScreenVerb(false, 2.0f, Color.BLACK))
-                .verb(new ConnectionVerb("start"))
+                .verb(new FadeScreenVerb(true, 0.1f, Color.BLACK))
+                .verb(new PosterVerb("ending-poster.png"))
+                .verb(new FadeScreenVerb(false, 0.1f, Color.BLACK))
                 .build());
 
         scenes.put("21", builder()
@@ -154,8 +157,7 @@ public class SceneContainer {
                 .build());
 
         scenes.put("23", builder()
-                .verb(new PosterVerb("poster-fuck-ant.png"))
-                .verb(new FadeScreenVerb(false, 2.0f, Color.BLACK))
+                .verb(new DialogVerb("24"))
                 .build());
     }
 
