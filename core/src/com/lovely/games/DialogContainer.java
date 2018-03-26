@@ -200,7 +200,7 @@ public class DialogContainer {
     public DialogContainer(AssetManager assetManager) {
         currentDialog = null;
         dialogIndex = 0;
-        font = loadFonts();
+        font = loadFonts("consolas.fnt");
         timer = 0;
         this.dialogBottom = assetManager.get("dialog-bottom.png");
         this.dialogTop = assetManager.get("dialog-top.png");
@@ -305,8 +305,8 @@ public class DialogContainer {
         }
     }
 
-    private BitmapFont loadFonts() {
-        font = new BitmapFont(Gdx.files.internal("consolas.fnt"),false);
+    private BitmapFont loadFonts(String fontString) {
+        font = new BitmapFont(Gdx.files.internal(fontString),false);
         font.setUseIntegerPositions(false);
         font.setColor(fontColorMain);
         return font;

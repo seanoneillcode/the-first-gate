@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.assets.loaders.SoundLoader;
@@ -13,10 +14,7 @@ import com.badlogic.gdx.assets.loaders.TextureLoader;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -144,6 +142,12 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private Animation<TextureRegion> antIdle;
     private Sprite antSprite;
     private SoundPlayer soundPlayer;
+    private int lastLevel = -1;
+    private String lastConnectionNumber = "";
+    private BitmapFont font;
+    private Color fontColorSelectedMain = new Color(0 / 256.0f, 82f / 256.0f, 69f / 256.0f, 1);
+    private Color fontColorMain = new Color(5 / 256.0f, 23  / 256.0f, 26 / 256.0f, 1);
+
 
     @Override
 	public void create () {
@@ -244,15 +248,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("ant-idle.png", Texture.class);
         assetManager.load("ant-walk.png", Texture.class);
 
-        assetManager.load("title.png", Texture.class);
-        assetManager.load("title-new.png", Texture.class);
-        assetManager.load("title-continue.png", Texture.class);
-        assetManager.load("title-options.png", Texture.class);
-        assetManager.load("title-quit.png", Texture.class);
-        assetManager.load("title-new-selected.png", Texture.class);
-        assetManager.load("title-continue-selected.png", Texture.class);
-        assetManager.load("title-options-selected.png", Texture.class);
-        assetManager.load("title-quit-selected.png", Texture.class);
+        assetManager.load("caen-title.png", Texture.class);
         assetManager.load("wind.png", Texture.class);
         assetManager.load("wind-horizontal.png", Texture.class);
         assetManager.load("fight-indicator.png", Texture.class);
@@ -292,6 +288,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         dialogContainer = new DialogContainer(assetManager);
 
         fadeColor = Color.BLACK;
+        inputVector = new Vector2();
 
         directions = Arrays.asList("left", "right", "up", "down");
 
@@ -327,10 +324,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         antSprite = new Sprite();
         antSprite.setSize(32,32);
 
-        titleSprite = new Sprite((Texture) assetManager.get("title.png"));
-        titleSprite.setScale(3);
-        titleSelectionSprite = new Sprite((Texture) assetManager.get("title-new.png"));
-        titleSelectionSprite.setScale(2);
+        titleSprite = new Sprite((Texture) assetManager.get("caen-title.png"));
+        titleSprite.setScale(2);
 
         lazerImage = assetManager.get("lazer.png");
         horizontalLazerImage = assetManager.get("lazer-horizontal.png");
@@ -419,19 +414,57 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         actorImages = new HashMap<>();
         actorImages.put("ant", assetManager.get("char-style-4.png"));
         currentScenes = new ArrayList<>();
+        loadExternalData();
+
+        font = loadFonts("kells.fnt");
 
         // start room = 20
-        Level startLevel = levels.get(20); // 28 -> 22 ->
+//        Level startLevel = levels.get(lastLevel); // 28 -> 22 ->
         moveLock = false;
 
         sceneContainer = new SceneContainer();
 
-        isTitleMenu = false;
+        isTitleMenu = true;
 //        fadeScreen(1.0f, Color.BLACK);
 
         // special
-        startLevel(startLevel, startLevel.getPreviousConnection());
+//        startLevel(startLevel, startLevel.getPreviousConnection());
 	}
+
+	private void loadExternalData() {
+        Preferences prefs = Gdx.app.getPreferences("caen-preferences");
+        if (prefs.contains("current-spell")) {
+            currentSpell = prefs.getString("current-spell");
+        } else {
+            currentSpell = null;
+        }
+    }
+
+    private void saveLevelNumber(int levelNumber, String lastConnectionNumber) {
+        Preferences prefs = Gdx.app.getPreferences("caen-preferences");
+        prefs.putInteger("last-level", levelNumber);
+        prefs.putString("last-connection-number", lastConnectionNumber);
+        prefs.flush();
+    }
+
+    private void loadLevelFromPrefs() {
+        Preferences prefs = Gdx.app.getPreferences("caen-preferences");
+        if (prefs.contains("last-level")) {
+            lastLevel = prefs.getInteger("last-level");
+        } else {
+            lastLevel = 20;
+        }
+        Level level = levels.get(lastLevel);
+        Connection connection = level.getPreviousConnection();
+        if (prefs.contains("last-connection-number")) {
+            lastConnectionNumber = prefs.getString("last-connection-number");
+            if (level.hasConnection(lastConnectionNumber)) {
+                connection = level.getConnection(lastConnectionNumber);
+            }
+        }
+
+        startLevel(level, connection);
+    }
 
     private Animation<TextureRegion> loadAnimation(Texture sheet, int numberOfFrames, float frameDelay) {
         TextureRegion[][] tmp = TextureRegion.split(sheet, sheet.getWidth() / numberOfFrames, sheet.getHeight());
@@ -446,7 +479,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         TiledMap map = assetManager.get(level.name);
         mapRenderer = new OrthogonalTiledMapRenderer(map, batch);
         mapRenderer.setView(camera);
-
     }
 
     private void startLevel(Level level, Connection startConnection) {
@@ -456,6 +488,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         stepTimer = -1;
         loadLevel(level);
         currentLevel = level;
+        saveLevelNumber(levels.indexOf(currentLevel), startConnection.name);
         playerPos = startConnection.pos.cpy();
         isMoving = false;
         inputVector = new Vector2();
@@ -505,9 +538,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             soundPlayer.stopSound("sound/cricket-2.ogg");
             staticLevel = false;
         }
-//        if (currentLevel.name.equals("levels/tower-ant-revenge.tmx")) {
-//            currentSpell = "arrow";
-//        }
     }
 
     private Vector3 getCameraPosition() {
@@ -516,7 +546,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             pos = new Vector2(280, 240);
         }
         if (isTitleMenu) {
-            return new Vector3(pos.x, pos.y, 0);
+            return new Vector3(280, 240, 0);
         }
         Vector3 target = new Vector3(pos.x, pos.y, 0);
         final float speed = CAMERA_CATCHUP_SPEED * Gdx.graphics.getDeltaTime();
@@ -651,19 +681,22 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         camera.position.set(getCameraPosition());
         camera.update();
         batch.setProjectionMatrix(camera.combined);
-        mapRenderer.setView(camera);
-        update();
+        if (!isTitleMenu) {
+            mapRenderer.setView(camera);
+            update();
+        }
 	    getInput();
 	    animationDelta = animationDelta + Gdx.graphics.getDeltaTime();
-
-	    renderLightMasks();
-
+        if (!isTitleMenu) {
+            renderLightMasks();
+        }
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-		Vector2 threeDeeLinePos = playerPos.cpy().add(0, 0);
+
 
         if (!isLevelDirty && !isTitleMenu) {
+            Vector2 threeDeeLinePos = playerPos.cpy().add(0, 0);
             mapRenderer.render();
             batch.setProjectionMatrix(camera.combined);
             batch.begin();
@@ -852,19 +885,21 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             }
             batch.end();
         }
-        if ( isTitleMenu ) {
+        if (isTitleMenu) {
             batch.setProjectionMatrix(camera.combined);
             batch.begin();
-            titleSprite.setPosition(250, 360);
+            titleSprite.setPosition(180, 300);
             titleSprite.draw(batch);
-            Vector2 selectedPos = new Vector2(240, 240);
+            Vector2 selectedPos = new Vector2(220, 200);
             int index = 0;
             for (String option : titleOptions) {
-                String selected = index == titleSelectionIndex ? "-selected" : "";
-                titleSelectionSprite.setRegion((Texture) assetManager.get("title-" + option + selected + ".png"));
-                titleSelectionSprite.setPosition(selectedPos.x, selectedPos.y);
-                titleSelectionSprite.draw(batch);
-                selectedPos.add(0, -48);
+                if (titleSelectionIndex == index) {
+                    font.setColor(fontColorSelectedMain);
+                } else {
+                    font.setColor(fontColorMain);
+                }
+                font.draw(batch, option, selectedPos.x, selectedPos.y, 0f, -1, false);
+                selectedPos.add(0, -40);
                 index++;
             }
             batch.end();
@@ -872,6 +907,14 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
         isLevelDirty = false;
 	}
+
+    private BitmapFont loadFonts(String fontString) {
+        font = new BitmapFont(Gdx.files.internal(fontString),false);
+        font.setUseIntegerPositions(false);
+        font.setColor(fontColorMain);
+        font.getData().setScale(2.0f, 2.0f);
+        return font;
+    }
 
     private void drawActor(Actor actor) {
         TextureRegion currentFrame;
@@ -1212,6 +1255,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             titleSelectionIndex = titleSelectionIndex - (int) inputVector.y;
             if (inputVector.y != 0) {
                 titleLock = true;
+                moveLock = true;
             }
             if (titleSelectionIndex > 3) {
                 titleSelectionIndex = 3;
@@ -1222,13 +1266,23 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             if (inputVector.x != 0 || Gdx.input.isKeyPressed(Input.Keys.SPACE) || Gdx.input.isKeyPressed(Input.Keys.ENTER)) {
                 if (titleSelectionIndex == 0) {
                     isTitleMenu = false;
-                    fadeScreen(0f, Color.BLACK);
+//                    fadeScreen(0f, Color.BLACK);
+                    saveLevelNumber(20, "61");
+                    loadLevelFromPrefs();
+                }
+                if (titleSelectionIndex == 1) {
+                    isTitleMenu = false;
+//                    fadeScreen(0f, Color.BLACK);
+                    loadLevelFromPrefs();
                 }
                 if (titleSelectionIndex == 3) {
                     Gdx.app.exit();
                 }
             }
-
+            if (inputVector.x == 0 && inputVector.y == 0) {
+                titleLock = false;
+            }
+            return;
         }
 
         if (conversation != null) {
@@ -1367,7 +1421,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         gamma = MathUtils.clamp(gamma, 0, 1.0f);
 
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
-            Gdx.app.exit();
+            isTitleMenu = true;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.R)) {
             restartLevel();
