@@ -17,10 +17,11 @@ public class SceneContainer {
 
         // ant tells player to stand on switch
         scenes.put("1", builder()
-                .verb(new MoveVerb(new Vector2(0, 3 * 32), "ant"))
-                .verb(new DialogVerb("6"))
-                .verb(new MoveVerb(new Vector2(4 * 32, 0), "ant", true))
-                .verb(new MoveVerb(new Vector2(0, 32), "ant", true))
+                .verb(new FadeScreenVerb(true, 2.0f, Color.BLACK))
+//                .verb(new MoveVerb(new Vector2(0, 3 * 32), "ant"))
+//                .verb(new DialogVerb("6"))
+//                .verb(new MoveVerb(new Vector2(4 * 32, 0), "ant", true))
+//                .verb(new MoveVerb(new Vector2(0, 32), "ant", true))
                 .build());
 
         // player steps on swithc, closes them off

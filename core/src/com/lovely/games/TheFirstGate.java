@@ -1071,6 +1071,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 if (connection.active) {
                     if (connection.to != null && !connection.to.isEmpty()) {
                         goToConnection(connection.to);
+                        return;
                     }
                 }
             } else {
@@ -1267,8 +1268,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 if (titleSelectionIndex == 0) {
                     isTitleMenu = false;
 //                    fadeScreen(0f, Color.BLACK);
-                    saveLevelNumber(20, "61");
-                    loadLevelFromPrefs();
+                    //saveLevelNumber(20, "61");
+//                    loadLevelFromPrefs();
+                    startLevel(levels.get(20), levels.get(20).getConnection("61"));
                 }
                 if (titleSelectionIndex == 1) {
                     isTitleMenu = false;

@@ -564,7 +564,7 @@ class Level {
                 if (properties.containsKey("switch")) {
                     switchId = properties.get("switch").toString();
                 }
-                builder.addScene(obj.getName(), pos, size, playOnce, isActive, switchId);
+                builder.addScene(obj.getName(), pos, size, false, isActive, switchId);
             }
             if (properties.containsKey("type") && properties.get("type").equals("pressure")) {
                 RectangleMapObject rectObj = (RectangleMapObject) obj;
