@@ -67,7 +67,7 @@ public class DialogContainer {
                 line(pro, "I'll go back if you go with me and let me out.")
         ));
         dialogs.put("11", Arrays.asList(
-                line(pro, "I can shoot fire with this stone!", "happy"),
+                line(pro, "I can feel the power of this stone!", "happy"),
                 line(pro, "My blood hurts though", "worried"),
                 line(ant, "You will learn to live with the pain in time.", "talk"),
                 line(ant, "The next tests will teach you how to use the stone.", "talk"),

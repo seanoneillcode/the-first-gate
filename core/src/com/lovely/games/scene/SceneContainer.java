@@ -122,6 +122,9 @@ public class SceneContainer {
                 .verb(new PosterVerb("poster-prize.png"))
                 .verb(new SendEventVerb("a"))
                 .verb(new DialogVerb("13"))
+                .verb(new MoveVerb(new Vector2(0, -1 * 32), "ant", false))
+                .verb(new MoveVerb(new Vector2(-1 * 32, 0), "ant", false))
+                .verb(new DialogVerb("11"))
                 .build());
 
         scenes.put("15", builder()

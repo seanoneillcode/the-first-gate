@@ -53,7 +53,7 @@ public class PosterVerb implements SceneVerb {
 
     @Override
     public boolean isBlocking() {
-        return false;
+        return true;
     }
 
     @Override
