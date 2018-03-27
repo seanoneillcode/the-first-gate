@@ -496,6 +496,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         arrows = new ArrayList<>();
         movementValue = 0;
         lastConnection = startConnection;
+        explosions = new ArrayList<>();
         for (ArrowSource arrowSource : currentLevel.getArrowSources()) {
             arrowSource.start();
         }
