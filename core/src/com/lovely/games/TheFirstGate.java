@@ -133,7 +133,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private Sprite titleSprite;
     private boolean isTitleMenu = false;
     private int titleSelectionIndex = 0;
-    private List<String> titleOptions = Arrays.asList("new", "continue", "options", "quit");
+    private List<String> titleOptions = Arrays.asList("quit", "options", "new", "continue");
     private Sprite titleSelectionSprite;
     private boolean titleLock = false;
     private Animation<TextureRegion> arrowExplodeAnim;
@@ -145,9 +145,10 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private int lastLevel = -1;
     private String lastConnectionNumber = "";
     private BitmapFont font;
-    private Color fontColorSelectedMain = new Color(0 / 256.0f, 82f / 256.0f, 69f / 256.0f, 1);
-    private Color fontColorMain = new Color(5 / 256.0f, 23  / 256.0f, 26 / 256.0f, 1);
-
+    private Color fontColorSelectedMain = new Color(69 / 256.0f, 128 / 256.0f, 213 / 256.0f, 1);
+    private Color fontColorMain = new Color(10 / 256.0f, 64 / 256.0f, 97 / 256.0f, 1);
+    private Color fontGreyedOut = new Color(55 / 256.0f, 55 / 256.0f, 55 / 256.0f, 1);
+    private boolean hasContinue = false;
 
     @Override
 	public void create () {
@@ -429,6 +430,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
         // special
 //        startLevel(startLevel, startLevel.getPreviousConnection());
+//        Gdx.app.getPreferences("caen-preferences").clear();
 	}
 
 	private void loadExternalData() {
@@ -438,6 +440,11 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         } else {
             currentSpell = null;
         }
+        if (prefs.contains("last-level")) {
+            hasContinue = prefs.getInteger("last-level") != 20;
+        } else {
+            hasContinue = false;
+        }
     }
 
     private void saveLevelNumber(int levelNumber, String lastConnectionNumber) {
@@ -445,6 +452,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         prefs.putInteger("last-level", levelNumber);
         prefs.putString("last-connection-number", lastConnectionNumber);
         prefs.flush();
+        hasContinue = true;
     }
 
     private void loadLevelFromPrefs() {
@@ -891,17 +899,19 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             batch.begin();
             titleSprite.setPosition(180, 300);
             titleSprite.draw(batch);
-            Vector2 selectedPos = new Vector2(220, 200);
-            int index = 0;
-            for (String option : titleOptions) {
-                if (titleSelectionIndex == index) {
+            Vector2 selectedPos = new Vector2(280, 200);
+            for (int index = titleOptions.size() - 1; index > -1; index--) {
+                String option = titleOptions.get(index);
+                if (titleSelectionIndex == titleOptions.size() - 1 - index) {
                     font.setColor(fontColorSelectedMain);
                 } else {
                     font.setColor(fontColorMain);
                 }
-                font.draw(batch, option, selectedPos.x, selectedPos.y, 0f, -1, false);
+                if (option.equals("continue") && !hasContinue) {
+                    font.setColor(fontGreyedOut);
+                }
+                font.draw(batch, option, selectedPos.x, selectedPos.y, 0f, 1, false);
                 selectedPos.add(0, -40);
-                index++;
             }
             batch.end();
         }
@@ -1259,8 +1269,13 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 titleLock = true;
                 moveLock = true;
             }
-            if (titleSelectionIndex > 3) {
-                titleSelectionIndex = 3;
+            if (!hasContinue) {
+                if (titleSelectionIndex < 1) {
+                    titleSelectionIndex = 1;
+                }
+            }
+            if (titleSelectionIndex > titleOptions.size() - 1) {
+                titleSelectionIndex = titleOptions.size() - 1;
             }
             if (titleSelectionIndex < 0) {
                 titleSelectionIndex = 0;
@@ -1268,15 +1283,11 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             if (inputVector.x != 0 || Gdx.input.isKeyPressed(Input.Keys.SPACE) || Gdx.input.isKeyPressed(Input.Keys.ENTER)) {
                 if (titleSelectionIndex == 0) {
                     isTitleMenu = false;
-//                    fadeScreen(0f, Color.BLACK);
-                    //saveLevelNumber(20, "61");
-//                    loadLevelFromPrefs();
-                    startLevel(levels.get(20), levels.get(20).getConnection("61"));
+                    loadLevelFromPrefs();
                 }
                 if (titleSelectionIndex == 1) {
                     isTitleMenu = false;
-//                    fadeScreen(0f, Color.BLACK);
-                    loadLevelFromPrefs();
+                    startLevel(levels.get(20), levels.get(20).getConnection("61"));
                 }
                 if (titleSelectionIndex == 3) {
                     Gdx.app.exit();
@@ -1285,6 +1296,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             if (inputVector.x == 0 && inputVector.y == 0) {
                 titleLock = false;
             }
+            inputVector = new Vector2();
             return;
         }
 
