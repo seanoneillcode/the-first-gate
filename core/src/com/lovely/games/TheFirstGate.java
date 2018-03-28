@@ -149,6 +149,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private Color fontColorMain = new Color(10 / 256.0f, 64 / 256.0f, 97 / 256.0f, 1);
     private Color fontGreyedOut = new Color(55 / 256.0f, 55 / 256.0f, 55 / 256.0f, 1);
     private boolean hasContinue = false;
+    private boolean isViewDirty = false;
+    private ScreenFader screenFader;
 
     @Override
 	public void create () {
@@ -341,6 +343,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
         shapeRenderer = new ShapeRenderer();
 
+        screenFader = new ScreenFader();
         screenFade = 0f;
 
         levels = new ArrayList<>();
@@ -426,7 +429,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         sceneContainer = new SceneContainer();
 
         isTitleMenu = true;
-//        fadeScreen(1.0f, Color.BLACK);
+        fadeScreen(true, 3.0f, Color.BLACK);
+//        setScreenFade(1.0f, Color.BLACK);
 
         // special
 //        startLevel(startLevel, startLevel.getPreviousConnection());
@@ -694,6 +698,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             mapRenderer.setView(camera);
             update();
         }
+        screenFader.update(this);
 	    getInput();
 	    animationDelta = animationDelta + Gdx.graphics.getDeltaTime();
         if (!isTitleMenu) {
@@ -704,7 +709,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
 
 
-        if (!isLevelDirty && !isTitleMenu) {
+        if (!isLevelDirty && !isTitleMenu && !isViewDirty) {
             Vector2 threeDeeLinePos = playerPos.cpy().add(0, 0);
             mapRenderer.render();
             batch.setProjectionMatrix(camera.combined);
@@ -886,15 +891,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 posterSprite.setPosition(camera.position.x - (VIEWPORT_WIDTH / 2.0f), camera.position.y - (VIEWPORT_HEIGHT / 2.0f));
                 posterSprite.draw(batch);
             }
-            if (screenFade > 0) {
-                fadeSprite.setColor(fadeColor);
-                fadeSprite.setAlpha(screenFade);
-                fadeSprite.setPosition(camera.position.x - 76, camera.position.y - 62);
-                fadeSprite.draw(batch);
-            }
             batch.end();
         }
-        if (isTitleMenu) {
+        if (isTitleMenu && !isViewDirty) {
             batch.setProjectionMatrix(camera.combined);
             batch.begin();
             titleSprite.setPosition(180, 300);
@@ -915,8 +914,21 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             }
             batch.end();
         }
+        if (screenFade > 0) {
+            Vector2 pos = new Vector2(204, 180);
+            if (!isTitleMenu) {
+                pos = new Vector2(camera.position.x - 76, camera.position.y - 60);
+            }
+            batch.begin();
+            fadeSprite.setColor(fadeColor);
+            fadeSprite.setAlpha(screenFade);
+            fadeSprite.setPosition(pos.x, pos.y);
+            fadeSprite.draw(batch);
+            batch.end();
+        }
 
         isLevelDirty = false;
+        isViewDirty = false;
 	}
 
     private BitmapFont loadFonts(String fontString) {
@@ -1293,6 +1305,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                     Gdx.app.exit();
                 }
             }
+            if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
+                Gdx.app.exit();
+            }
             if (inputVector.x == 0 && inputVector.y == 0) {
                 titleLock = false;
             }
@@ -1437,6 +1452,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
             isTitleMenu = true;
+            isViewDirty = true;
+            titleLock = true;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.R)) {
             restartLevel();
@@ -1558,9 +1575,13 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         }
     }
 
-    public void fadeScreen(float amount, Color color) {
+    public void setScreenFade(float amount, Color color) {
         screenFade = amount;
         fadeColor = color;
+    }
+
+    public void fadeScreen(boolean inDirection, float time, Color color) {
+        screenFader.fadeScreen(inDirection, time, color);
     }
 
     @Override

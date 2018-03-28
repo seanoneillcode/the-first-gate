@@ -25,22 +25,26 @@ public class FadeScreenVerb implements SceneVerb {
     @Override
     public void update(Stage stage) {
         if (!isDone) {
-            if (inDirection) {
-                amount = amount - Gdx.graphics.getDeltaTime();
-                if (amount < 0) {
-                    isDone = true;
-                    amount = 0;
-                }
-            } else {
-                amount = amount + Gdx.graphics.getDeltaTime();
-                if (amount > time) {
-                    isDone = true;
-                    amount = time;
-                }
-            }
-
+//            if (inDirection) {
+//                amount = amount - Gdx.graphics.getDeltaTime();
+//                if (amount < 0) {
+//                    isDone = true;
+//                    amount = 0;
+//                }
+//            } else {
+//                amount = amount + Gdx.graphics.getDeltaTime();
+//                if (amount > time) {
+//                    isDone = true;
+//                    amount = time;
+//                }
+//            }
+//            amount = amount - Gdx.graphics.getDeltaTime();
+//            if (amount < 0) {
+//                isDone = true;
+//            }
+            stage.fadeScreen(inDirection, time, color);
+            isDone = true;
         }
-        stage.fadeScreen(amount / time, color);
     }
 
     @Override

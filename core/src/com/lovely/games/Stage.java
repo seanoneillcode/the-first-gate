@@ -27,5 +27,7 @@ public interface Stage {
 
     void goToConnection(String connection);
 
-    void fadeScreen(float amount, Color color);
+    void setScreenFade(float amount, Color color);
+
+    void fadeScreen(boolean inDirection, float time, Color color);
 }
