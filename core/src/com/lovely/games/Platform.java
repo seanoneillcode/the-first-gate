@@ -33,7 +33,7 @@ public class Platform implements Switchable {
         this.isActive = isActive;
         this.initialIsActive = isActive;
         this.switchId = switchId;
-        this.color = new Color(random(0.8f, 1.0f), random(0.2f, 0.4f), random(0.8f, 1.0f), 1.0f);
+        this.color = new Color(random(0.8f, 1.0f), random(0.8f, 0.8f), random(0.8f, 1.0f), 1.0f);
     }
 
     void start(SoundPlayer soundPlayer) {

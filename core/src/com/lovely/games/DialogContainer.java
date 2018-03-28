@@ -151,7 +151,7 @@ public class DialogContainer {
                 line(pro, "Is this a trick question? This could turn a peasant into criminal. It could turn a noble into a tyrant.", "angry"),
                 line(pro, "It is a curse", "angry"),
                 line(ant, "Yes, now you understand.", "happy"),
-                line(ant, "I am satisfied with you. Listen to me.", "talk"),
+                line(ant, "I am satisfied that you understand the stone. Listen to me.", "talk"),
                 line(ant, "I can take you to Bryn, the hearth of Mages. There you can learn to control the power, to use it ethically."),
                 line(pro, "You would turn me, a peasant, into a Mage?", "worried"),
                 line(ant, "Yes, anyone who survives the Caen can enter Bryn."),
@@ -200,7 +200,7 @@ public class DialogContainer {
     public DialogContainer(AssetManager assetManager) {
         currentDialog = null;
         dialogIndex = 0;
-        font = loadFonts("consolas.fnt");
+        font = loadFonts("fonts/consolas.fnt");
         timer = 0;
         this.dialogBottom = assetManager.get("dialog-bottom.png");
         this.dialogTop = assetManager.get("dialog-top.png");
@@ -291,12 +291,12 @@ public class DialogContainer {
                 optionPointer.setPosition(dialogPos.x + 6, dialogPos.y - 2 + ypos + startHeight - 14);
                 optionPointer.draw(batch);
                 font.setColor(fontColorSecondary);
-                font.draw(batch, line, dialogPos.x + 10 + offsetx, dialogPos.y - 2 + ypos + startHeight - 2);
+                font.draw(batch, line, dialogPos.x + 10 + offsetx, dialogPos.y - 1 + ypos + startHeight - 2);
                 font.setColor(fontColorHighlighted);
                 font.draw(batch, line, dialogPos.x + 10 + offsetx, dialogPos.y + ypos + startHeight - 2);
             } else {
                 font.setColor(fontColorSecondary);
-                font.draw(batch, line, dialogPos.x + 10 + offsetx, dialogPos.y - 2 + ypos + startHeight - 2);
+                font.draw(batch, line, dialogPos.x + 10 + offsetx, dialogPos.y - 1 + ypos + startHeight - 2);
                 font.setColor(fontColorMain);
                 font.draw(batch, line, dialogPos.x + 10 + offsetx, dialogPos.y + ypos + startHeight - 2);
             }

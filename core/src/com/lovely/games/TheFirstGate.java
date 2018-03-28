@@ -1,7 +1,6 @@
 package com.lovely.games;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -62,7 +61,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private Connection lastConnection;
     private List<Level> levels;
     private List<Arrow> arrows;
-    private Texture arrowImage;
     private Texture platformImg;
     private Texture blockImage;
     private Texture groundBlockImage;
@@ -88,24 +86,14 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private List<Scene> currentScenes;
     private DialogVerb activeDialogVerb;
     private boolean moveLock, snaplock;
-    private Map<String, Texture> actorImages;
     private boolean skipLock;
     private boolean castLock;
     private String currentSpell;
     private float castCooldown = 0;
-    private boolean fighting;
-    private float fightLevel;
     private ShapeRenderer shapeRenderer;
-    private Vector2 antFightJitter, proFightJitter;
-    private String fightInputNeeded;
-    private List<String> directions;
-    private float fightInputScale;
-    private Sprite fightDirectionArrow;
     private Sprite playerSprite;
-    private boolean fightInputLock;
     private Sprite enemySprite;
 
-    private FightVerb fightVerb;
     private float posterAlpha;
     private String posterImageName;
     private Sprite posterSprite;
@@ -181,15 +169,12 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("levels/tower-switch-04.tmx", TiledMap.class);
         assetManager.load("levels/tower-switch-05.tmx", TiledMap.class);
         assetManager.load("levels/start-room.tmx", TiledMap.class);
-        assetManager.load("levels/end-room.tmx", TiledMap.class);
         assetManager.load("levels/scene-test.tmx", TiledMap.class);
         assetManager.load("levels/tower-broken-level.tmx", TiledMap.class);
         assetManager.load("levels/tower-bridge-1.tmx", TiledMap.class);
         assetManager.load("levels/tower-prize-fight.tmx", TiledMap.class);
         assetManager.load("levels/tower-ant-revenge.tmx", TiledMap.class);
         assetManager.load("levels/camp-fire.tmx", TiledMap.class);
-        assetManager.load("levels/wind-1.tmx", TiledMap.class);
-        assetManager.load("levels/wind-2.tmx", TiledMap.class);
         assetManager.load("levels/bullet-01.tmx", TiledMap.class);
         assetManager.load("levels/bullet-02.tmx", TiledMap.class);
         assetManager.load("levels/bullet-03.tmx", TiledMap.class);
@@ -206,65 +191,33 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("levels/enemy-6.tmx", TiledMap.class);
         assetManager.load("levels/enemy-8.tmx", TiledMap.class);
         assetManager.load("levels/enemy-9.tmx", TiledMap.class);
-        assetManager.load("levels/block-test.tmx", TiledMap.class);
         assetManager.load("levels/crossy-road-1.tmx", TiledMap.class);
         assetManager.load("levels/crossy-road-2.tmx", TiledMap.class);
 
-        assetManager.load("arrow.png", Texture.class);
-        assetManager.load("platform.png", Texture.class);
-        assetManager.load("block.png", Texture.class);
-        assetManager.load("pressure.png", Texture.class);
-        assetManager.load("ground-block.png", Texture.class);
-        assetManager.load("door.png", Texture.class);
-        assetManager.load("open-door.png", Texture.class);
-        assetManager.load("wizard-sheet.png", Texture.class);
-        assetManager.load("dialog-bottom.png", Texture.class);
-        assetManager.load("dialog-top.png", Texture.class);
-        assetManager.load("dialog-line.png", Texture.class);
-        assetManager.load("light-hole.png", Texture.class);
-        assetManager.load("light-magic.png", Texture.class);
-        assetManager.load("player-light.png", Texture.class);
-        assetManager.load("arrow-sheet.png", Texture.class);
-        assetManager.load("level-light.png", Texture.class);
-        assetManager.load("torch-sheet.png", Texture.class);
-        assetManager.load("portraits/portrait-1.png", Texture.class);
-        assetManager.load("portraits/red-01.png", Texture.class);
-        assetManager.load("wizard.png", Texture.class);
-        assetManager.load("ant-test.png", Texture.class);
-        assetManager.load("fade-image.png", Texture.class);
-        assetManager.load("dialog-pointer.png", Texture.class);
-        assetManager.load("enemy.png", Texture.class);
-        assetManager.load("enemy-ground.png", Texture.class);
-        assetManager.load("lava-ball.png", Texture.class);
-        assetManager.load("lazer.png", Texture.class);
-        assetManager.load("lazer-horizontal.png", Texture.class);
-        assetManager.load("char-style-4.png", Texture.class);
-        assetManager.load("char-style-3.png", Texture.class);
-        assetManager.load("pro-simple-fall-death.png", Texture.class);
-        assetManager.load("pro-simple-fire-death.png", Texture.class);
-        assetManager.load("pro-simple-push.png", Texture.class);
-        assetManager.load("pro-simple-shoot.png", Texture.class);
-        assetManager.load("pro-simple-idle.png", Texture.class);
-        assetManager.load("pro-simple-walk.png", Texture.class);
-        assetManager.load("pro-walk-down.png", Texture.class);
-        assetManager.load("arrow-explode.png", Texture.class);
-        assetManager.load("ant-idle.png", Texture.class);
-        assetManager.load("ant-walk.png", Texture.class);
+        assetManager.load("entity/platform.png", Texture.class);
+        assetManager.load("entity/block.png", Texture.class);
+        assetManager.load("entity/pressure.png", Texture.class);
+        assetManager.load("entity/ground-block.png", Texture.class);
+        assetManager.load("entity/door.png", Texture.class);
+        assetManager.load("entity/open-door.png", Texture.class);
+        assetManager.load("entity/arrow-explode.png", Texture.class);
+        assetManager.load("entity/arrow-sheet.png", Texture.class);
+        assetManager.load("entity/torch-sheet.png", Texture.class);
+        assetManager.load("entity/enemy.png", Texture.class);
+        assetManager.load("entity/enemy-ground.png", Texture.class);
+        assetManager.load("entity/lazer.png", Texture.class);
+        assetManager.load("entity/lazer-horizontal.png", Texture.class);
+        assetManager.load("entity/campfire.png", Texture.class);
 
-        assetManager.load("caen-title.png", Texture.class);
-        assetManager.load("wind.png", Texture.class);
-        assetManager.load("wind-horizontal.png", Texture.class);
-        assetManager.load("fight-indicator.png", Texture.class);
-        assetManager.load("fight-pro-avatar.png", Texture.class);
-        assetManager.load("fight-ant-avatar.png", Texture.class);
-        assetManager.load("direction-arrow.png", Texture.class);
-        assetManager.load("poster-prize.png", Texture.class);
-        assetManager.load("poster-help-ant.png", Texture.class);
-        assetManager.load("ending-poster.png", Texture.class);
-        assetManager.load("poster-fuck-ant.png", Texture.class);
-        assetManager.load("campfire.png", Texture.class);
-        assetManager.load("option-pointer.png", Texture.class);
-        assetManager.load("portraits/real-test.png", Texture.class);
+        assetManager.load("character/pro-simple-fall-death.png", Texture.class);
+        assetManager.load("character/pro-simple-fire-death.png", Texture.class);
+        assetManager.load("character/pro-simple-push.png", Texture.class);
+        assetManager.load("character/pro-simple-shoot.png", Texture.class);
+        assetManager.load("character/pro-simple-idle.png", Texture.class);
+        assetManager.load("character/pro-simple-walk.png", Texture.class);
+        assetManager.load("character/ant-idle.png", Texture.class);
+        assetManager.load("character/ant-walk.png", Texture.class);
+
         assetManager.load("portraits/portrait-pro.png", Texture.class);
         assetManager.load("portraits/portrait-pro-listening.png", Texture.class);
         assetManager.load("portraits/portrait-pro-angry.png", Texture.class);
@@ -274,7 +227,21 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("portraits/portrait-ant-listening.png", Texture.class);
         assetManager.load("portraits/portrait-ant-angry.png", Texture.class);
         assetManager.load("portraits/portrait-ant-happy.png", Texture.class);
-        assetManager.load("portraits/portrait-ant-worried.png", Texture.class);
+
+        assetManager.load("posters/ending-poster.png", Texture.class);
+        assetManager.load("posters/poster-prize.png", Texture.class);
+
+        assetManager.load("dialog-bottom.png", Texture.class);
+        assetManager.load("dialog-top.png", Texture.class);
+        assetManager.load("dialog-line.png", Texture.class);
+        assetManager.load("light-hole.png", Texture.class);
+        assetManager.load("light-magic.png", Texture.class);
+        assetManager.load("player-light.png", Texture.class);
+        assetManager.load("level-light.png", Texture.class);
+        assetManager.load("fade-image.png", Texture.class);
+        assetManager.load("dialog-pointer.png", Texture.class);
+        assetManager.load("caen-title.png", Texture.class);
+        assetManager.load("option-pointer.png", Texture.class);
 
         assetManager.load("sound/step-2.ogg", Sound.class);
         assetManager.load("sound/block-0.ogg", Sound.class);
@@ -293,35 +260,34 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         fadeColor = Color.BLACK;
         inputVector = new Vector2();
 
-        directions = Arrays.asList("left", "right", "up", "down");
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
 
 		batch = new SpriteBatch();
         bufferBatch = new SpriteBatch();
-        fighting = false;
 
         explosions = new ArrayList<>();
 
         soundPlayer = new SoundPlayer(assetManager);
 
-		arrowImage = assetManager.get("arrow.png");
-        platformImg = assetManager.get("platform.png");
-        blockImage = assetManager.get("block.png");
-        pressureImage = assetManager.get("pressure.png");
-        groundBlockImage = assetManager.get("ground-block.png");
-        doorImage = assetManager.get("door.png");
-        openDoorImage = assetManager.get("open-door.png");
+        platformImg = assetManager.get("entity/platform.png");
+        blockImage = assetManager.get("entity/block.png");
+        pressureImage = assetManager.get("entity/pressure.png");
+        groundBlockImage = assetManager.get("entity/ground-block.png");
+        doorImage = assetManager.get("entity/door.png");
+        openDoorImage = assetManager.get("entity/open-door.png");
         lightHole = new Sprite((Texture) assetManager.get("light-hole.png"));
         lightHole.setScale(6.0f);
         playerLight = new Sprite((Texture) assetManager.get("player-light.png"));
         playerLight.setScale(1.0f, 4.0f);
         levelLight = new Sprite((Texture) assetManager.get("level-light.png"));
-        fightDirectionArrow = new Sprite((Texture) assetManager.get("direction-arrow.png"));
         fadeSprite = new Sprite((Texture) assetManager.get("fade-image.png"));
         fadeSprite.setScale(4.0f);
-        enemySprite = new Sprite((Texture) assetManager.get("enemy.png"));
+        posterSprite = new Sprite((Texture) assetManager.get("posters/poster-prize.png"));
+        posterSprite.setBounds(0,0,VIEWPORT_WIDTH,VIEWPORT_HEIGHT);
+        enemySprite = new Sprite((Texture) assetManager.get("entity/enemy.png"));
+        enemySprite.setSize(32, 32);
         playerSprite = new Sprite();
         playerSprite.setSize(32,32);
         antSprite = new Sprite();
@@ -330,16 +296,14 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         titleSprite = new Sprite((Texture) assetManager.get("caen-title.png"));
         titleSprite.setScale(2);
 
-        lazerImage = assetManager.get("lazer.png");
-        horizontalLazerImage = assetManager.get("lazer-horizontal.png");
+        lazerImage = assetManager.get("entity/lazer.png");
+        horizontalLazerImage = assetManager.get("entity/lazer-horizontal.png");
 
         buffer = FrameBuffer.createFrameBuffer(Pixmap.Format.RGBA8888, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, false);
         cam = new OrthographicCamera(buffer.getWidth(), buffer.getHeight());
         cam.position.set(buffer.getWidth() / 2, buffer.getWidth() / 2, 0);
         cam.update();
 
-        posterSprite = new Sprite((Texture) assetManager.get("poster-prize.png"));
-        posterSprite.setBounds(0,0,VIEWPORT_WIDTH,VIEWPORT_HEIGHT);
 
         shapeRenderer = new ShapeRenderer();
 
@@ -368,7 +332,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         levels.add(Level.loadLevel(assetManager, "levels/tower-switch-04.tmx", soundPlayer)); // 37
         levels.add(Level.loadLevel(assetManager, "levels/tower-switch-05.tmx", soundPlayer)); // 39
         levels.add(Level.loadLevel(assetManager, "levels/start-room.tmx", soundPlayer)); // 1 // 20
-        levels.add(Level.loadLevel(assetManager, "levels/end-room.tmx", soundPlayer)); // 41 // 21
         levels.add(Level.loadLevel(assetManager, "levels/scene-test.tmx", soundPlayer)); // 1 // 22
         levels.add(Level.loadLevel(assetManager, "levels/tower-broken-level.tmx", soundPlayer)); // 51 // 23
         levels.add(Level.loadLevel(assetManager, "levels/tower-arrow-06.tmx", soundPlayer)); // 53 // 24
@@ -376,8 +339,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         levels.add(Level.loadLevel(assetManager, "levels/tower-prize-fight.tmx", soundPlayer)); // 57 // 26
         levels.add(Level.loadLevel(assetManager, "levels/tower-ant-revenge.tmx", soundPlayer)); // 59 // 27
         levels.add(Level.loadLevel(assetManager, "levels/camp-fire.tmx", soundPlayer)); // start // 28
-        levels.add(Level.loadLevel(assetManager, "levels/wind-1.tmx", soundPlayer)); // 61 // 29
-        levels.add(Level.loadLevel(assetManager, "levels/wind-2.tmx", soundPlayer)); // 63 // 30
         levels.add(Level.loadLevel(assetManager, "levels/bullet-01.tmx", soundPlayer)); // 65 // 31
         levels.add(Level.loadLevel(assetManager, "levels/bullet-02.tmx", soundPlayer)); // 67 // 32
         levels.add(Level.loadLevel(assetManager, "levels/bullet-03.tmx", soundPlayer)); // 69 // 33
@@ -394,33 +355,32 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         levels.add(Level.loadLevel(assetManager, "levels/enemy-6.tmx", soundPlayer)); // 44
         levels.add(Level.loadLevel(assetManager, "levels/enemy-8.tmx", soundPlayer)); // 45
         levels.add(Level.loadLevel(assetManager, "levels/enemy-9.tmx", soundPlayer)); // 46
-        levels.add(Level.loadLevel(assetManager, "levels/block-test.tmx", soundPlayer)); // 47
         levels.add(Level.loadLevel(assetManager, "levels/crossy-road-1.tmx", soundPlayer)); // 48
         levels.add(Level.loadLevel(assetManager, "levels/crossy-road-2.tmx", soundPlayer)); // 49
         gamma = 0.2f;
 
-        antWalk = loadAnimation(assetManager.get("ant-walk.png"), 4, 0.165f);
-        antIdle = loadAnimation(assetManager.get("ant-idle.png"), 2, 0.5f);
-        walkRight = loadAnimation(assetManager.get("pro-simple-walk.png"), 4, 0.165f);
-        fireDeath = loadAnimation(assetManager.get("pro-simple-fire-death.png"), 8, 0.085f);
-        fallDeath = loadAnimation(assetManager.get("pro-simple-fall-death.png"), 5, 0.08f);
-        playerShoot = loadAnimation(assetManager.get("pro-simple-shoot.png"), 6, 0.1f);
-        pushBlock = loadAnimation(assetManager.get("pro-simple-push.png"), 4, 0.165f);
-        idleAnim = loadAnimation(assetManager.get("pro-simple-idle.png"), 2, 0.5f);
+        antWalk = loadAnimation(assetManager.get("character/ant-walk.png"), 4, 0.165f);
+        antIdle = loadAnimation(assetManager.get("character/ant-idle.png"), 2, 0.5f);
+        walkRight = loadAnimation(assetManager.get("character/pro-simple-walk.png"), 4, 0.165f);
+        fireDeath = loadAnimation(assetManager.get("character/pro-simple-fire-death.png"), 8, 0.085f);
+        fallDeath = loadAnimation(assetManager.get("character/pro-simple-fall-death.png"), 5, 0.08f);
+        playerShoot = loadAnimation(assetManager.get("character/pro-simple-shoot.png"), 6, 0.1f);
+        pushBlock = loadAnimation(assetManager.get("character/pro-simple-push.png"), 4, 0.165f);
+        idleAnim = loadAnimation(assetManager.get("character/pro-simple-idle.png"), 2, 0.5f);
         lightAnim = loadAnimation(assetManager.get("light-magic.png"), 4, 0.6f);
         playerLightAnim = loadAnimation(assetManager.get("player-light.png"), 4, 0.5f);
-        arrowAnim = loadAnimation(assetManager.get("arrow-sheet.png"), 8, 0.05f);
-        arrowExplodeAnim = loadAnimation(assetManager.get("arrow-explode.png"), 8, 0.05f);
-        torchAnim = loadAnimation(assetManager.get("torch-sheet.png"), 2, 0.5f);
-        campfireAnim = loadAnimation(assetManager.get("campfire.png"), 8, 0.1f);
+        arrowAnim = loadAnimation(assetManager.get("entity/arrow-sheet.png"), 8, 0.05f);
+        arrowExplodeAnim = loadAnimation(assetManager.get("entity/arrow-explode.png"), 8, 0.05f);
+        torchAnim = loadAnimation(assetManager.get("entity/torch-sheet.png"), 2, 0.5f);
+        campfireAnim = loadAnimation(assetManager.get("entity/campfire.png"), 8, 0.1f);
         arrowSprite = new Sprite();
         arrowSprite.setBounds(0,0,32,32);
-        actorImages = new HashMap<>();
-        actorImages.put("ant", assetManager.get("char-style-4.png"));
+//        actorImages = new HashMap<>();
+//        actorImages.put("ant", assetManager.get("char-style-4.png"));
         currentScenes = new ArrayList<>();
         loadExternalData();
 
-        font = loadFonts("kells.fnt");
+        font = loadFonts("fonts/kells.fnt");
 
         // start room = 20
 //        Level startLevel = levels.get(lastLevel); // 28 -> 22 ->
@@ -541,7 +501,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         moveLock = false;
         cameraTargetPos = null;
         playerDir = new Vector2(1,0);
-        fightLevel = 0;
         if (level.name.equals("levels/camp-fire.tmx")) {
             staticLevel = true;
             soundPlayer.playSound("sound/chirp-1.ogg", true, 0.2f);
@@ -739,13 +698,14 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 }
             }
             for (Arrow arrow : arrows) {
-                if (arrow.img.equals(arrowImage)) {
+                if (arrow.isArrow) {
                     TextureRegion currentFrame = arrowAnim.getKeyFrame(animationDelta, true);
                     arrowSprite.setPosition(arrow.pos.x, arrow.pos.y + 12);
                     arrowSprite.setRegion(currentFrame);
                     arrowSprite.draw(batch);
                 } else {
-                    batch.draw(arrow.img, arrow.pos.x, arrow.pos.y);
+                    Texture img = arrow.dir.x != 0 ? horizontalLazerImage : lazerImage;
+                    batch.draw(img, arrow.pos.x, arrow.pos.y);
                 }
             }
             for (Door door : currentLevel.doors) {
@@ -852,38 +812,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             } else {
                 dialogContainer.reset();
             }
-
-            if (fighting) {
-                batch.draw((Texture) assetManager.get("fight-pro-avatar.png"), proFightJitter.x + camera.position.x - (VIEWPORT_WIDTH / 2.0f) , proFightJitter.y + camera.position.y - 160);
-                batch.draw((Texture) assetManager.get("fight-ant-avatar.png"), camera.position.x + (VIEWPORT_WIDTH / 2.0f) - 300 + antFightJitter.x, antFightJitter.y + camera.position.y - 160);
-
-                batch.end();
-                shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
-                shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-                shapeRenderer.setColor(new Color(1.0f, 0.2f, 0.2f, 1.0f));
-                shapeRenderer.rect(camera.position.x - (VIEWPORT_WIDTH / 2.0f) + 48, camera.position.y - 200, fightLevel * 5, 32);
-                shapeRenderer.setColor(new Color(0.2f, 0.2f, 1.0f, 1.0f));
-                shapeRenderer.rect(camera.position.x - (VIEWPORT_WIDTH / 2.0f) + 48 + (fightLevel * 5), camera.position.y - 200, (100 - fightLevel) * 5, 32);
-                shapeRenderer.end();
-                batch.begin();
-
-                batch.draw((Texture) assetManager.get("fight-indicator.png"), camera.position.x - (VIEWPORT_WIDTH / 2.0f) + (fightLevel * 5) , camera.position.y - 216);
-
-                fightDirectionArrow.setScale(fightInputScale);
-                float rotation = 0;
-                if (fightInputNeeded.equals("left")) {
-                    rotation = 180;
-                }
-                if (fightInputNeeded.equals("up")) {
-                    rotation = 90;
-                }
-                if (fightInputNeeded.equals("down")) {
-                    rotation = 270;
-                }
-                fightDirectionArrow.setRotation(rotation);
-                fightDirectionArrow.setPosition(camera.position.x - 32, camera.position.y - 32);
-                fightDirectionArrow.draw(batch);
-            }
             if (posterImageName != null) {
                 Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
                 posterSprite.setTexture(assetManager.get(posterImageName));
@@ -953,7 +881,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     }
 
     private void drawEnemy(Enemy enemy) {
-        String enemyImg = enemy.isGround() ? "enemy-ground.png" : "enemy.png";
+        String enemyImg = enemy.isGround() ? "entity/enemy-ground.png" : "entity/enemy.png";
         enemySprite.setTexture(assetManager.get(enemyImg));
         enemySprite.setRotation(enemy.getRotation());
         enemySprite.setPosition(enemy.pos.x, enemy.pos.y + 8);
@@ -1068,23 +996,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             }
         }
 
-        if (fighting) {
-            fightLevel = fightLevel - (fightName.equals("camp") ? 0.4f : 0.2f);
-            if (fightLevel < 0 || fightLevel > 100) {
-                fightLevel = 0;
-                fighting = false;
-                fightVerb.isDone = true;
-            }
-            int jitter = 10;
-            antFightJitter.x = antFightJitter.x + MathUtils.random(-jitter, jitter);
-            antFightJitter.y = antFightJitter.y + MathUtils.random(-jitter, jitter);
-            proFightJitter.x = proFightJitter.x + MathUtils.random(-jitter, jitter);
-            proFightJitter.y = proFightJitter.y + MathUtils.random(-jitter, jitter);
-            if (fightInputScale > 1.0f ) {
-                fightInputScale = fightInputScale - (Gdx.graphics.getDeltaTime() * 2);
-            }
-        }
-
         if (currentPlatform != null && !isMoving) {
             playerPos = currentPlatform.pos.cpy();
         }
@@ -1146,7 +1057,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         Iterator<Arrow> arrowIterator = arrows.iterator();
         while(arrowIterator.hasNext()) {
             Arrow arrow = arrowIterator.next();
-            arrow.update(this);
+            arrow.update();
             if (currentLevel.isWall(arrow.pos) || currentLevel.isOutOfBounds(arrow.pos)) {
                 explosions.add(new Explosion(arrow.pos.cpy()));
                 soundPlayer.playSound("sound/blast-1.ogg", false, 0.3f,  MathUtils.random(0.7f, 1.3f));
@@ -1332,7 +1243,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 }
             }
         } else {
-            if (!fighting && !playerIsDead) {
+            if (!playerIsDead) {
                 boolean sceneBlock = !currentScenes.isEmpty() && currentScenes.stream().anyMatch(Scene::isBlocking);
                 if (!moveLock && !sceneBlock && !isMoving && !inputVector.isZero()) {
                     boolean blocked = false;
@@ -1387,41 +1298,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 } else {
                     castLock = false;
                 }
-            } else {
-                int fightLevelAmount = 4;
-                if (fightInputNeeded != null && !fightInputLock) {
-                    switch (fightInputNeeded) {
-                        case "left":
-                            if (inputVector.x == -1 && inputVector.y == 0) {
-                                fightInputNeeded = getRandomFightInput();
-                                fightLevel = fightLevel + fightLevelAmount;
-                                fightInputLock = true;
-                            }
-                            break;
-                        case "right":
-                            if (inputVector.x == 1 && inputVector.y == 0) {
-                                fightInputNeeded = getRandomFightInput();
-                                fightLevel = fightLevel + fightLevelAmount;
-                                fightInputLock = true;
-                            }
-                            break;
-                        case "up":
-                            if (inputVector.x == 0 && inputVector.y == 1) {
-                                fightInputNeeded = getRandomFightInput();
-                                fightLevel = fightLevel + fightLevelAmount;
-                                fightInputLock = true;
-                            }
-                            break;
-                        case "down":
-                            if (inputVector.x == 0 && inputVector.y == -1) {
-                                fightInputNeeded = getRandomFightInput();
-                                fightLevel = fightLevel + fightLevelAmount;
-                                fightInputLock = true;
-                            }
-                            break;
-                    }
-
-                }
             }
         }
         if ((inputVector.x != 0 || inputVector.y != 0)) {
@@ -1437,7 +1313,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             dialogLock = false;
             moveLock = false;
             skipLock = false;
-            fightInputLock = false;
             wasMoving = false;
             titleLock = false;
         }
@@ -1480,14 +1355,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             addArrow(nextTilePos, playerDir, PLAYER_ARROW_SPEED);
             castCooldown = CAST_ARROW_COOLDOWN;
         }
-    }
-
-    private String getRandomFightInput() {
-        fightInputScale = 2.0f;
-        if (MathUtils.random(0,5) == 0 || fightInputNeeded == null) {
-            return directions.get(MathUtils.random(0,3));
-        }
-        return fightInputNeeded;
     }
 
     public void startDialog(String id, DialogVerb dialogVerb) {
@@ -1544,33 +1411,21 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
     void addArrow(Vector2 pos, Vector2 dir, float speed) {
         soundPlayer.playSound("sound/blast-1.ogg", false, 0.3f,  MathUtils.random(0.6f, 1.4f));
-        arrows.add(new Arrow(arrowImage, pos, dir, speed));
+        arrows.add(new Arrow(true, pos, dir, speed));
     }
 
     void addLazer(Vector2 pos, Vector2 dir) {
-        Texture img = dir.x != 0 ? horizontalLazerImage : lazerImage;
         if (lazerSoundTimer <= 0) {
             soundPlayer.playSound("sound/lazer-4.ogg", false, 6.0f, 1.0f);
             lazerSoundTimer = 0.5f;
         }
-        arrows.add(new Arrow(img, pos, dir, TILE_SIZE * 16.0f));
-    }
-
-    public void startFight(String fightName, FightVerb fightVerb) {
-        fighting = true;
-        fightLevel = 50;
-        antFightJitter = new Vector2();
-        proFightJitter = new Vector2();
-        fightInputNeeded = getRandomFightInput();
-        fightInputScale = 1.0f;
-        this.fightVerb = fightVerb;
-        this.fightName = fightName;
+        arrows.add(new Arrow(false, pos, dir, TILE_SIZE * 16.0f));
     }
 
     public void showPoster(float alpha, String poster) {
         posterAlpha = alpha;
         posterImageName = poster;
-        if (poster != null && poster.equals("poster-prize.png")) {
+        if (poster != null && poster.equals("posters/poster-prize.png")) {
             currentSpell = "arrow";
         }
     }
