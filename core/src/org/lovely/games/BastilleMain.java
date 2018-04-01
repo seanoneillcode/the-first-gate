@@ -9,13 +9,13 @@ import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
-import static org.lovely.games.LoadingManager.PLAYER_FALL;
-import static org.lovely.games.LoadingManager.PLAYER_IDLE;
-import static org.lovely.games.LoadingManager.PLAYER_RUN;
+import static org.lovely.games.LevelManager.TILE_SIZE;
+import static org.lovely.games.LoadingManager.*;
 
 public class BastilleMain extends ApplicationAdapter {
 
@@ -29,7 +29,7 @@ public class BastilleMain extends ApplicationAdapter {
     private LevelManager levelManager;
     private EntManager entManager;
     private float animationDelta = 0f;
-    Color background = new Color(65 / 256f, 115 / 256f, 145 / 256f, 1);
+    Color background = new Color(0 / 256f, 149 / 256f, 233 / 256f, 1);
     Ent player;
 
     @Override
@@ -66,27 +66,41 @@ public class BastilleMain extends ApplicationAdapter {
 	}
 
     private void drawEnts(EntManager entManager) {
+        Sprite entSprite = new Sprite();
+        entSprite.setScale(2);
         for (Ent ent : entManager.ents) {
-            if (ent.state == Ent.EntState.FALLING) {
-                TextureRegion torchFrame = loadingManager.getAnim(PLAYER_FALL).getKeyFrame(ent.delta, false);
-                batch.draw(torchFrame, ent.pos.x, ent.pos.y);
-            }
-            if (ent.state == Ent.EntState.ALIVE) {
-                if (inputManager.isMoving()) {
-                    TextureRegion torchFrame = loadingManager.getAnim(PLAYER_RUN).getKeyFrame(ent.delta, true);
-                    batch.draw(torchFrame, ent.pos.x, ent.pos.y);
-                } else {
-                    TextureRegion torchFrame = loadingManager.getAnim(PLAYER_IDLE).getKeyFrame(ent.delta, true);
-                    batch.draw(torchFrame, ent.pos.x, ent.pos.y);
+            entSprite.setSize(ent.size.x, ent.size.y);
+            entSprite.setPosition(ent.pos.x, ent.pos.y);
+            if (ent.state != Ent.EntState.DEAD) {
+                TextureRegion frame = null;
+                if (ent.state == Ent.EntState.FALLING) {
+                    frame = loadingManager.getAnim(PLAYER_FALL).getKeyFrame(ent.delta, false);
                 }
+                if (ent.state == Ent.EntState.JUMPING) {
+                    frame = loadingManager.getAnim(PLAYER_JUMP).getKeyFrame(ent.delta, false);
+                }
+                if (ent.state == Ent.EntState.ALIVE) {
+                    if (inputManager.isMoving()) {
+                        frame = loadingManager.getAnim(PLAYER_RUN).getKeyFrame(ent.delta, true);
+                    } else {
+                        frame = loadingManager.getAnim(PLAYER_IDLE).getKeyFrame(ent.delta, true);
+                    }
+                }
+                entSprite.setRegion(frame);
+                entSprite.draw(batch);
             }
         }
     }
 
     private void drawLevel(LevelManager levelManager) {
+        Sprite tileSprite = new Sprite();
+        tileSprite.setSize(TILE_SIZE, TILE_SIZE);
         for (Tile tile : levelManager.tiles) {
             TextureRegion frame = loadingManager.getAnim(tile.image).getKeyFrame(animationDelta, true);
-            batch.draw(frame, tile.pos.x, tile.pos.y);
+            tileSprite.setPosition(tile.pos.x, tile.pos.y);
+            tileSprite.setRegion(frame);
+            tileSprite.setColor(tile.color);
+            tileSprite.draw(batch);
         }
     }
 
@@ -101,5 +115,13 @@ public class BastilleMain extends ApplicationAdapter {
             Vector2 change = inputVector.cpy().scl(PLAYER_SPEED);
             player.pos.add(change);
         }
+        if (player.state == Ent.EntState.JUMPING) {
+            Vector2 change = inputVector.cpy().scl(PLAYER_SPEED).scl(0.2f);
+            player.pos.add(change);
+        }
+    }
+
+    public void jumpPlayer() {
+        player.jump(inputManager.getInput());
     }
 }

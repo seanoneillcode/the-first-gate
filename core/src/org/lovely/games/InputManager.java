@@ -8,10 +8,14 @@ import com.badlogic.gdx.math.Vector2;
 public class InputManager {
 
     private Vector2 inputVector;
+    public boolean isRight = true;
 
     public void update(BastilleMain bastilleMain) {
         Vector2 inputVector = getInput();
         bastilleMain.movePlayer(inputVector);
+        if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+            bastilleMain.jumpPlayer();
+        }
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
             Gdx.app.exit();
         }

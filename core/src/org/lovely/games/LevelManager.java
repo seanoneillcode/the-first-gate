@@ -1,6 +1,7 @@
 package org.lovely.games;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
@@ -14,7 +15,7 @@ public class LevelManager {
 
     List<Tile> tiles = new ArrayList<>();
     private float animationDelta = 0f;
-    private float TILE_SIZE = 16;
+    public static float TILE_SIZE = 16;
     private int MAP_SIZE = 16;
     private int SQUARE_SIZE = 8;
     Vector2 TILE_SIZE_VEC = new Vector2(TILE_SIZE, TILE_SIZE);
@@ -40,9 +41,10 @@ public class LevelManager {
         for (int i = 0; i < size.x; i++) {
             for (int j = 0; j < size.y; j++) {
                 Vector2 tilePos = pos.cpy().scl(TILE_SIZE).add(i * TILE_SIZE, j * TILE_SIZE);
-                tiles.add(new Tile(tilePos, TILE_SIZE_VEC, GRASS_TILE, true));
+                Color color = Color.WHITE.cpy().fromHsv(MathUtils.random(180f, 190f), 1, 1);
+                tiles.add(new Tile(tilePos, TILE_SIZE_VEC, GRASS_TILE, true, color));
                 if (j == 0) {
-                    tiles.add(new Tile(tilePos.cpy().sub(0, TILE_SIZE), TILE_SIZE_VEC, BOTTOM_TILE, false));
+                    tiles.add(new Tile(tilePos.cpy().sub(0, TILE_SIZE), TILE_SIZE_VEC, BOTTOM_TILE, false, color));
                 }
             }
         }

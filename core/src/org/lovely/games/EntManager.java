@@ -24,7 +24,7 @@ public class EntManager {
     public void update(LevelManager levelManager) {
         boolean hasDeadEnts = false;
         for (Ent ent : ents) {
-            if (ent.state == Ent.EntState.ALIVE && ent.needsGround && !isOnGround(levelManager, ent.pos, ent.size)) {
+            if (ent.state == Ent.EntState.ALIVE && ent.needsGround && !isOnGround(levelManager, ent.pos.cpy().add(ent.offset), ent.size)) {
                 ent.fall();
             }
             if (ent.state == Ent.EntState.FALLING) {
@@ -34,6 +34,13 @@ public class EntManager {
                     hasDeadEnts = true;
                 }
             }
+            if (ent.state == Ent.EntState.JUMPING) {
+                if (ent.jumpTimer < 0) {
+                    ent.state = Ent.EntState.ALIVE;
+                }
+                ent.pos = ent.pos.cpy().add(ent.physics);
+            }
+            ent.jumpTimer = ent.jumpTimer - Gdx.graphics.getDeltaTime();
             ent.delta = ent.delta + Gdx.graphics.getDeltaTime();
         }
         if (hasDeadEnts) {

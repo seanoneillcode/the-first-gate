@@ -13,6 +13,7 @@ public class LoadingManager {
 
     public static final String PLAYER_IDLE = "player-idle.png";
     public static final String PLAYER_FALL = "player-fall.png";
+    public static final String PLAYER_JUMP = "player-jump.png";
     public static final String PLAYER_RUN = "player-run.png";
     public static final String GRASS_TILE = "grass-tile.png";
     public static final String BOTTOM_TILE = "bottom-tile.png";
@@ -28,6 +29,7 @@ public class LoadingManager {
         assetManager.load(PLAYER_IDLE, Texture.class);
         assetManager.load(PLAYER_FALL, Texture.class);
         assetManager.load(PLAYER_RUN, Texture.class);
+        assetManager.load(PLAYER_JUMP, Texture.class);
         assetManager.load(GRASS_TILE, Texture.class);
         assetManager.load(BOTTOM_TILE, Texture.class);
 
@@ -35,7 +37,8 @@ public class LoadingManager {
 
         anims.put(PLAYER_IDLE, loadAnimation(PLAYER_IDLE, 2, 0.25f));
         anims.put(PLAYER_FALL, loadAnimation(PLAYER_FALL, 6, 0.1f));
-        anims.put(PLAYER_RUN, loadAnimation(PLAYER_RUN, 4, 0.1f));
+        anims.put(PLAYER_RUN, loadAnimation(PLAYER_RUN, 4, 0.15f));
+        anims.put(PLAYER_JUMP, loadAnimation(PLAYER_JUMP, 2, 0.25f));
         anims.put(GRASS_TILE, loadAnimation(GRASS_TILE, 4, 0.5f));
         anims.put(BOTTOM_TILE, loadAnimation(BOTTOM_TILE, 1, 1f));
     }
