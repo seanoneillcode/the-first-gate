@@ -13,19 +13,21 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
+import static org.lovely.games.LoadingManager.PLAYER_FALL;
 import static org.lovely.games.LoadingManager.PLAYER_IDLE;
+import static org.lovely.games.LoadingManager.PLAYER_RUN;
 
 public class BastilleMain extends ApplicationAdapter {
 
     SpriteBatch batch;
-    Texture img;
 
     private CameraManager cameraManager;
     private InputManager inputManager;
-    private float PLAYER_SPEED = 1.0f;
+    private float PLAYER_SPEED = 1.5f;
     private AssetManager assetManager;
     private LoadingManager loadingManager;
     private LevelManager levelManager;
+    private EntManager entManager;
     private float animationDelta = 0f;
     Color background = new Color(65 / 256f, 115 / 256f, 145 / 256f, 1);
     Ent player;
@@ -41,8 +43,10 @@ public class BastilleMain extends ApplicationAdapter {
         levelManager = new LevelManager();
 		cameraManager = new CameraManager();
 		inputManager = new InputManager();
-		player = new Ent(new Vector2(), new Vector2(16, 16));
+		entManager = new EntManager();
 		levelManager.start();
+		Vector2 startPos = levelManager.tiles.get(levelManager.tiles.size() - 1).pos.cpy();
+        player = entManager.addEnt(startPos, new Vector2(8, 8), new Vector2(4, 4), true);
 	}
 
 	@Override
@@ -50,29 +54,52 @@ public class BastilleMain extends ApplicationAdapter {
         inputManager.update(this);
         cameraManager.update(player.pos, inputManager.getInput());
         levelManager.update();
+        entManager.update(levelManager);
 		Gdx.gl.glClearColor(background.r, background.g, background.b, background.a);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.setProjectionMatrix(cameraManager.camera.combined);
         animationDelta = animationDelta + Gdx.graphics.getDeltaTime();
 		batch.begin();
-		levelManager.draw(batch, loadingManager);
-        drawPlayer(player.pos);
+        drawLevel(levelManager);
+        drawEnts(entManager);
 		batch.end();
 	}
 
-	private void drawPlayer(Vector2 playerPos) {
-        TextureRegion torchFrame = loadingManager.getAnim(PLAYER_IDLE).getKeyFrame(animationDelta, true);
-        batch.draw(torchFrame, playerPos.x, playerPos.y);
+    private void drawEnts(EntManager entManager) {
+        for (Ent ent : entManager.ents) {
+            if (ent.state == Ent.EntState.FALLING) {
+                TextureRegion torchFrame = loadingManager.getAnim(PLAYER_FALL).getKeyFrame(ent.delta, false);
+                batch.draw(torchFrame, ent.pos.x, ent.pos.y);
+            }
+            if (ent.state == Ent.EntState.ALIVE) {
+                if (inputManager.isMoving()) {
+                    TextureRegion torchFrame = loadingManager.getAnim(PLAYER_RUN).getKeyFrame(ent.delta, true);
+                    batch.draw(torchFrame, ent.pos.x, ent.pos.y);
+                } else {
+                    TextureRegion torchFrame = loadingManager.getAnim(PLAYER_IDLE).getKeyFrame(ent.delta, true);
+                    batch.draw(torchFrame, ent.pos.x, ent.pos.y);
+                }
+            }
+        }
+    }
+
+    private void drawLevel(LevelManager levelManager) {
+        for (Tile tile : levelManager.tiles) {
+            TextureRegion frame = loadingManager.getAnim(tile.image).getKeyFrame(animationDelta, true);
+            batch.draw(frame, tile.pos.x, tile.pos.y);
+        }
     }
 
 	@Override
 	public void dispose () {
 		batch.dispose();
-		img.dispose();
+		assetManager.dispose();
 	}
 
     public void movePlayer(Vector2 inputVector) {
-        Vector2 change = inputVector.cpy().scl(PLAYER_SPEED);
-        player.pos.add(change);
+        if (player.state == Ent.EntState.ALIVE) {
+            Vector2 change = inputVector.cpy().scl(PLAYER_SPEED);
+            player.pos.add(change);
+        }
     }
 }

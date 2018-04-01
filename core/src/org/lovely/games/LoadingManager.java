@@ -12,7 +12,10 @@ import java.util.Map;
 public class LoadingManager {
 
     public static final String PLAYER_IDLE = "player-idle.png";
+    public static final String PLAYER_FALL = "player-fall.png";
+    public static final String PLAYER_RUN = "player-run.png";
     public static final String GRASS_TILE = "grass-tile.png";
+    public static final String BOTTOM_TILE = "bottom-tile.png";
     private Map<String, Animation<TextureRegion>> anims;
     AssetManager assetManager;
 
@@ -23,12 +26,18 @@ public class LoadingManager {
 
     public void load() {
         assetManager.load(PLAYER_IDLE, Texture.class);
+        assetManager.load(PLAYER_FALL, Texture.class);
+        assetManager.load(PLAYER_RUN, Texture.class);
         assetManager.load(GRASS_TILE, Texture.class);
+        assetManager.load(BOTTOM_TILE, Texture.class);
 
         assetManager.finishLoading();
 
         anims.put(PLAYER_IDLE, loadAnimation(PLAYER_IDLE, 2, 0.25f));
+        anims.put(PLAYER_FALL, loadAnimation(PLAYER_FALL, 6, 0.1f));
+        anims.put(PLAYER_RUN, loadAnimation(PLAYER_RUN, 4, 0.1f));
         anims.put(GRASS_TILE, loadAnimation(GRASS_TILE, 4, 0.5f));
+        anims.put(BOTTOM_TILE, loadAnimation(BOTTOM_TILE, 1, 1f));
     }
 
     public Animation<TextureRegion> getAnim(String name) {

@@ -7,6 +7,8 @@ import com.badlogic.gdx.math.Vector2;
 
 public class InputManager {
 
+    private Vector2 inputVector;
+
     public void update(BastilleMain bastilleMain) {
         Vector2 inputVector = getInput();
         bastilleMain.movePlayer(inputVector);
@@ -16,7 +18,7 @@ public class InputManager {
     }
 
     public Vector2 getInput() {
-        Vector2 inputVector = new Vector2();
+        inputVector = new Vector2();
         boolean isLeftPressed = Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A);
         boolean isRightPressed = Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D);
         boolean isUpPressed = Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W);
@@ -35,5 +37,9 @@ public class InputManager {
             inputVector.y = inputVector.y - 1;
         }
         return inputVector;
+    }
+
+    public boolean isMoving() {
+        return inputVector.x != 0 || inputVector.y != 0;
     }
 }
