@@ -1,7 +1,6 @@
 package org.lovely.games;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
@@ -14,16 +13,19 @@ import static org.lovely.games.LoadingManager.*;
 public class LevelManager {
 
     public static final int NUM_CLOUDS = 16;
-    public static final int NUM_PLATFORMS = 24;
+    private static final int NUM_POINTS = 8;
     List<Tile> tiles = new ArrayList<>();
     private float animationDelta = 0f;
     public static float TILE_SIZE = 16;
-    private int MAP_SIZE = 32;
-    private int SQUARE_SIZE = 8;
-    Vector2 TILE_SIZE_VEC = new Vector2(TILE_SIZE, TILE_SIZE);
+    private int MAP_SIZE = 64;
     List<Cloud> clouds = new ArrayList<>();
     List<String> cloundImages = Arrays.asList(CLOUD_0, CLOUD_1, CLOUD_2, CLOUD_3);
     public Tile goalTile;
+    LevelGenerator levelGenerator;
+
+    LevelManager() {
+        levelGenerator = new LevelGenerator();
+    }
 
     public void start() {
         tiles.clear();
@@ -34,39 +36,13 @@ public class LevelManager {
             float scale = mov.x / 1.0f;
             addCloud(pos, img, mov, scale);
         }
-        for (int i = 0; i < NUM_PLATFORMS; i++) {
-            Vector2 pos = new Vector2(MathUtils.random(0, MAP_SIZE), MathUtils.random(0, MAP_SIZE));
-            Vector2 size = new Vector2(MathUtils.random(1, SQUARE_SIZE), MathUtils.random(1, SQUARE_SIZE));
-            addSquare(pos, size);
-        }
-        tiles.sort((o1, o2) -> {
-            if (o1.isGround && !o2.isGround) {
-                return 1;
-            }
-            if (!o1.isGround && o2.isGround) {
-                return -1;
-            }
-            return 0;
-        });
+        tiles.addAll(levelGenerator.generate(NUM_POINTS, MAP_SIZE));
         int goalTileIndex = MathUtils.random(0, tiles.size() - 1);
         goalTile = tiles.get(goalTileIndex);
     }
 
     private void addCloud(Vector2 pos, String image, Vector2 mov, float scale) {
         clouds.add(new Cloud(pos, image, mov, scale));
-    }
-
-    private void addSquare(Vector2 pos, Vector2 size) {
-        for (int i = 0; i < size.x; i++) {
-            for (int j = 0; j < size.y; j++) {
-                Vector2 tilePos = pos.cpy().scl(TILE_SIZE).add(i * TILE_SIZE, j * TILE_SIZE);
-                Color color = Color.WHITE.cpy().fromHsv(MathUtils.random(180f, 190f), 1, 1);
-                tiles.add(new Tile(tilePos, TILE_SIZE_VEC, GRASS_TILE, true, color));
-                if (j == 0) {
-                    tiles.add(new Tile(tilePos.cpy().sub(0, TILE_SIZE), TILE_SIZE_VEC, BOTTOM_TILE, false, color));
-                }
-            }
-        }
     }
 
     public void update() {
