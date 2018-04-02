@@ -18,6 +18,11 @@ public class LoadingManager {
     public static final String PLAYER_RUN = "player-run.png";
     public static final String GRASS_TILE = "grass-tile.png";
     public static final String BOTTOM_TILE = "bottom-tile.png";
+    public static final String CLOUD_0 = "cloud-0.png";
+    public static final String CLOUD_1 = "cloud-1.png";
+    public static final String CLOUD_2 = "cloud-2.png";
+    public static final String CLOUD_3 = "cloud-3.png";
+    public static final String LAND_EFFECT = "land-effect.png";
     private Map<String, Animation<TextureRegion>> anims;
     AssetManager assetManager;
 
@@ -34,6 +39,11 @@ public class LoadingManager {
         assetManager.load(GRASS_TILE, Texture.class);
         assetManager.load(BOTTOM_TILE, Texture.class);
         assetManager.load(PLAYER_SHADOW, Texture.class);
+        assetManager.load(LAND_EFFECT, Texture.class);
+        assetManager.load(CLOUD_0, Texture.class);
+        assetManager.load(CLOUD_1, Texture.class);
+        assetManager.load(CLOUD_2, Texture.class);
+        assetManager.load(CLOUD_3, Texture.class);
 
         assetManager.finishLoading();
 
@@ -44,6 +54,11 @@ public class LoadingManager {
         anims.put(GRASS_TILE, loadAnimation(GRASS_TILE, 4, 0.5f));
         anims.put(BOTTOM_TILE, loadAnimation(BOTTOM_TILE, 1, 1f));
         anims.put(PLAYER_SHADOW, loadAnimation(PLAYER_SHADOW, 1, 1f));
+        anims.put(CLOUD_0, loadAnimation(CLOUD_0, 1, 1f));
+        anims.put(CLOUD_1, loadAnimation(CLOUD_1, 1, 1f));
+        anims.put(CLOUD_2, loadAnimation(CLOUD_2, 1, 1f));
+        anims.put(CLOUD_3, loadAnimation(CLOUD_3, 1, 1f));
+        anims.put(LAND_EFFECT, loadAnimation(LAND_EFFECT, 6, 0.05f));
     }
 
     public Animation<TextureRegion> getAnim(String name) {

@@ -14,6 +14,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.lovely.games.LevelManager.TILE_SIZE;
 import static org.lovely.games.LoadingManager.*;
 
@@ -27,10 +30,12 @@ public class BastilleMain extends ApplicationAdapter {
     private AssetManager assetManager;
     private LoadingManager loadingManager;
     private LevelManager levelManager;
+    private EffectManager effectManager;
     private EntManager entManager;
     private float animationDelta = 0f;
     Color background = new Color(0 / 256f, 149 / 256f, 233 / 256f, 1);
     Ent player;
+    private List<Cloud> cloudShadows;
 
     @Override
 	public void create () {
@@ -42,11 +47,12 @@ public class BastilleMain extends ApplicationAdapter {
         loadingManager.load();
         levelManager = new LevelManager();
 		cameraManager = new CameraManager();
+		effectManager = new EffectManager();
 		inputManager = new InputManager();
 		entManager = new EntManager();
 		levelManager.start();
 		Vector2 startPos = levelManager.getStartPos();
-        player = entManager.addEnt(startPos, new Vector2(8, 8), new Vector2(4, 4), true);
+        player = entManager.addEnt(startPos, new Vector2(8, 8), new Vector2(0, 0), true);
 	}
 
 	@Override
@@ -54,16 +60,30 @@ public class BastilleMain extends ApplicationAdapter {
         inputManager.update(this);
         cameraManager.update(player.pos, inputManager.getInput());
         levelManager.update();
-        entManager.update(levelManager, this);
+        entManager.update(levelManager, this, effectManager);
+        effectManager.update();
 		Gdx.gl.glClearColor(background.r, background.g, background.b, background.a);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.setProjectionMatrix(cameraManager.camera.combined);
         animationDelta = animationDelta + Gdx.graphics.getDeltaTime();
 		batch.begin();
         drawLevel(levelManager);
+        drawEffects(effectManager);
         drawEnts(entManager);
+        drawCloudShadows();
 		batch.end();
 	}
+
+    private void drawEffects(EffectManager effectManager) {
+        Sprite effectSprite = new Sprite();
+        for (Effect effect : effectManager.effects) {
+            TextureRegion frame = loadingManager.getAnim(effect.image).getKeyFrame(effect.anim, true);
+            effectSprite.setRegion(frame);
+            effectSprite.setSize(frame.getRegionWidth(), frame.getRegionHeight());
+            effectSprite.setPosition(effect.pos.x, effect.pos.y);
+            effectSprite.draw(batch);
+        }
+    }
 
     private void drawEnts(EntManager entManager) {
         Sprite entSprite = new Sprite();
@@ -92,13 +112,41 @@ public class BastilleMain extends ApplicationAdapter {
                 if (!inputManager.isRight) {
                     entSprite.flip(true, false);
                 }
-                batch.draw(loadingManager.getAnim(PLAYER_SHADOW).getKeyFrame(ent.delta, false), ent.pos.x, ent.pos.y - 4);
+                if (ent.state != Ent.EntState.DEAD && ent.state != Ent.EntState.FALLING) {
+                    batch.draw(loadingManager.getAnim(PLAYER_SHADOW).getKeyFrame(ent.delta, false), ent.pos.x, ent.pos.y - 4);
+                }
                 entSprite.draw(batch);
             }
         }
     }
 
+    private void drawCloudShadows() {
+        Sprite cloudSprite = new Sprite();
+        cloudSprite.setSize(128, 128);
+        for (Cloud cloud : cloudShadows) {
+            cloudSprite.setPosition(cloud.pos.x, cloud.pos.y);
+            TextureRegion frame = loadingManager.getAnim(cloud.img).getKeyFrame(animationDelta, true);
+            cloudSprite.setRegion(frame);
+            cloudSprite.draw(batch);
+        }
+    }
+
     private void drawLevel(LevelManager levelManager) {
+        cloudShadows = new ArrayList<>();
+        Sprite cloudSprite = new Sprite();
+        cloudSprite.setSize(128, 128);
+        for (Cloud cloud : levelManager.clouds) {
+            if (cloud.img == CLOUD_3) {
+                cloudShadows.add(cloud);
+                continue;
+            }
+            cloudSprite.setPosition(cloud.pos.x, cloud.pos.y);
+            TextureRegion frame = loadingManager.getAnim(cloud.img).getKeyFrame(animationDelta, true);
+            cloudSprite.setRegion(frame);
+            cloudSprite.setScale(cloud.scale);
+            cloudSprite.draw(batch);
+        }
+
         Sprite tileSprite = new Sprite();
         tileSprite.setSize(TILE_SIZE, TILE_SIZE);
         for (Tile tile : levelManager.tiles) {

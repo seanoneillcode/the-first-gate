@@ -7,6 +7,8 @@ import com.badlogic.gdx.math.Vector2;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.lovely.games.LoadingManager.LAND_EFFECT;
+
 public class EntManager {
 
     private static final float GRAVITY = 0.1f;
@@ -22,7 +24,7 @@ public class EntManager {
         return ent;
     }
 
-    public void update(LevelManager levelManager, BastilleMain bastilleMain) {
+    public void update(LevelManager levelManager, BastilleMain bastilleMain, EffectManager effectManager) {
         boolean hasDeadEnts = false;
         for (Ent ent : ents) {
             if (ent.state == Ent.EntState.ALIVE && ent.needsGround && !isOnGround(levelManager, ent.pos.cpy().add(ent.offset), ent.size)) {
@@ -44,6 +46,12 @@ public class EntManager {
                     ent.state = Ent.EntState.ALIVE;
                     ent.jumpTimer = 0;
                     ent.z = 0;
+                    if (ent.needsGround && !isOnGround(levelManager, ent.pos.cpy().add(ent.offset), ent.size)) {
+                        ent.fall();
+                    } else {
+                        effectManager.addEffect(ent.pos.cpy().add(-4, -10), LAND_EFFECT, 0.3f);
+                    }
+
                 }
             }
             ent.jumpTimer = ent.jumpTimer - Gdx.graphics.getDeltaTime();
