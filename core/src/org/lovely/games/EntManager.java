@@ -74,9 +74,13 @@ public class EntManager {
         return false;
     }
 
-    private boolean isOverlap(Vector2 p1, Vector2 s1, Vector2 p2, Vector2 s2) {
+    public static boolean isOverlap(Vector2 p1, Vector2 s1, Vector2 p2, Vector2 s2) {
         Rectangle rect1 = new Rectangle(p1.x, p1.y, s1.x, s1.y);
         Rectangle rect2 = new Rectangle(p2.x, p2.y, s2.x, s2.y);
         return rect1.overlaps(rect2);
+    }
+
+    public void start() {
+        ents.clear();
     }
 }

@@ -25,4 +25,8 @@ public class EffectManager {
     public void addEffect(Vector2 pos, String image, float timer) {
         effects.add(new Effect(pos, timer, image));
     }
+
+    public void start() {
+        effects.clear();
+    }
 }

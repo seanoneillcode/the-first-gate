@@ -22,6 +22,7 @@ public class LoadingManager {
     public static final String CLOUD_1 = "cloud-1.png";
     public static final String CLOUD_2 = "cloud-2.png";
     public static final String CLOUD_3 = "cloud-3.png";
+    public static final String GOAL = "goal.png";
     public static final String LAND_EFFECT = "land-effect.png";
     private Map<String, Animation<TextureRegion>> anims;
     AssetManager assetManager;
@@ -44,13 +45,15 @@ public class LoadingManager {
         assetManager.load(CLOUD_1, Texture.class);
         assetManager.load(CLOUD_2, Texture.class);
         assetManager.load(CLOUD_3, Texture.class);
+        assetManager.load(GOAL, Texture.class);
 
         assetManager.finishLoading();
 
-        anims.put(PLAYER_IDLE, loadAnimation(PLAYER_IDLE, 2, 0.25f));
+        anims.put(PLAYER_IDLE, loadAnimation(PLAYER_IDLE, 4, 0.25f));
         anims.put(PLAYER_FALL, loadAnimation(PLAYER_FALL, 6, 0.1f));
         anims.put(PLAYER_RUN, loadAnimation(PLAYER_RUN, 4, 0.15f));
         anims.put(PLAYER_JUMP, loadAnimation(PLAYER_JUMP, 2, 0.25f));
+        anims.put(GOAL, loadAnimation(GOAL, 2, 0.25f));
         anims.put(GRASS_TILE, loadAnimation(GRASS_TILE, 4, 0.5f));
         anims.put(BOTTOM_TILE, loadAnimation(BOTTOM_TILE, 1, 1f));
         anims.put(PLAYER_SHADOW, loadAnimation(PLAYER_SHADOW, 1, 1f));

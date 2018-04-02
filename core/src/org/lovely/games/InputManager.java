@@ -9,10 +9,18 @@ public class InputManager {
 
     private Vector2 inputVector;
     public boolean isRight = true;
+    private float zoom = 0;
 
     public void update(BastilleMain bastilleMain) {
         Vector2 inputVector = getInput();
         bastilleMain.movePlayer(inputVector);
+        zoom = 0;
+        if (Gdx.input.isKeyPressed(Input.Keys.M)) {
+            zoom = 0.02f;
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.N)) {
+            zoom = -0.02f;
+        }
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
             bastilleMain.jumpPlayer();
         }
@@ -47,5 +55,9 @@ public class InputManager {
 
     public boolean isMoving() {
         return inputVector.x != 0 || inputVector.y != 0;
+    }
+
+    public float getZoom() {
+        return zoom;
     }
 }

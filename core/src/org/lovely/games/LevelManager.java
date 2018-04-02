@@ -13,24 +13,28 @@ import static org.lovely.games.LoadingManager.*;
 
 public class LevelManager {
 
+    public static final int NUM_CLOUDS = 16;
+    public static final int NUM_PLATFORMS = 24;
     List<Tile> tiles = new ArrayList<>();
     private float animationDelta = 0f;
     public static float TILE_SIZE = 16;
-    private int MAP_SIZE = 16;
+    private int MAP_SIZE = 32;
     private int SQUARE_SIZE = 8;
     Vector2 TILE_SIZE_VEC = new Vector2(TILE_SIZE, TILE_SIZE);
     List<Cloud> clouds = new ArrayList<>();
     List<String> cloundImages = Arrays.asList(CLOUD_0, CLOUD_1, CLOUD_2, CLOUD_3);
+    public Tile goalTile;
 
     public void start() {
-        for (int i = 0; i < 16; i++) {
+        tiles.clear();
+        for (int i = 0; i < NUM_CLOUDS; i++) {
             Vector2 pos = new Vector2(MathUtils.random(0, MAP_SIZE * TILE_SIZE), MathUtils.random(0, MAP_SIZE * TILE_SIZE));
             Vector2 mov = new Vector2(MathUtils.random(0.1f, 1.0f), 0);
             String img = cloundImages.get(MathUtils.random(cloundImages.size() - 1));
             float scale = mov.x / 1.0f;
             addCloud(pos, img, mov, scale);
         }
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < NUM_PLATFORMS; i++) {
             Vector2 pos = new Vector2(MathUtils.random(0, MAP_SIZE), MathUtils.random(0, MAP_SIZE));
             Vector2 size = new Vector2(MathUtils.random(1, SQUARE_SIZE), MathUtils.random(1, SQUARE_SIZE));
             addSquare(pos, size);
@@ -44,6 +48,8 @@ public class LevelManager {
             }
             return 0;
         });
+        int goalTileIndex = MathUtils.random(0, tiles.size() - 1);
+        goalTile = tiles.get(goalTileIndex);
     }
 
     private void addCloud(Vector2 pos, String image, Vector2 mov, float scale) {

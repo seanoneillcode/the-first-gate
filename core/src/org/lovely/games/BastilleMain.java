@@ -26,7 +26,7 @@ public class BastilleMain extends ApplicationAdapter {
 
     private CameraManager cameraManager;
     private InputManager inputManager;
-    private float PLAYER_SPEED = 1.5f;
+    private float PLAYER_SPEED = 1.8f;
     private AssetManager assetManager;
     private LoadingManager loadingManager;
     private LevelManager levelManager;
@@ -50,18 +50,17 @@ public class BastilleMain extends ApplicationAdapter {
 		effectManager = new EffectManager();
 		inputManager = new InputManager();
 		entManager = new EntManager();
-		levelManager.start();
-		Vector2 startPos = levelManager.getStartPos();
-        player = entManager.addEnt(startPos, new Vector2(8, 8), new Vector2(0, 0), true);
+        startLevel();
 	}
 
 	@Override
 	public void render () {
         inputManager.update(this);
-        cameraManager.update(player.pos, inputManager.getInput());
+        cameraManager.update(player.pos, inputManager);
         levelManager.update();
         entManager.update(levelManager, this, effectManager);
         effectManager.update();
+        updatePlayer();
 		Gdx.gl.glClearColor(background.r, background.g, background.b, background.a);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.setProjectionMatrix(cameraManager.camera.combined);
@@ -156,6 +155,13 @@ public class BastilleMain extends ApplicationAdapter {
             tileSprite.setColor(tile.color);
             tileSprite.draw(batch);
         }
+        Sprite goalSprite = new Sprite();
+        goalSprite.setSize(TILE_SIZE * 2, TILE_SIZE * 2);
+        Tile goalTile = levelManager.goalTile;
+        TextureRegion frame = loadingManager.getAnim(GOAL).getKeyFrame(animationDelta, true);
+        goalSprite.setPosition(goalTile.pos.x, goalTile.pos.y);
+        goalSprite.setRegion(frame);
+        goalSprite.draw(batch);
     }
 
 	@Override
@@ -175,7 +181,21 @@ public class BastilleMain extends ApplicationAdapter {
         }
     }
 
+    private void startLevel() {
+        entManager.start();
+        levelManager.start();
+        effectManager.start();
+        Vector2 startPos = levelManager.getStartPos();
+        player = entManager.addEnt(startPos, new Vector2(8, 8), new Vector2(0, 0), true);
+    }
+
     public void jumpPlayer() {
         player.jump();
+    }
+
+    private void updatePlayer() {
+        if (EntManager.isOverlap(player.pos, player.size, levelManager.goalTile.pos, levelManager.goalTile.size)) {
+            startLevel();
+        }
     }
 }

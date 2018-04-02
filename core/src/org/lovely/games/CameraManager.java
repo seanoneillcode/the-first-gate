@@ -13,7 +13,7 @@ public class CameraManager {
     private float VIEWPORT_WIDTH = 320;
     private float VIEWPORT_HEIGHT = 240f;
 
-    private float CAMERA_CATCHUP_SPEED = 0.8f;
+    private float CAMERA_CATCHUP_SPEED = 1.2f;
     public OrthographicCamera camera;
 
 
@@ -22,8 +22,9 @@ public class CameraManager {
         camera.setToOrtho(false, VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
     }
 
-    public void update(Vector2 playerPos, Vector2 inputPos) {
-        camera.position.set(getCameraPosition(playerPos, inputPos));
+    public void update(Vector2 playerPos, InputManager inputManager) {
+        camera.position.set(getCameraPosition(playerPos, inputManager.getInput()));
+        camera.zoom += inputManager.getZoom();
         camera.update();
     }
 
