@@ -31,7 +31,6 @@ public class BastilleMain extends ApplicationAdapter {
     private float animationDelta = 0f;
     Color background = new Color(0 / 256f, 149 / 256f, 233 / 256f, 1);
     Ent player;
-    private Vector2 startPos;
 
     @Override
 	public void create () {
@@ -71,7 +70,8 @@ public class BastilleMain extends ApplicationAdapter {
         entSprite.setScale(2);
         for (Ent ent : entManager.ents) {
             entSprite.setSize(ent.size.x, ent.size.y);
-            entSprite.setPosition(ent.pos.x, ent.pos.y);
+            float actualy = ent.pos.y + ent.z;
+            entSprite.setPosition(ent.pos.x, actualy);
 
             if (ent.state != Ent.EntState.DEAD) {
                 TextureRegion frame = null;
@@ -79,7 +79,7 @@ public class BastilleMain extends ApplicationAdapter {
                     frame = loadingManager.getAnim(PLAYER_FALL).getKeyFrame(ent.delta, false);
                 }
                 if (ent.state == Ent.EntState.JUMPING) {
-                    frame = loadingManager.getAnim(PLAYER_JUMP).getKeyFrame(ent.delta, false);
+                    frame = loadingManager.getAnim(PLAYER_JUMP).getKeyFrame(ent.delta, true);
                 }
                 if (ent.state == Ent.EntState.ALIVE) {
                     if (inputManager.isMoving()) {
@@ -92,6 +92,7 @@ public class BastilleMain extends ApplicationAdapter {
                 if (!inputManager.isRight) {
                     entSprite.flip(true, false);
                 }
+                batch.draw(loadingManager.getAnim(PLAYER_SHADOW).getKeyFrame(ent.delta, false), ent.pos.x, ent.pos.y - 4);
                 entSprite.draw(batch);
             }
         }
@@ -121,12 +122,12 @@ public class BastilleMain extends ApplicationAdapter {
             player.pos.add(change);
         }
         if (player.state == Ent.EntState.JUMPING) {
-            Vector2 change = inputVector.cpy().scl(PLAYER_SPEED).scl(0.2f);
+            Vector2 change = inputVector.cpy().scl(PLAYER_SPEED).scl(0.8f);
             player.pos.add(change);
         }
     }
 
     public void jumpPlayer() {
-        player.jump(inputManager.getInput());
+        player.jump();
     }
 }

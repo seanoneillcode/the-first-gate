@@ -9,6 +9,7 @@ import java.util.List;
 
 public class EntManager {
 
+    private static final float GRAVITY = 0.1f;
     List<Ent> ents;
 
     EntManager() {
@@ -35,12 +36,16 @@ public class EntManager {
                 }
             }
             if (ent.state == Ent.EntState.JUMPING) {
-                if (ent.jumpTimer < 0) {
-                    ent.state = Ent.EntState.ALIVE;
-                }
+                ent.impulse = ent.impulse - GRAVITY;
+                ent.z = ent.z - GRAVITY;
+                ent.z = ent.z + ent.impulse;
                 ent.pos = ent.pos.cpy().add(ent.physics);
+                if (ent.z <= 0) {
+                    ent.state = Ent.EntState.ALIVE;
+                    ent.jumpTimer = 0;
+                    ent.z = 0;
+                }
             }
-
             ent.jumpTimer = ent.jumpTimer - Gdx.graphics.getDeltaTime();
             ent.delta = ent.delta + Gdx.graphics.getDeltaTime();
         }

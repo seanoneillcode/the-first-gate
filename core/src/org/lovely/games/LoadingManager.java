@@ -12,6 +12,7 @@ import java.util.Map;
 public class LoadingManager {
 
     public static final String PLAYER_IDLE = "player-idle.png";
+    public static final String PLAYER_SHADOW = "player-shadow.png";
     public static final String PLAYER_FALL = "player-fall.png";
     public static final String PLAYER_JUMP = "player-jump.png";
     public static final String PLAYER_RUN = "player-run.png";
@@ -32,6 +33,7 @@ public class LoadingManager {
         assetManager.load(PLAYER_JUMP, Texture.class);
         assetManager.load(GRASS_TILE, Texture.class);
         assetManager.load(BOTTOM_TILE, Texture.class);
+        assetManager.load(PLAYER_SHADOW, Texture.class);
 
         assetManager.finishLoading();
 
@@ -41,6 +43,7 @@ public class LoadingManager {
         anims.put(PLAYER_JUMP, loadAnimation(PLAYER_JUMP, 2, 0.25f));
         anims.put(GRASS_TILE, loadAnimation(GRASS_TILE, 4, 0.5f));
         anims.put(BOTTOM_TILE, loadAnimation(BOTTOM_TILE, 1, 1f));
+        anims.put(PLAYER_SHADOW, loadAnimation(PLAYER_SHADOW, 1, 1f));
     }
 
     public Animation<TextureRegion> getAnim(String name) {
