@@ -21,7 +21,7 @@ public class EntManager {
         return ent;
     }
 
-    public void update(LevelManager levelManager) {
+    public void update(LevelManager levelManager, BastilleMain bastilleMain) {
         boolean hasDeadEnts = false;
         for (Ent ent : ents) {
             if (ent.state == Ent.EntState.ALIVE && ent.needsGround && !isOnGround(levelManager, ent.pos.cpy().add(ent.offset), ent.size)) {
@@ -40,8 +40,12 @@ public class EntManager {
                 }
                 ent.pos = ent.pos.cpy().add(ent.physics);
             }
+
             ent.jumpTimer = ent.jumpTimer - Gdx.graphics.getDeltaTime();
             ent.delta = ent.delta + Gdx.graphics.getDeltaTime();
+        }
+        if (bastilleMain.player.state == Ent.EntState.DEAD) {
+            bastilleMain.player = addEnt(levelManager.getStartPos(), new Vector2(8, 8), new Vector2(4, 4), true);
         }
         if (hasDeadEnts) {
             ents.removeIf(ent -> ent.state == Ent.EntState.DEAD);
@@ -62,5 +66,4 @@ public class EntManager {
         Rectangle rect2 = new Rectangle(p2.x, p2.y, s2.x, s2.y);
         return rect1.overlaps(rect2);
     }
-
 }

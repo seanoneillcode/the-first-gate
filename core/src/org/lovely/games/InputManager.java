@@ -30,9 +30,11 @@ public class InputManager {
 
         if (isLeftPressed) {
             inputVector.x = inputVector.x - 1;
+            isRight = false;
         }
         if (isRightPressed) {
             inputVector.x = inputVector.x + 1;
+            isRight = true;
         }
         if (isUpPressed) {
             inputVector.y = inputVector.y + 1;

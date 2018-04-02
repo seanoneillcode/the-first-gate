@@ -53,4 +53,8 @@ public class LevelManager {
     public void update() {
         animationDelta = animationDelta + Gdx.graphics.getDeltaTime();
     }
+
+    public Vector2 getStartPos() {
+        return tiles.get(tiles.size() - 1).pos.cpy();
+    }
 }

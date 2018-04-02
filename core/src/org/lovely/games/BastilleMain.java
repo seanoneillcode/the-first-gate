@@ -31,6 +31,7 @@ public class BastilleMain extends ApplicationAdapter {
     private float animationDelta = 0f;
     Color background = new Color(0 / 256f, 149 / 256f, 233 / 256f, 1);
     Ent player;
+    private Vector2 startPos;
 
     @Override
 	public void create () {
@@ -45,7 +46,7 @@ public class BastilleMain extends ApplicationAdapter {
 		inputManager = new InputManager();
 		entManager = new EntManager();
 		levelManager.start();
-		Vector2 startPos = levelManager.tiles.get(levelManager.tiles.size() - 1).pos.cpy();
+		Vector2 startPos = levelManager.getStartPos();
         player = entManager.addEnt(startPos, new Vector2(8, 8), new Vector2(4, 4), true);
 	}
 
@@ -54,7 +55,7 @@ public class BastilleMain extends ApplicationAdapter {
         inputManager.update(this);
         cameraManager.update(player.pos, inputManager.getInput());
         levelManager.update();
-        entManager.update(levelManager);
+        entManager.update(levelManager, this);
 		Gdx.gl.glClearColor(background.r, background.g, background.b, background.a);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.setProjectionMatrix(cameraManager.camera.combined);
@@ -71,6 +72,7 @@ public class BastilleMain extends ApplicationAdapter {
         for (Ent ent : entManager.ents) {
             entSprite.setSize(ent.size.x, ent.size.y);
             entSprite.setPosition(ent.pos.x, ent.pos.y);
+
             if (ent.state != Ent.EntState.DEAD) {
                 TextureRegion frame = null;
                 if (ent.state == Ent.EntState.FALLING) {
@@ -87,6 +89,9 @@ public class BastilleMain extends ApplicationAdapter {
                     }
                 }
                 entSprite.setRegion(frame);
+                if (!inputManager.isRight) {
+                    entSprite.flip(true, false);
+                }
                 entSprite.draw(batch);
             }
         }
