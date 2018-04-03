@@ -1,6 +1,7 @@
 package org.lovely.games;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
@@ -39,6 +40,8 @@ public class LevelManager {
         tiles.addAll(levelGenerator.generate(NUM_POINTS, MAP_SIZE));
         int goalTileIndex = MathUtils.random(0, tiles.size() - 1);
         goalTile = tiles.get(goalTileIndex);
+        Vector2 lPos = tiles.get(MathUtils.random(0, tiles.size() - 1)).pos;
+        tiles.add(new Tile(lPos.cpy(), new Vector2(64, 128), LIGHTHOUSE, false, Color.WHITE));
     }
 
     private void addCloud(Vector2 pos, String image, Vector2 mov, float scale) {

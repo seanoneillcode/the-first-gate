@@ -5,16 +5,19 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.lovely.games.LevelManager.TILE_SIZE;
-import static org.lovely.games.LoadingManager.BOTTOM_TILE;
-import static org.lovely.games.LoadingManager.GRASS_TILE;
+import static org.lovely.games.LoadingManager.*;
 
 public class LevelGenerator {
 
     private static final int MAX_PLATFORM_SIZE = 12;
     private static Vector2 TILE_SIZE_VEC = new Vector2(TILE_SIZE, TILE_SIZE);
+    private static List<String> GRASS_TILES = Arrays.asList(GRASS_TILE_2, GRASS_TILE_3, GRASS_TILE_2, GRASS_TILE_3, GRASS_TILE_8,
+            GRASS_TILE_4, GRASS_TILE_5, GRASS_TILE_6, GRASS_TILE_7, GRASS_TILE_8, GRASS_TILE_2, GRASS_TILE_3, GRASS_TILE_2, GRASS_TILE_3, GRASS_TILE_8,
+            GRASS_TILE_9, GRASS_TILE_9, GRASS_TILE_9, GRASS_TILE_9, GRASS_TILE_9, GRASS_TILE_9, GRASS_TILE_9, GRASS_TILE, GRASS_TILE);
 
     public List<Tile> generate(int points, int mapSize) {
         List<Tile> tiles = new ArrayList<>();
@@ -92,8 +95,8 @@ public class LevelGenerator {
         for (int i = 0; i < size.x; i++) {
             for (int j = 0; j < size.y; j++) {
                 Vector2 tilePos = pos.cpy().scl(TILE_SIZE).add(i * TILE_SIZE, j * TILE_SIZE);
-                Color color = Color.WHITE.cpy().fromHsv(MathUtils.random(180f, 190f), 1, 1);
-                tiles.add(new Tile(tilePos, TILE_SIZE_VEC, GRASS_TILE, true, color));
+                Color color = Color.WHITE;//.cpy().fromHsv(MathUtils.random(180f, 190f), 1, 1);
+                tiles.add(new Tile(tilePos, TILE_SIZE_VEC, GRASS_TILES.get(MathUtils.random(0,GRASS_TILES.size() - 1)), true, color));
                 if (j == 0) {
                     tiles.add(new Tile(tilePos.cpy().sub(0, TILE_SIZE), TILE_SIZE_VEC, BOTTOM_TILE, false, color));
                 }

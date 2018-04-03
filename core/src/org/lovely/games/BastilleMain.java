@@ -147,10 +147,11 @@ public class BastilleMain extends ApplicationAdapter {
         }
 
         Sprite tileSprite = new Sprite();
-        tileSprite.setSize(TILE_SIZE, TILE_SIZE);
+
         for (Tile tile : levelManager.tiles) {
-            TextureRegion frame = loadingManager.getAnim(tile.image).getKeyFrame(animationDelta, true);
+            TextureRegion frame = loadingManager.getAnim(tile.image).getKeyFrame(animationDelta + tile.animationOffset, true);
             tileSprite.setPosition(tile.pos.x, tile.pos.y);
+            tileSprite.setSize(tile.size.x, tile.size.y);
             tileSprite.setRegion(frame);
             tileSprite.setColor(tile.color);
             tileSprite.draw(batch);
