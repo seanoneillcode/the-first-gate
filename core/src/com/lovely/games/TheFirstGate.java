@@ -422,14 +422,11 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
     @Override
     public void pause() {
-        System.out.println("pause CALLED");
         isPaused = true;
     }
 
     @Override
     public void resume() {
-
-        System.out.println("RESUEMEMEM CALLED");
         isPaused = false;
     }
 
@@ -1080,19 +1077,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 soundPlayer.playSound("sound/blast-1.ogg", false, 0.3f,  MathUtils.random(0.7f, 1.3f));
                 arrowIterator.remove();
             }
-            Vector2 nextTilePos = arrow.dir.cpy().scl(TILE_SIZE).add(arrow.pos).add(QUARTER_TILE_SIZE, QUARTER_TILE_SIZE);
-            BlockLike block = currentLevel.getBlockLike(nextTilePos, true);
-            if (block != null) {
+            if (checkArrowCollision(arrow.pos.cpy(), arrow, arrowIterator)) {
                 blocksDirty = true;
-                Vector2 nextTileAgain = arrow.dir.cpy().scl(TILE_SIZE * 2.0f).add(arrow.pos).add(QUARTER_TILE_SIZE, QUARTER_TILE_SIZE);
-                explosions.add(new Explosion(arrow.pos.cpy()));
-                if (currentLevel.isTileBlocked(nextTileAgain)) {
-                    arrowIterator.remove();
-                } else {
-                    block.move(arrow.dir);
-                    arrowIterator.remove();
-                }
-                soundPlayer.playSound("sound/blast-1.ogg", false, 0.3f,  MathUtils.random(0.7f, 1.3f));
             }
             if (!playerIsDead && getPlayerRect().overlaps(arrow.getRect())) {
                 playerDeathTimer = PLAYER_DEATH_TIME;
@@ -1142,6 +1128,24 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         if (blocksDirty) {
             currentLevel.blocks.sort((o1, o2) -> o1.isGround() == o2.isGround() ? 0 : (o1.isGround() ? -1 : 1));
         }
+    }
+
+    private boolean checkArrowCollision(Vector2 pos, Arrow arrow, Iterator<Arrow> arrowIterator) {
+        boolean blocksDirty = false;
+        BlockLike block = currentLevel.getBlockLike(pos, true);
+        if (block != null) {
+            blocksDirty = true;
+            Vector2 nextTileAgain = arrow.dir.cpy().scl(TILE_SIZE * 2.0f).add(arrow.pos).add(QUARTER_TILE_SIZE, QUARTER_TILE_SIZE);
+            explosions.add(new Explosion(arrow.pos.cpy()));
+            if (currentLevel.isTileBlocked(nextTileAgain)) {
+                arrowIterator.remove();
+            } else {
+                block.move(arrow.dir);
+                arrowIterator.remove();
+            }
+            soundPlayer.playSound("sound/blast-1.ogg", false, 0.3f,  MathUtils.random(0.7f, 1.3f));
+        }
+        return blocksDirty;
     }
 
 
@@ -1364,11 +1368,12 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     }
 
     private void castCurrentSpell() {
+        currentSpell = "arrow";
         if (castCooldown > 0) {
             return;
         }
         if (currentSpell != null && currentSpell.equals("arrow")) {
-            Vector2 nextTilePos = playerDir.cpy().scl(TILE_SIZE).add(playerPos);
+            Vector2 nextTilePos = playerDir.cpy().scl(24f).add(playerPos);
             addArrow(nextTilePos, playerDir, PLAYER_ARROW_SPEED);
             castCooldown = CAST_ARROW_COOLDOWN;
         }
