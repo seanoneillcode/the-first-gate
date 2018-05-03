@@ -36,7 +36,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private static final float PLAYER_SPEED = TILE_SIZE * 4.0f;
     private static final float CAMERA_MARGIN = 0.5f;
     private static final float CAMERA_CATCHUP_SPEED = 2.0f;
-    private static final int VIEWPORT_WIDTH = 600;
+    private static final int VIEWPORT_WIDTH = 850;
     private static final int VIEWPORT_HEIGHT = 480;
     private static final float CAST_ARROW_COOLDOWN = 0.6f;
     private static final float PLAYER_DEATH_TIME = 1.0f;
@@ -139,6 +139,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private boolean hasContinue = false;
     private boolean isViewDirty = false;
     private ScreenFader screenFader;
+    private boolean isPaused = false;
 
     @Override
 	public void create () {
@@ -419,6 +420,19 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         hasContinue = true;
     }
 
+    @Override
+    public void pause() {
+        System.out.println("pause CALLED");
+        isPaused = true;
+    }
+
+    @Override
+    public void resume() {
+
+        System.out.println("RESUEMEMEM CALLED");
+        isPaused = false;
+    }
+
     private void loadLevelFromPrefs() {
         Preferences prefs = Gdx.app.getPreferences("caen-preferences");
         if (prefs.contains("last-level")) {
@@ -650,6 +664,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
 	@Override
 	public void render () {
+        if (isPaused) {
+            return;
+        }
         camera.position.set(getCameraPosition());
         camera.update();
         batch.setProjectionMatrix(camera.combined);

@@ -148,7 +148,7 @@ public class SceneContainer {
         scenes.put("17", builder()
                 .verb(new FadeScreenVerb(false, 2.0f, Color.BLACK))
                 .verb(new FadeScreenVerb(true, 0.1f, Color.BLACK))
-                .verb(new PosterVerb("ending-poster.png"))
+                .verb(new PosterVerb("posters/ending-poster.png"))
                 .verb(new FadeScreenVerb(false, 0.1f, Color.BLACK))
                 .build());
 
