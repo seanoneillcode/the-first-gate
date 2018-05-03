@@ -673,23 +673,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             return;
         }
         camera.position.set(getCameraPosition());
-        if ((conversation == null && currentScenes.isEmpty()) || showSaveWarning) {
-            targetZoom = 1.0f;
-        } else {
-            targetZoom = 0.8f;
-        }
-        if (isTitleMenu) {
-            targetZoom = 0.9f;
-        }
-        if (Math.abs(camera.zoom - targetZoom) < ZOOM_THRESHOLH) {
-            camera.zoom = targetZoom;
-        }
-        if (camera.zoom < targetZoom) {
-            camera.zoom = camera.zoom + ZOOM_AMOUNT;
-        }
-        if (camera.zoom > targetZoom) {
-            camera.zoom = camera.zoom - ZOOM_AMOUNT;
-        }
+        updateCameraZoom();
         camera.update();
         batch.setProjectionMatrix(camera.combined);
         if (!isTitleMenu) {
@@ -901,6 +885,29 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         isLevelDirty = false;
         isViewDirty = false;
 	}
+
+    private void updateCameraZoom() {
+        if ((conversation == null && currentScenes.isEmpty()) || showSaveWarning) {
+            targetZoom = 1.0f;
+        } else {
+            targetZoom = 0.8f;
+        }
+        if (isTitleMenu) {
+            targetZoom = 0.9f;
+        }
+        if (posterImageName != null) {
+            targetZoom = 1.0f;
+        }
+        if (Math.abs(camera.zoom - targetZoom) < ZOOM_THRESHOLH) {
+            camera.zoom = targetZoom;
+        }
+        if (camera.zoom < targetZoom) {
+            camera.zoom = camera.zoom + ZOOM_AMOUNT;
+        }
+        if (camera.zoom > targetZoom) {
+            camera.zoom = camera.zoom - ZOOM_AMOUNT;
+        }
+    }
 
     private BitmapFont loadFonts(String fontString) {
         font = new BitmapFont(Gdx.files.internal(fontString),false);

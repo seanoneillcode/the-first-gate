@@ -78,11 +78,11 @@ public class DialogContainer {
         ));
         dialogs.put("12", Arrays.asList(
                 line(pro, "Those tests almost killed me!", "angry"),
-                line(ant, "Those tests have killed most. Be glad, you are alive.", "happy"),
-                line(ant, "And the reward demands the risk.", "talk"),
-                line(pro, "Reward? I hope it is gold.", "angry"),
+                line(ant, "Then you should be happy to be alive", "happy"),
+                line(ant, "A Great reward demands a great risk", "talk"),
+                line(pro, "Reward? I hope it is gold.", "happy"),
                 line(ant, "Why?", "talk"),
-                line(pro, "I am a landless peasant. I have nothing", "angry"),
+                line(pro, "I am a landless peasant. I have nothing", "worried"),
                 line(ant, "There is no gold here.", "talk"),
                 line(pro, "What? Then what is the reward!?", "angry"),
                 line(ant, "Power. See for yourself. Take the stone.", "talk")
@@ -109,7 +109,7 @@ public class DialogContainer {
                 line(ant, "Fool, now I'll take what's mine.", "happy")
         ));
         dialogs.put("18", Arrays.asList(
-                line(pro, "Now to take the stone")
+                line(pro, "This must be the stone")
         ));
         dialogs.put("19", Arrays.asList(
                 line(ant, "Yes?"),
@@ -128,16 +128,20 @@ public class DialogContainer {
         ));
         dialogs.put("22", Arrays.asList(
                 line(ant, "I am the caretaker of the Caen."),
-                line(ant, "My role is to rebuke the foolish and the curious."),
-                line(ant, "To encourage the brave and worthy."),
-                line(ant, "And to clean and maintain the Caen.")
+                line(ant, "I clean the rooms"),
+                line(pro, "That's nice", "happy"),
+                line(ant, "It's mostly removing bodies and cleaning blood"),
+                line(pro, "Oh... that's less nice", "worried"),
+                line(ant, "Well I quite enjoy it", "happy")
+
         ));
         dialogs.put("23", Arrays.asList(
                 line(ant, "That's for you figure out."),
                 line(ant, "Have a look around."),
                 line(pro, "Thanks..."),
-                line(ant, "I could say, that you are aiming for the exit to the north."),
-                line(ant, "But the tests are taken in a linear fashion")
+                line(ant, "Well the goal is the exit at the top of this room"),
+                line(ant, "But the tests are taken in a linear fashion"),
+                line(ant, "You can start at the bottom right room if you're eager")
         ));
         dialogs.put("24", Arrays.asList(
                 line(pro, "What next?"),
@@ -148,16 +152,17 @@ public class DialogContainer {
                 line(ant, "There is no gold."),
                 line(pro, "I cannot eat the stone.", "angry"),
                 line(ant, "Why not sell it?"),
-                line(pro, "Is this a trick question? This could turn a peasant into criminal. It could turn a noble into a tyrant.", "angry"),
+                line(pro, "Sell it? This would turn a man into criminal, a noble into a tyrant.", "angry"),
                 line(pro, "It is a curse", "angry"),
                 line(ant, "Yes, now you understand.", "happy"),
-                line(ant, "I am satisfied that you understand the stone. Listen to me.", "talk"),
+                line(ant, "I am happy that you understand the nature of power. Listen to me.", "talk"),
                 line(ant, "I can take you to Bryn, the hearth of Mages. There you can learn to control the power, to use it ethically."),
                 line(pro, "You would turn me, a peasant, into a Mage?", "worried"),
                 line(ant, "Yes, anyone who survives the Caen can enter Bryn."),
-                line(ant, "It is another set of trials though. Not of block and switches but of people. Not in rooms but in the mind. It is much harder than the Caen."),
-                line(pro, "But does the reward demand the risk...?"),
-                line(ant, "A Mage will not go hungry..."),
+                line(ant, "It is another set of trials though. Not of block and switches but of people. Not in rooms but in the mind."),
+                line(ant, "Surviving Bryn is much harder than the Caen."),
+                line(pro, "But is the reward equal to the risk?"),
+                line(ant, "well... a Mage will not go hungry..."),
                 line(ant, "Take the night to rest and think on it.")
         ));
         dialogs.put("saveWarning", Arrays.asList(
@@ -271,6 +276,9 @@ public class DialogContainer {
         if (actors.contains("ant")) {
             rightPortrait.setPosition(dialogPos.x + 302, dialogPos.y + 4 - 170);
             rightPortrait.draw(batch);
+        }
+        if (dialogLine.getOwner().equals("info")) {
+            dialogPos.x = dialogPos.x + 40;
         }
 
         List<String> lines = dialogLine.getLines();
