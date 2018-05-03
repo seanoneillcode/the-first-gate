@@ -27,4 +27,6 @@ public interface Stage {
     void setScreenFade(float amount, Color color);
 
     void fadeScreen(boolean inDirection, float time, Color color);
+
+    void gotoState(String state);
 }

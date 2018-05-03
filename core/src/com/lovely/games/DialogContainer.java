@@ -160,6 +160,14 @@ public class DialogContainer {
                 line(ant, "A Mage will not go hungry..."),
                 line(ant, "Take the night to rest and think on it.")
         ));
+        dialogs.put("saveWarning", Arrays.asList(
+                line(info, "There is already a save game. Starting a new game will overwrite the save game."),
+                line(info, "Do you wish to start a new game?"),
+                options(info)
+                        .opt("yes", "new-game")
+                        .opt("no", "menu")
+                        .build()
+        ));
 //        dialogs.put("21", Arrays.asList(
 //                line(ant, "Only a day or two more. Over the nearest peak and through a valley."),
 //                line(pro, "We will run out of supplies for the return journey if we go too far.", "worried"),
@@ -189,8 +197,8 @@ public class DialogContainer {
     private BitmapFont font;
     private float timer;
     private Texture dialogBottom, dialogTop, dialogLineImg;
-    private Color fontColorMain = new Color(172.0f / 256.0f, 203.0f  / 256.0f, 255.0f / 256.0f, 1);
-    private Color fontColorHighlighted = new Color(200.0f / 256.0f, 200.0f  / 256.0f, 160.0f / 256.0f, 1);
+    private Color fontColorHighlighted = new Color(58f / 256.0f, 68f / 256.0f, 102f / 256.0f, 1);
+    private Color fontColorMain = new Color(24f / 256.0f, 20f  / 256.0f, 37f / 256.0f, 1);
     private Color fontColorSecondary = new Color(7.0f / 256.0f, 0.0f  / 256.0f, 7.0f / 256.0f, 1);
     private Map<String, Texture> portraits;
     private Sprite dialogPointer, optionPointer;
@@ -200,7 +208,7 @@ public class DialogContainer {
     public DialogContainer(AssetManager assetManager) {
         currentDialog = null;
         dialogIndex = 0;
-        font = loadFonts("fonts/consolas.fnt");
+        font = loadFonts("fonts/decent.fnt");
         timer = 0;
         this.dialogBottom = assetManager.get("dialog-bottom.png");
         this.dialogTop = assetManager.get("dialog-top.png");
@@ -230,7 +238,7 @@ public class DialogContainer {
     }
 
     void render(SpriteBatch batch, Vector2 offset, Conversation conversation) {
-        Vector2 dialogPos = offset.cpy().add(64, 16);
+        Vector2 dialogPos = offset.cpy().add(0, 16);
         DialogElement dialogLine = conversation.getCurrentDialog();
         actors = new HashSet<>(conversation.getActors());
         float portraitHeight = 170;
@@ -243,7 +251,7 @@ public class DialogContainer {
                 leftPortrait.setTexture(portraits.get("pro-talk"));
                 lastMood = "pro-listening";
             }
-            dialogPointer.setPosition(dialogPos.x + 150, dialogPos.y + portraitHeight - 10);
+            dialogPointer.setPosition(dialogPos.x + 150, dialogPos.y + portraitHeight - 40);
             rightPortrait.setTexture(portraits.get(lastAntMood));
         } else {
             if (dialogLine.getMood() != null) {
@@ -254,14 +262,14 @@ public class DialogContainer {
                 lastAntMood = "ant-listening";
             }
             leftPortrait.setTexture(portraits.get(lastMood));
-            rightDialogPointer.setPosition(dialogPos.x + 302, dialogPos.y + portraitHeight - 10);
+            rightDialogPointer.setPosition(dialogPos.x + 302, dialogPos.y + portraitHeight - 40);
         }
         if (actors.contains("pro")) {
-            leftPortrait.setPosition(dialogPos.x, dialogPos.y + 4 - 50);
+            leftPortrait.setPosition(dialogPos.x - 20, dialogPos.y + 4 - 100);
             leftPortrait.draw(batch);
         }
         if (actors.contains("ant")) {
-            rightPortrait.setPosition(dialogPos.x + 242, dialogPos.y + 4 - 120);
+            rightPortrait.setPosition(dialogPos.x + 302, dialogPos.y + 4 - 170);
             rightPortrait.draw(batch);
         }
 
@@ -269,7 +277,9 @@ public class DialogContainer {
         float ypos = dialogLine.getTotalLines() * 32;
 
         float startHeight = portraitHeight + 16;
-
+        if (!isLeft) {
+            dialogPos.x = dialogPos.x + 120;
+        }
         batch.draw(dialogBottom, dialogPos.x, dialogPos.y + startHeight);
         batch.draw(dialogTop, dialogPos.x, dialogPos.y + 8 + ypos + startHeight);
         for (int i = 0; i < dialogLine.getTotalLines(); i++) {
@@ -290,13 +300,13 @@ public class DialogContainer {
             if (chosenOption != null && line.equals(chosenOption)) {
                 optionPointer.setPosition(dialogPos.x + 6, dialogPos.y - 2 + ypos + startHeight - 14);
                 optionPointer.draw(batch);
-                font.setColor(fontColorSecondary);
-                font.draw(batch, line, dialogPos.x + 10 + offsetx, dialogPos.y - 1 + ypos + startHeight - 2);
+//                font.setColor(fontColorSecondary);
+//                font.draw(batch, line, dialogPos.x + 10 + offsetx, dialogPos.y - 1 + ypos + startHeight - 2);
                 font.setColor(fontColorHighlighted);
                 font.draw(batch, line, dialogPos.x + 10 + offsetx, dialogPos.y + ypos + startHeight - 2);
             } else {
-                font.setColor(fontColorSecondary);
-                font.draw(batch, line, dialogPos.x + 10 + offsetx, dialogPos.y - 1 + ypos + startHeight - 2);
+//                font.setColor(fontColorSecondary);
+//                font.draw(batch, line, dialogPos.x + 10 + offsetx, dialogPos.y - 1 + ypos + startHeight - 2);
                 font.setColor(fontColorMain);
                 font.draw(batch, line, dialogPos.x + 10 + offsetx, dialogPos.y + ypos + startHeight - 2);
             }

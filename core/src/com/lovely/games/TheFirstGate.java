@@ -36,12 +36,14 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private static final float PLAYER_SPEED = TILE_SIZE * 4.0f;
     private static final float CAMERA_MARGIN = 0.5f;
     private static final float CAMERA_CATCHUP_SPEED = 2.0f;
-    private static final int VIEWPORT_WIDTH = 850;
+    private static final int VIEWPORT_WIDTH = 800;
     private static final int VIEWPORT_HEIGHT = 480;
     private static final float CAST_ARROW_COOLDOWN = 0.6f;
     private static final float PLAYER_DEATH_TIME = 1.0f;
     private static final float PLAYER_SHOOTING_TIME = 0.3f;
     private static final float PLAYER_ARROW_SPEED = TILE_SIZE * 4.0f;
+    public static final float ZOOM_AMOUNT = 0.005f;
+    public static final float ZOOM_THRESHOLH = 0.01f;
 
     private float lazerSoundTimer = 0;
     private float stepTimer = 0;
@@ -121,7 +123,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private Sprite titleSprite;
     private boolean isTitleMenu = false;
     private int titleSelectionIndex = 0;
-    private List<String> titleOptions = Arrays.asList("quit", "options", "new", "continue");
+    private List<String> titleOptions = Arrays.asList("credits", "options", "new game", "load game");
     private Sprite titleSelectionSprite;
     private boolean titleLock = false;
     private Animation<TextureRegion> arrowExplodeAnim;
@@ -140,6 +142,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private boolean isViewDirty = false;
     private ScreenFader screenFader;
     private boolean isPaused = false;
+    private boolean showSaveWarning = false;
+    private float targetZoom = 1f;
 
     @Override
 	public void create () {
@@ -388,7 +392,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         moveLock = false;
 
         sceneContainer = new SceneContainer();
-
         isTitleMenu = true;
         fadeScreen(true, 3.0f, Color.BLACK);
 //        setScreenFade(1.0f, Color.BLACK);
@@ -411,6 +414,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             hasContinue = false;
         }
     }
+
+
+
 
     private void saveLevelNumber(int levelNumber, String lastConnectionNumber) {
         Preferences prefs = Gdx.app.getPreferences("caen-preferences");
@@ -552,6 +558,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             cameraPosition.x = MathUtils.clamp(cameraPosition.x, -cameraTrailLimit + pos.x, cameraTrailLimit + pos.x);
             cameraPosition.y = MathUtils.clamp(cameraPosition.y, -cameraTrailLimit + pos.y, cameraTrailLimit + pos.y);
         }
+
         return cameraPosition;
     }
 
@@ -563,6 +570,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             Gdx.gl.glClearColor(gamma, gamma, gamma, 1.0f);
         }
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
         bufferBatch.setProjectionMatrix(camera.combined);
         bufferBatch.begin();
 
@@ -665,6 +673,23 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             return;
         }
         camera.position.set(getCameraPosition());
+        if ((conversation == null && currentScenes.isEmpty()) || showSaveWarning) {
+            targetZoom = 1.0f;
+        } else {
+            targetZoom = 0.8f;
+        }
+        if (isTitleMenu) {
+            targetZoom = 0.9f;
+        }
+        if (Math.abs(camera.zoom - targetZoom) < ZOOM_THRESHOLH) {
+            camera.zoom = targetZoom;
+        }
+        if (camera.zoom < targetZoom) {
+            camera.zoom = camera.zoom + ZOOM_AMOUNT;
+        }
+        if (camera.zoom > targetZoom) {
+            camera.zoom = camera.zoom - ZOOM_AMOUNT;
+        }
         camera.update();
         batch.setProjectionMatrix(camera.combined);
         if (!isTitleMenu) {
@@ -822,7 +847,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
             if (conversation != null) {
-                dialogContainer.render(batch, new Vector2(camera.position.x - (VIEWPORT_WIDTH / 2.0f), camera.position.y - (VIEWPORT_HEIGHT / 2.0f)), conversation);
+                dialogContainer.render(batch, new Vector2(camera.position.x - (VIEWPORT_WIDTH / 2.0f) + 100, camera.position.y - (VIEWPORT_HEIGHT / 2.0f) + 100), conversation);
             } else {
                 dialogContainer.reset();
             }
@@ -853,6 +878,10 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 }
                 font.draw(batch, option, selectedPos.x, selectedPos.y, 0f, 1, false);
                 selectedPos.add(0, -40);
+            }
+            if (showSaveWarning && conversation != null) {
+                conversation.update();
+                dialogContainer.render(batch, new Vector2(camera.position.x - (VIEWPORT_WIDTH / 2.0f), camera.position.y - (VIEWPORT_HEIGHT / 2.0f)), conversation);
             }
             batch.end();
         }
@@ -1199,7 +1228,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             inputVector.y = inputVector.y - 1;
         }
 
-        if (isTitleMenu && !titleLock) {
+        if (isTitleMenu && !titleLock && !showSaveWarning) {
             titleSelectionIndex = titleSelectionIndex - (int) inputVector.y;
             if (inputVector.y != 0) {
                 titleLock = true;
@@ -1222,11 +1251,18 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                     loadLevelFromPrefs();
                 }
                 if (titleSelectionIndex == 1) {
-                    isTitleMenu = false;
-                    startLevel(levels.get(20), levels.get(20).getConnection("61"));
+//                    isTitleMenu = false;
+//                    startLevel(levels.get(20), levels.get(20).getConnection("61"));
+                    if (hasContinue) {
+                        showSaveWarning = true;
+                        startDialog("saveWarning", new DialogVerb("new-game"));
+                    } else {
+                        gotoState("new-game");
+                        return;
+                    }
                 }
                 if (titleSelectionIndex == 3) {
-                    Gdx.app.exit();
+                    //Gdx.app.exit();
                 }
             }
             if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
@@ -1246,6 +1282,13 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 }
                 if (conversation.isFinished()) {
                     String chosenOption = conversation.getCurrentDialog().getChosenOption();
+                    if (showSaveWarning) {
+                        if (chosenOption.equals("new-game")) {
+                            gotoState("new-game");
+                        } else {
+                            gotoState("menu");
+                        }
+                    }
                     if (activeDialogVerb != null) {
                         activeDialogVerb.finish(chosenOption);
                         activeDialogVerb = null;
@@ -1471,6 +1514,20 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
     public void fadeScreen(boolean inDirection, float time, Color color) {
         screenFader.fadeScreen(inDirection, time, color);
+    }
+
+    @Override
+    public void gotoState(String state) {
+        if (state.equals("new-game")) {
+            isTitleMenu = false;
+            startLevel(levels.get(20), levels.get(20).getConnection("61"));
+        }
+        if (state.equals("menu")) {
+            isTitleMenu = true;
+            isViewDirty = true;
+            titleLock = true;
+        }
+        showSaveWarning = false;
     }
 
     @Override
