@@ -1072,13 +1072,24 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         while(arrowIterator.hasNext()) {
             Arrow arrow = arrowIterator.next();
             arrow.update();
-            if (currentLevel.isWall(arrow.pos) || currentLevel.isOutOfBounds(arrow.pos)) {
+            if (currentLevel.isWall(arrow.pos) || currentLevel.isOutOfBounds(arrow.pos) || currentLevel.getDoor(arrow.pos.cpy(), false) != null) {
                 explosions.add(new Explosion(arrow.pos.cpy()));
                 soundPlayer.playSound("sound/blast-1.ogg", false, 0.3f,  MathUtils.random(0.7f, 1.3f));
                 arrowIterator.remove();
+                continue;
             }
-            if (checkArrowCollision(arrow.pos.cpy(), arrow, arrowIterator)) {
+            BlockLike block = currentLevel.getBlockLike(arrow.pos.cpy(), true);
+            if (block != null) {
                 blocksDirty = true;
+                Vector2 nextTileAgain = arrow.dir.cpy().scl(TILE_SIZE * 2.0f).add(arrow.pos).add(QUARTER_TILE_SIZE, QUARTER_TILE_SIZE);
+                explosions.add(new Explosion(arrow.pos.cpy()));
+                if (currentLevel.isTileBlocked(nextTileAgain)) {
+                    arrowIterator.remove();
+                } else {
+                    arrowIterator.remove();
+                    block.move(arrow.dir);
+                }
+                soundPlayer.playSound("sound/blast-1.ogg", false, 0.3f,  MathUtils.random(0.7f, 1.3f));
             }
             if (!playerIsDead && getPlayerRect().overlaps(arrow.getRect())) {
                 playerDeathTimer = PLAYER_DEATH_TIME;
@@ -1132,19 +1143,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
     private boolean checkArrowCollision(Vector2 pos, Arrow arrow, Iterator<Arrow> arrowIterator) {
         boolean blocksDirty = false;
-        BlockLike block = currentLevel.getBlockLike(pos, true);
-        if (block != null) {
-            blocksDirty = true;
-            Vector2 nextTileAgain = arrow.dir.cpy().scl(TILE_SIZE * 2.0f).add(arrow.pos).add(QUARTER_TILE_SIZE, QUARTER_TILE_SIZE);
-            explosions.add(new Explosion(arrow.pos.cpy()));
-            if (currentLevel.isTileBlocked(nextTileAgain)) {
-                arrowIterator.remove();
-            } else {
-                block.move(arrow.dir);
-                arrowIterator.remove();
-            }
-            soundPlayer.playSound("sound/blast-1.ogg", false, 0.3f,  MathUtils.random(0.7f, 1.3f));
-        }
+
         return blocksDirty;
     }
 
