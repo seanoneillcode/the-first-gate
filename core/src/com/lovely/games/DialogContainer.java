@@ -77,9 +77,9 @@ public class DialogContainer {
                 line(ant, "This is great power, a force to create or destroy. A power over others.", "angry")
         ));
         dialogs.put("12", Arrays.asList(
-                line(pro, "Those tests almost killed me!", "angry"),
-                line(ant, "Then you should be happy to be alive", "happy"),
-                line(ant, "A Great reward demands a great risk", "talk"),
+                line(pro, "Those tests are bloody hard!", "angry"),
+                line(ant, "Then you should be happy", "happy"),
+                line(ant, "A Great reward demands a great challenge", "talk"),
                 line(pro, "Reward? I hope it is gold.", "happy"),
                 line(ant, "Why?", "talk"),
                 line(pro, "I am a landless peasant. I have nothing", "worried"),
@@ -194,6 +194,15 @@ public class DialogContainer {
                         .opt("sleep", "17")
                         .opt("stay up a little longer", null)
                         .build()
+        ));
+        dialogs.put("25", Arrays.asList(
+                line(ant, "You're doing great!", "happy"),
+                line(ant, "...almost there"),
+                line(pro, "Almost?"),
+                line(ant, "The next one is a bit tricky, but it's worth it.", "talk"),
+                line(pro, "Any hints or tips?"),
+                line(ant, "No", "happy"),
+                line(ant, "Good luck!", "happy")
         ));
     }
 

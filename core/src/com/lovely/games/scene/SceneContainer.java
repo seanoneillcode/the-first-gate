@@ -121,8 +121,9 @@ public class SceneContainer {
                 .verb(new PosterVerb("posters/poster-prize.png"))
                 .verb(new SendEventVerb("a"))
                 .verb(new DialogVerb("13"))
-                .verb(new MoveVerb(new Vector2(0, -1 * 32), "ant", false))
-                .verb(new MoveVerb(new Vector2(-1 * 32, 0), "ant", false))
+                .verb(new MoveVerb(new Vector2(0, -32), "ant", false))
+                .verb(new MoveVerb(new Vector2(32, 0), "ant", false))
+                .verb(new MoveVerb(new Vector2(0, -32), "ant", false))
                 .verb(new DialogVerb("11"))
                 .build());
 
@@ -161,6 +162,10 @@ public class SceneContainer {
 
         scenes.put("23", builder()
                 .verb(new DialogVerb("24"))
+                .build());
+
+        scenes.put("24", builder()
+                .verb(new DialogVerb("25"))
                 .build());
 
         scenes.put("new-game", builder()
