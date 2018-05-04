@@ -42,8 +42,10 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private static final float PLAYER_DEATH_TIME = 1.0f;
     private static final float PLAYER_SHOOTING_TIME = 0.3f;
     private static final float PLAYER_ARROW_SPEED = TILE_SIZE * 4.0f;
-    public static final float ZOOM_AMOUNT = 0.005f;
-    public static final float ZOOM_THRESHOLH = 0.01f;
+    private static final float ZOOM_AMOUNT = 0.005f;
+    private static final float ZOOM_THRESHOLH = 0.01f;
+    private static final float LEVEL_TRANSITION_TIMER = 0.5f;
+    private static final float PLAYER_TRANSITION_SPEED = 0.5f;
 
     private float lazerSoundTimer = 0;
     private float stepTimer = 0;
@@ -144,6 +146,10 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private boolean isPaused = false;
     private boolean showSaveWarning = false;
     private float targetZoom = 1f;
+    private Level nextLevel = null;
+    private Connection nextConnection = null;
+    private float levelTransitionTimer = 0;
+    private boolean leaveLevel = false;
 
     @Override
 	public void create () {
@@ -288,7 +294,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         playerLight.setScale(1.0f, 4.0f);
         levelLight = new Sprite((Texture) assetManager.get("level-light.png"));
         fadeSprite = new Sprite((Texture) assetManager.get("fade-image.png"));
-        fadeSprite.setScale(4.0f);
+        fadeSprite.setScale(8.0f);
         posterSprite = new Sprite((Texture) assetManager.get("posters/poster-prize.png"));
         posterSprite.setBounds(0,0,VIEWPORT_WIDTH,VIEWPORT_HEIGHT);
         enemySprite = new Sprite((Texture) assetManager.get("entity/enemy.png"));
@@ -393,7 +399,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
         sceneContainer = new SceneContainer();
         isTitleMenu = true;
-        fadeScreen(true, 3.0f, Color.BLACK);
+        fadeScreen(true, 2.0f, Color.BLACK);
 //        setScreenFade(1.0f, Color.BLACK);
 
         // special
@@ -471,6 +477,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     }
 
     private void startLevel(Level level, Connection startConnection) {
+        setScreenFade(1.0f, Color.BLACK);
         currentPlatform = null;
         playerIsDead = false;
         playerDeathTimer = 0;
@@ -527,6 +534,10 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             soundPlayer.stopSound("sound/cricket-2.ogg");
             staticLevel = false;
         }
+        nextLevel = null;
+        nextConnection = null;
+        levelTransitionTimer = LEVEL_TRANSITION_TIMER;
+        leaveLevel = false;
     }
 
     private Vector3 getCameraPosition() {
@@ -680,7 +691,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             mapRenderer.setView(camera);
             update();
         }
-        screenFader.update(this);
+        //screenFader.update(this);
 	    getInput();
 	    animationDelta = animationDelta + Gdx.graphics.getDeltaTime();
         if (!isTitleMenu) {
@@ -757,7 +768,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             }
             playerSprite.setPosition(playerPos.x, playerPos.y + QUARTER_TILE_SIZE );
             TextureRegion currentFrame;
-            if (!playerIsDead && isMoving) {
+            if (!playerIsDead && (levelTransitionTimer > 0 || isMoving)) {
                 if (playerIsPushing || playerWasPushing) {
                     currentFrame = pushBlock.getKeyFrame(walkAnimDelta, true);
                 } else {
@@ -869,7 +880,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             }
             batch.end();
         }
-        if (screenFade > 0) {
+//        if (screenFade > 0) {
             Vector2 pos = new Vector2(204, 180);
             if (!isTitleMenu) {
                 pos = new Vector2(camera.position.x - 76, camera.position.y - 60);
@@ -880,7 +891,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             fadeSprite.setPosition(pos.x, pos.y);
             fadeSprite.draw(batch);
             batch.end();
-        }
+//        }
 
         isLevelDirty = false;
         isViewDirty = false;
@@ -992,6 +1003,29 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         if (stepTimer > 0) {
             stepTimer = stepTimer - Gdx.graphics.getDeltaTime();
         }
+        if (levelTransitionTimer < 0) {
+            if (leaveLevel) {
+                startLevel(nextLevel, nextConnection);
+            }
+        } else {
+            levelTransitionTimer = levelTransitionTimer - Gdx.graphics.getDeltaTime();
+            walkAnimDelta = walkAnimDelta + Gdx.graphics.getDeltaTime();
+            Vector2 dir = leaveLevel ? nextConnection.dir.cpy() : lastConnection.dir.cpy();
+            if (dir.x > 0) {
+                playerFacingLeft = false;
+            }
+            if (dir.x < 0) {
+                playerFacingLeft = true;
+            }
+            Vector2 movement = dir.scl(Gdx.graphics.getDeltaTime() * PLAYER_SPEED * PLAYER_TRANSITION_SPEED);
+            playerPos.add(movement);
+            if (!leaveLevel) {
+                setScreenFade(levelTransitionTimer/LEVEL_TRANSITION_TIMER, Color.BLACK);
+            } else {
+                setScreenFade((LEVEL_TRANSITION_TIMER - levelTransitionTimer)/LEVEL_TRANSITION_TIMER, Color.BLACK);
+            }
+            return;
+        }
         for (PressureTile pressureTile : currentLevel.pressureTiles) {
             boolean handled = false;
             if (playerPos.dst2(pressureTile.pos) < 64) {
@@ -1025,9 +1059,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             if (platform != null) {
                 currentPlatform = platform;
             } else {
-                if (currentPlatform != null) {
-
-                }
                 currentPlatform = null;
             }
             if (currentPlatform == null && currentLevel.isDeath(playerPos.cpy().add(HALF_TILE_SIZE,HALF_TILE_SIZE))) {
@@ -1258,8 +1289,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                     loadLevelFromPrefs();
                 }
                 if (titleSelectionIndex == 1) {
-//                    isTitleMenu = false;
-//                    startLevel(levels.get(20), levels.get(20).getConnection("61"));
                     if (hasContinue) {
                         showSaveWarning = true;
                         startDialog("saveWarning", new DialogVerb("new-game"));
@@ -1306,7 +1335,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 }
             }
         } else {
-            if (!playerIsDead) {
+            if (!playerIsDead && levelTransitionTimer < 0) {
                 boolean sceneBlock = !currentScenes.isEmpty() && currentScenes.stream().anyMatch(Scene::isBlocking);
                 if (!moveLock && !sceneBlock && !isMoving && !inputVector.isZero()) {
                     boolean blocked = false;
@@ -1515,8 +1544,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     }
 
     public void setScreenFade(float amount, Color color) {
-        screenFade = amount;
+        screenFade = MathUtils.clamp(amount, 0, 1f);
         fadeColor = color;
+        System.out.println("setting fade to " + amount);
     }
 
     public void fadeScreen(boolean inDirection, float time, Color color) {
@@ -1542,7 +1572,10 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         for (Level level : levels) {
             if (level.hasConnection(target)) {
                 Connection connection = level.getConnection(target);
-                startLevel(level, connection);
+                nextLevel = level;
+                nextConnection = connection;
+                levelTransitionTimer = LEVEL_TRANSITION_TIMER;
+                leaveLevel = true;
                 break;
             }
         }

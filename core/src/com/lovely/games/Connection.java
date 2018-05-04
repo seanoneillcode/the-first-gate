@@ -11,12 +11,14 @@ public class Connection {
     String to;
     Vector2 pos;
     boolean active;
+    Vector2 dir;
 
-    public Connection(String name, String to, Vector2 pos) {
+    public Connection(String name, String to, Vector2 pos, Vector2 dir) {
         this.name = name;
         this.to = to;
         this.pos = pos;
         this.active = false;
+        this.dir = dir;
     }
 
     public void reset() {

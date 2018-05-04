@@ -291,8 +291,8 @@ class Level {
             this.numYTiles = numYTiles;
         }
 
-        Builder addConnection(String name, String to, Vector2 pos) {
-            this.connections.add(new Connection(name, to, pos));
+        Builder addConnection(String name, String to, Vector2 pos, Vector2 dir) {
+            this.connections.add(new Connection(name, to, pos, dir));
             return this;
         }
 
@@ -421,7 +421,23 @@ class Level {
                 if (properties.containsKey("to")) {
                     to = properties.get("to").toString();
                 }
-                builder.addConnection(objName, to, new Vector2(rectObj.getRectangle().x, rectObj.getRectangle().y));
+                Vector2 dir = new Vector2();
+                if (properties.containsKey("dir")) {
+                    String dirString = properties.get("dir").toString();
+                    if (dirString.equals("up")) {
+                        dir = new Vector2(0, 1);
+                    }
+                    if (dirString.equals("down")) {
+                        dir = new Vector2(0, -1);
+                    }
+                    if (dirString.equals("left")) {
+                        dir = new Vector2(-1, 0);
+                    }
+                    if (dirString.equals("right")) {
+                        dir = new Vector2(1, 0);
+                    }
+                }
+                builder.addConnection(objName, to, new Vector2(rectObj.getRectangle().x, rectObj.getRectangle().y), dir);
             }
             if (properties.containsKey("type") && properties.get("type").equals("arrowSource")) {
                 RectangleMapObject rectObj = (RectangleMapObject) obj;

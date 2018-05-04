@@ -76,31 +76,37 @@
  <objectgroup name="objects">
   <object id="1" name="62" type="connection" x="512" y="480" width="32" height="32">
    <properties>
+    <property name="dir" value="left"/>
     <property name="to" value="01"/>
    </properties>
   </object>
   <object id="9" name="61" type="connection" x="288" y="576" width="32" height="32">
    <properties>
+    <property name="dir" value="up"/>
     <property name="to" value="00"/>
    </properties>
   </object>
   <object id="10" name="112" type="connection" x="64" y="480" width="32" height="32">
    <properties>
+    <property name="dir" value="right"/>
     <property name="to" value="58"/>
    </properties>
   </object>
   <object id="11" name="115" type="connection" x="288" y="32" width="32" height="32">
    <properties>
+    <property name="dir" value="down"/>
     <property name="to" value="116"/>
    </properties>
   </object>
   <object id="12" name="114" type="connection" x="96" y="224" width="32" height="32">
    <properties>
+    <property name="dir" value="right"/>
     <property name="to" value="110"/>
    </properties>
   </object>
   <object id="13" name="113" type="connection" x="544" y="224" width="32" height="32">
    <properties>
+    <property name="dir" value="left"/>
     <property name="to" value="59"/>
    </properties>
   </object>
