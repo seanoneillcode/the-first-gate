@@ -175,6 +175,13 @@ public class SceneContainer {
         scenes.put("menu", builder()
                 .verb(new GameControlVerb("menu"))
                 .build());
+
+        scenes.put("poster-test", builder()
+                .verb(new FadeScreenVerb(false, 2.0f, Color.BLACK))
+                .verb(new FadeScreenVerb(true, 0.1f, Color.BLACK))
+                .verb(new PosterVerb("posters/poster-prize.png"))
+                .verb(new FadeScreenVerb(false, 0.1f, Color.BLACK))
+                .build());
     }
 
 }

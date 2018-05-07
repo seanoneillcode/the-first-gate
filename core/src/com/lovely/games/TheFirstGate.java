@@ -150,6 +150,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private Connection nextConnection = null;
     private float levelTransitionTimer = 0;
     private boolean leaveLevel = false;
+    private StonePrizeScene stonePrizeScene = null;
 
     @Override
 	public void create () {
@@ -241,6 +242,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
         assetManager.load("posters/ending-poster.png", Texture.class);
         assetManager.load("posters/poster-prize.png", Texture.class);
+        assetManager.load("posters/stone-0.png", Texture.class);
+        assetManager.load("posters/stone-1.png", Texture.class);
+        assetManager.load("posters/stone-2.png", Texture.class);
 
         assetManager.load("dialog-bottom.png", Texture.class);
         assetManager.load("dialog-top.png", Texture.class);
@@ -391,6 +395,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         currentScenes = new ArrayList<>();
         loadExternalData();
 
+        stonePrizeScene = new StonePrizeScene(assetManager);
+
         font = loadFonts("fonts/kells.fnt");
 
         // start room = 20
@@ -538,6 +544,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         nextConnection = null;
         levelTransitionTimer = LEVEL_TRANSITION_TIMER;
         leaveLevel = false;
+        stonePrizeScene.reset();
     }
 
     private Vector3 getCameraPosition() {
@@ -691,7 +698,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             mapRenderer.setView(camera);
             update();
         }
-        //screenFader.update(this);
+//        screenFader.update(this);
 	    getInput();
 	    animationDelta = animationDelta + Gdx.graphics.getDeltaTime();
         if (!isTitleMenu) {
@@ -847,11 +854,17 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 dialogContainer.reset();
             }
             if (posterImageName != null) {
-                Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-                posterSprite.setTexture(assetManager.get(posterImageName));
-                posterSprite.setAlpha(posterAlpha);
-                posterSprite.setPosition(camera.position.x - (VIEWPORT_WIDTH / 2.0f), camera.position.y - (VIEWPORT_HEIGHT / 2.0f));
-                posterSprite.draw(batch);
+                if (posterImageName.equals("posters/poster-prize.png")) {
+                    stonePrizeScene.update(this);
+                    Vector2 pos = new Vector2(camera.position.x - 150, camera.position.y - 120);
+                    stonePrizeScene.render(batch, pos);
+                } else {
+                    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+                    posterSprite.setTexture(assetManager.get(posterImageName));
+                    posterSprite.setAlpha(posterAlpha);
+                    posterSprite.setPosition(camera.position.x - (VIEWPORT_WIDTH / 2.0f), camera.position.y - (VIEWPORT_HEIGHT / 2.0f));
+                    posterSprite.draw(batch);
+                }
             }
             batch.end();
         }
@@ -1546,7 +1559,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     public void setScreenFade(float amount, Color color) {
         screenFade = MathUtils.clamp(amount, 0, 1f);
         fadeColor = color;
-        System.out.println("setting fade to " + amount);
     }
 
     public void fadeScreen(boolean inDirection, float time, Color color) {
