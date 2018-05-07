@@ -1372,14 +1372,22 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                     }
                     Platform platform = currentLevel.getPlatform(playerPos);
                     if (platform != null) {
-                        Vector2 nextNextTilePos = moveVector.cpy().scl(TILE_SIZE * 2f).add(playerPos).add(QUARTER_TILE_SIZE, QUARTER_TILE_SIZE);
+                        Vector2 nextNextTilePos = moveVector.cpy().scl(TILE_SIZE * 1.0f).add(playerPos).add(QUARTER_TILE_SIZE, QUARTER_TILE_SIZE);
                         if (currentLevel.isTileBlocked(nextNextTilePos)) {
                             BlockLike block = currentLevel.getBlockLike(nextNextTilePos, true);
                             if (block == null) {
                                 checkForSceneSources(nextNextTilePos);
                                 blocked = true;
                             } else {
-                                Vector2 nextTileAgain = moveVector.cpy().scl(TILE_SIZE * 3.0f).add(playerPos).add(QUARTER_TILE_SIZE, QUARTER_TILE_SIZE);
+                                Vector2 nextTileAgain = moveVector.cpy().scl(TILE_SIZE * 2.0f).add(playerPos).add(QUARTER_TILE_SIZE, QUARTER_TILE_SIZE);
+                                if (currentLevel.isTileBlocked(nextTileAgain)) {
+                                    blocked = true;
+                                } else {
+                                    block.move(moveVector);
+                                    playerIsPushing = true;
+                                    soundPlayer.playSound("sound/block-3.ogg", false, 0.5f, MathUtils.random(0.9f, 1.1f));
+                                }
+                                nextTileAgain = moveVector.cpy().scl(TILE_SIZE * 3.0f).add(playerPos).add(QUARTER_TILE_SIZE, QUARTER_TILE_SIZE);
                                 if (currentLevel.isTileBlocked(nextTileAgain)) {
                                     blocked = true;
                                 } else {

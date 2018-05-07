@@ -20,11 +20,11 @@ public class SoundPlayer {
     }
 
     public void playSound(String name, boolean loop, float volume) {
-//        playSound(name, playerPos, loop, volume, 1.0f);
+        playSound(name, playerPos, loop, volume, 1.0f);
     }
 
     public void playSound(String name, boolean loop, float volume, float pitch) {
-//        return playSound(name, playerPos, loop, volume, pitch);
+        playSound(name, playerPos, loop, volume, pitch);
     }
 
     public void stopSound(String name) {

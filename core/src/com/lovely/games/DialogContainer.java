@@ -211,8 +211,8 @@ public class DialogContainer {
     private BitmapFont font;
     private float timer;
     private Texture dialogBottom, dialogTop, dialogLineImg;
-    private Color fontColorHighlighted = new Color(58f / 256.0f, 68f / 256.0f, 102f / 256.0f, 1);
-    private Color fontColorMain = new Color(24f / 256.0f, 20f  / 256.0f, 37f / 256.0f, 1);
+    private Color fontColorMain = new Color(6f / 256.0f, 27f  / 256.0f, 46f / 256.0f, 1);
+    private Color fontColorHighlighted = fontColorMain;//new Color(110f / 256.0f, 36f / 256.0f, 61f / 256.0f, 1);
     private Color fontColorSecondary = new Color(7.0f / 256.0f, 0.0f  / 256.0f, 7.0f / 256.0f, 1);
     private Map<String, Texture> portraits;
     private Sprite dialogPointer, optionPointer;
