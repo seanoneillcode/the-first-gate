@@ -32,7 +32,6 @@ public class StonePrizeScene {
 
     void reset() {
         timer = 0;
-        System.out.println("resetting scene");
         playerPos = new Vector2(-134f, -24f);
         stonePos = new Vector2(96f, -24f);
         lightAlpha = 0;

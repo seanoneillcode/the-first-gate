@@ -4,7 +4,7 @@
  <layer name="ground" width="15" height="15">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,27,37,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,27,0,0,0,
 0,54,37,28,27,37,28,27,28,27,37,37,56,0,0,
 0,54,27,37,37,27,37,27,37,37,28,27,56,0,0,
@@ -41,8 +41,8 @@
  </layer>
  <layer name="walls" width="15" height="15">
   <data encoding="csv">
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,14,28,15,0,0,
+0,0,0,0,0,0,0,0,0,12,12,12,15,0,0,
+0,0,0,0,0,0,0,0,0,55,0,0,15,0,0,
 0,12,12,12,12,12,12,12,12,12,12,0,12,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -59,9 +59,9 @@
 </data>
  </layer>
  <objectgroup name="objects">
-  <object id="9" name="67" type="connection" x="352" y="64" width="32" height="32">
+  <object id="9" name="67" type="connection" x="320" y="32" width="32" height="32">
    <properties>
-    <property name="dir" value="down"/>
+    <property name="dir" value="right"/>
     <property name="to" value="66"/>
    </properties>
   </object>

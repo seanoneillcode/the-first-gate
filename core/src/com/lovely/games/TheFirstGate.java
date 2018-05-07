@@ -1545,7 +1545,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             soundPlayer.playSound("sound/lazer-4.ogg", false, 6.0f, 1.0f);
             lazerSoundTimer = 0.5f;
         }
-        arrows.add(new Arrow(false, pos, dir, TILE_SIZE * 16.0f));
+        arrows.add(new Arrow(false, pos.cpy().add(dir.x * HALF_TILE_SIZE, dir.y * HALF_TILE_SIZE), dir, TILE_SIZE * 16.0f));
     }
 
     public void showPoster(float alpha, String poster) {
