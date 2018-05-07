@@ -61,6 +61,7 @@
  <objectgroup name="objects">
   <object id="9" name="59" type="connection" x="32" y="384" width="32" height="32">
    <properties>
+    <property name="dir" value="right"/>
     <property name="to" value="113"/>
    </properties>
   </object>
@@ -81,6 +82,7 @@
   </object>
   <object id="63" name="60" type="connection" x="576" y="128" width="32" height="32">
    <properties>
+    <property name="dir" value="left"/>
     <property name="to" value="65"/>
    </properties>
   </object>

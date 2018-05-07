@@ -136,11 +136,13 @@
  <objectgroup name="objects">
   <object id="9" name="79" type="connection" x="480" y="64" width="32" height="32">
    <properties>
+    <property name="dir" value="down"/>
     <property name="to" value="78"/>
    </properties>
   </object>
   <object id="10" name="80" type="connection" x="864" y="1120" width="32" height="32">
    <properties>
+    <property name="dir" value="up"/>
     <property name="to" value="81"/>
    </properties>
   </object>

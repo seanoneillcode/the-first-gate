@@ -61,11 +61,13 @@
  <objectgroup name="objects">
   <object id="9" name="67" type="connection" x="352" y="64" width="32" height="32">
    <properties>
+    <property name="dir" value="down"/>
     <property name="to" value="66"/>
    </properties>
   </object>
   <object id="10" name="68" type="connection" x="416" y="384" width="32" height="32">
    <properties>
+    <property name="dir" value="left"/>
     <property name="to" value="69"/>
    </properties>
   </object>
