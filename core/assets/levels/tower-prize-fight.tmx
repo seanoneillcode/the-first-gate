@@ -100,6 +100,5 @@
     <property name="switch" value="a"/>
    </properties>
   </object>
-  <object id="59" name="poster-test" type="scene" x="96" y="32" width="32" height="32"/>
  </objectgroup>
 </map>
