@@ -1325,7 +1325,11 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         }
 
         if (conversation != null) {
+            if (Gdx.input.isKeyPressed(Input.Keys.SPACE) || Gdx.input.isKeyPressed(Input.Keys.ENTER)) {
+                inputVector.x = 1;
+            }
             if ((inputVector.x != 0 || inputVector.y != 0) && !dialogLock) {
+
                 if (!conversation.isFinished()) {
                     conversation.handleInput(inputVector);
                 }
