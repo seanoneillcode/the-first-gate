@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" tiledversion="1.1.3" orientation="orthogonal" renderorder="right-down" width="20" height="16" tilewidth="32" tileheight="32" infinite="0" nextobjectid="3">
+ <tileset firstgid="1" source="tower-tileset.tsx"/>
+ <layer name="walls" width="20" height="16">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,34,0,0,0,0,0,0,0,0,
+0,0,0,34,34,34,34,34,34,34,34,34,34,34,34,34,0,0,0,0,
+0,0,0,34,0,34,0,0,0,0,0,0,0,34,0,34,0,0,0,0,
+0,0,0,34,0,34,0,0,0,0,0,0,0,34,0,34,0,0,0,0,
+0,0,0,34,0,0,0,0,0,0,0,0,0,0,0,34,0,0,0,0,
+0,0,0,34,0,34,0,0,0,0,0,0,0,34,0,34,0,0,0,0,
+0,0,0,34,0,34,0,0,0,0,0,0,0,34,0,34,0,0,0,0,
+0,0,0,34,0,34,0,0,0,0,0,0,0,34,0,34,0,0,0,0,
+0,0,0,34,0,0,0,0,0,0,0,0,0,0,0,34,0,0,0,0,
+0,0,0,34,0,34,0,0,0,0,0,0,0,34,0,34,0,0,0,0,
+0,0,0,34,0,34,0,0,0,0,0,0,0,34,0,34,0,0,0,0,
+0,0,0,34,0,34,0,0,0,0,0,0,0,34,0,34,0,0,0,0,
+0,0,0,34,34,34,34,34,34,0,34,34,34,34,34,34,0,0,0,0,
+0,0,0,0,0,0,0,0,34,34,34,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <imagelayer name="background">
+  <image source="../entrance-concept.png" width="600" height="512"/>
+ </imagelayer>
+ <objectgroup name="objects">
+  <object id="1" name="85" type="connection" x="288" y="480" width="32" height="32">
+   <properties>
+    <property name="dir" value="right"/>
+    <property name="to" value="84"/>
+   </properties>
+  </object>
+  <object id="2" name="85" type="connection" x="288" y="128" width="32" height="32">
+   <properties>
+    <property name="dir" value="right"/>
+    <property name="to" value="84"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>

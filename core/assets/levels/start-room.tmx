@@ -44,7 +44,7 @@
 0,12,12,0,0,0,16,0,0,0,0,0,16,0,0,0,12,12,0,
 0,55,0,0,0,0,16,23,0,0,0,22,16,0,0,0,0,55,0,
 0,12,23,0,0,0,15,14,0,0,0,15,14,0,0,0,22,12,0,
-0,0,24,12,12,12,21,24,23,0,12,21,24,12,12,12,21,0,0,
+0,0,24,12,12,12,21,24,23,0,22,21,24,12,12,12,21,0,0,
 0,0,0,0,0,0,0,0,14,0,15,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,14,55,15,0,0,0,0,0,0,0,0
 </data>
@@ -115,16 +115,6 @@
   <object id="20" type="torch" x="128" y="288" width="32" height="32"/>
   <object id="21" type="torch" x="448" y="416" width="32" height="32"/>
   <object id="22" type="torch" x="448" y="160" width="32" height="32"/>
-  <object id="24" name="ant" type="actor" x="352" y="416" width="32" height="32">
-   <properties>
-    <property name="isHide" value="false"/>
-   </properties>
-  </object>
-  <object id="34" name="15" type="scene" x="352" y="416" width="32" height="32">
-   <properties>
-    <property name="playOnce" value="false"/>
-   </properties>
-  </object>
   <object id="35" name="1" type="scene" x="288" y="576" width="32" height="32"/>
  </objectgroup>
 </map>
