@@ -46,6 +46,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private static final float ZOOM_THRESHOLH = 0.01f;
     private static final float LEVEL_TRANSITION_TIMER = 0.5f;
     private static final float PLAYER_TRANSITION_SPEED = 0.5f;
+    private static final int START_LEVEL_NUM = 46;
 
     private float lazerSoundTimer = 0;
     private float stepTimer = 0;
@@ -205,6 +206,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("levels/enemy-9.tmx", TiledMap.class);
         assetManager.load("levels/crossy-road-1.tmx", TiledMap.class);
         assetManager.load("levels/crossy-road-2.tmx", TiledMap.class);
+        assetManager.load("levels/entrance-1.tmx", TiledMap.class);
 
         assetManager.load("entity/platform.png", Texture.class);
         assetManager.load("entity/block.png", Texture.class);
@@ -372,6 +374,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         levels.add(Level.loadLevel(assetManager, "levels/enemy-9.tmx", soundPlayer)); // 46
         levels.add(Level.loadLevel(assetManager, "levels/crossy-road-1.tmx", soundPlayer)); // 48
         levels.add(Level.loadLevel(assetManager, "levels/crossy-road-2.tmx", soundPlayer)); // 49
+        levels.add(Level.loadLevel(assetManager, "levels/entrance-1.tmx", soundPlayer)); // 50
         gamma = 0.2f;
 
         antWalk = loadAnimation(assetManager.get("character/ant-walk.png"), 4, 0.165f);
@@ -421,14 +424,11 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             currentSpell = null;
         }
         if (prefs.contains("last-level")) {
-            hasContinue = prefs.getInteger("last-level") != 20;
+            hasContinue = prefs.getInteger("last-level") != START_LEVEL_NUM;
         } else {
             hasContinue = false;
         }
     }
-
-
-
 
     private void saveLevelNumber(int levelNumber, String lastConnectionNumber) {
         Preferences prefs = Gdx.app.getPreferences("caen-preferences");
@@ -453,7 +453,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         if (prefs.contains("last-level")) {
             lastLevel = prefs.getInteger("last-level");
         } else {
-            lastLevel = 20;
+            lastLevel = START_LEVEL_NUM;
         }
         Level level = levels.get(lastLevel);
         Connection connection = level.getPreviousConnection();
@@ -1581,7 +1581,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     public void gotoState(String state) {
         if (state.equals("new-game")) {
             isTitleMenu = false;
-            startLevel(levels.get(20), levels.get(20).getConnection("61"));
+            startLevel(levels.get(START_LEVEL_NUM), levels.get(START_LEVEL_NUM).getConnection("61"));
         }
         if (state.equals("menu")) {
             isTitleMenu = true;
