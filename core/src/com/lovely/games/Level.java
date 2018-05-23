@@ -42,6 +42,7 @@ class Level {
     List<SceneSource> scenes;
     Trunk trunk;
     List<Actor> actors;
+    List<Guff> guffs;
     public List<Wind> winds;
     public List<Enemy> enemies;
 
@@ -49,7 +50,7 @@ class Level {
           int numYTiles, List<ArrowSource> arrowSources, List<Platform> platforms, List<Block> blocks,
           List<PressureTile> pressureTiles, List<Door> doors, List<DialogSource> dialogSources,
           List<LevelLight> lights, List<Torch> torches, List<SceneSource> scenes, Trunk trunk, List<Actor> actors,
-          List<Wind> winds, List<Enemy> enemies) {
+          List<Wind> winds, List<Enemy> enemies, List<Guff> guffs) {
         this.connections = connections;
         this.walls = walls;
         this.deaths = deaths;
@@ -69,6 +70,7 @@ class Level {
         this.actors = actors;
         this.winds = winds;
         this.enemies = enemies;
+        this.guffs = guffs;
     }
 
     Vector2 getConnectionPosition(String name) {
@@ -284,6 +286,7 @@ class Level {
         List<Actor> actors = new ArrayList<>();
         private List<Wind> winds = new ArrayList<>();
         List<Enemy> enemies = new ArrayList<>();
+        private List<Guff> guffs = new ArrayList<>();
 
         Builder(String name, int numXTiles, int numYTiles) {
             this.name = name;
@@ -383,6 +386,11 @@ class Level {
             return this;
         }
 
+        Builder addGuff(Vector2 pos, Vector2 size, String image) {
+            this.guffs.add(new Guff(image, pos, size));
+            return this;
+        }
+
         Trunk getTrunk() {
             return this.trunk;
         }
@@ -395,7 +403,7 @@ class Level {
                 deaths = new boolean[numXTiles][numYTiles];
             }
             return new Level(connections, walls, deaths, name, numXTiles, numYTiles, arrowSources, platforms, blocks,
-                    pressureTiles, doors, dialogSources, lights, torches, scenes, trunk, actors, winds, enemies);
+                    pressureTiles, doors, dialogSources, lights, torches, scenes, trunk, actors, winds, enemies, guffs);
         }
 
 
@@ -563,6 +571,13 @@ class Level {
                     color = new Color(r, g, b, a);
                 }
                 builder.addLight(new LevelLight(pos, size, color));
+            }
+            if (properties.containsKey("type") && properties.get("type").equals("guff")) {
+                RectangleMapObject rectObj = (RectangleMapObject) obj;
+                Vector2 pos = new Vector2(rectObj.getRectangle().x, rectObj.getRectangle().y);
+                Vector2 size = new Vector2(rectObj.getRectangle().width, rectObj.getRectangle().height);
+                String image = properties.get("image").toString();
+                builder.addGuff(pos, size, image);
             }
             if (properties.containsKey("type") && properties.get("type").equals("scene")) {
                 RectangleMapObject rectObj = (RectangleMapObject) obj;

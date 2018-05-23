@@ -204,6 +204,19 @@ public class DialogContainer {
                 line(ant, "No", "happy"),
                 line(ant, "Good luck!", "happy")
         ));
+        dialogs.put("26", Arrays.asList(
+                line(ant, "Why are you here?"),
+                line(pro, "I am here to pass through the first gate", "worried"),
+                line(ant, "You are joking?", "happy"),
+                line(ant, "By your rags and limp you are clearly a beggar", "talk"),
+                line(pro, "I have travelled far and suffered much just to take these tests", "worried"),
+                line(ant, "Begone you fool, this place is for the finest men and women.", "angry"),
+                line(ant, "Those who wish to pass the first gate...", "talk"),
+                line(ant, "...to become a wizard", "happy")
+        ));
+        dialogs.put("27", Arrays.asList(
+                line(pro, "We will see", "angry")
+        ));
     }
 
     String currentDialog;

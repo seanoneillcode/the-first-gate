@@ -152,6 +152,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private float levelTransitionTimer = 0;
     private boolean leaveLevel = false;
     private StonePrizeScene stonePrizeScene = null;
+    private Map<String, Animation<TextureRegion>> guffImages;
 
     @Override
 	public void create () {
@@ -222,6 +223,12 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("entity/lazer.png", Texture.class);
         assetManager.load("entity/lazer-horizontal.png", Texture.class);
         assetManager.load("entity/campfire.png", Texture.class);
+        assetManager.load("entity/grass-1.png", Texture.class);
+        assetManager.load("entity/grass-2.png", Texture.class);
+        assetManager.load("entity/grass-3.png", Texture.class);
+        assetManager.load("entity/grass-4.png", Texture.class);
+        assetManager.load("entity/dust-air.png", Texture.class);
+        assetManager.load("entity/dust-air-2.png", Texture.class);
 
         assetManager.load("character/pro-simple-fall-death.png", Texture.class);
         assetManager.load("character/pro-simple-fire-death.png", Texture.class);
@@ -391,6 +398,13 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         arrowExplodeAnim = loadAnimation(assetManager.get("entity/arrow-explode.png"), 8, 0.05f);
         torchAnim = loadAnimation(assetManager.get("entity/torch-sheet.png"), 2, 0.5f);
         campfireAnim = loadAnimation(assetManager.get("entity/campfire.png"), 8, 0.1f);
+        guffImages = new HashMap<>();
+        guffImages.put("entity/grass-1.png", loadAnimation(assetManager.get("entity/grass-1.png"), 4, 0.515f));
+        guffImages.put("entity/grass-2.png", loadAnimation(assetManager.get("entity/grass-2.png"), 4, 0.52f));
+        guffImages.put("entity/grass-3.png", loadAnimation(assetManager.get("entity/grass-3.png"), 4, 0.525f));
+        guffImages.put("entity/grass-4.png", loadAnimation(assetManager.get("entity/grass-4.png"), 4, 0.53f));
+        guffImages.put("entity/dust-air.png", loadAnimation(assetManager.get("entity/dust-air.png"), 16, 0.2f));
+        guffImages.put("entity/dust-air-2.png", loadAnimation(assetManager.get("entity/dust-air-2.png"), 16, 0.2f));
         arrowSprite = new Sprite();
         arrowSprite.setBounds(0,0,32,32);
 //        actorImages = new HashMap<>();
@@ -714,7 +728,10 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             mapRenderer.render();
             batch.setProjectionMatrix(camera.combined);
             batch.begin();
-
+            for (Guff guff : currentLevel.guffs) {
+                TextureRegion currentFrame = guffImages.get(guff.imageName).getKeyFrame(animationDelta + guff.offset, true);
+                batch.draw(currentFrame, guff.pos.x, guff.pos.y, guff.size.x, guff.size.y);
+            }
             for (PressureTile pressureTile : currentLevel.pressureTiles) {
                 batch.draw(pressureImage, pressureTile.pos.x, pressureTile.pos.y);
             }
