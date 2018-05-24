@@ -208,6 +208,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("levels/crossy-road-1.tmx", TiledMap.class);
         assetManager.load("levels/crossy-road-2.tmx", TiledMap.class);
         assetManager.load("levels/entrance-1.tmx", TiledMap.class);
+        assetManager.load("levels/lobby-1.tmx", TiledMap.class);
 
         assetManager.load("entity/platform.png", Texture.class);
         assetManager.load("entity/block.png", Texture.class);
@@ -382,6 +383,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         levels.add(Level.loadLevel(assetManager, "levels/crossy-road-1.tmx", soundPlayer)); // 48
         levels.add(Level.loadLevel(assetManager, "levels/crossy-road-2.tmx", soundPlayer)); // 49
         levels.add(Level.loadLevel(assetManager, "levels/entrance-1.tmx", soundPlayer)); // 50
+        levels.add(Level.loadLevel(assetManager, "levels/lobby-1.tmx", soundPlayer)); // 50
         gamma = 0.2f;
 
         antWalk = loadAnimation(assetManager.get("character/ant-walk.png"), 4, 0.165f);
@@ -931,7 +933,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         if ((conversation == null && currentScenes.isEmpty()) || showSaveWarning) {
             targetZoom = 1.0f;
         } else {
-            targetZoom = 0.8f;
+            targetZoom = 0.85f;
         }
         if (isTitleMenu) {
             targetZoom = 0.9f;
@@ -954,7 +956,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         font = new BitmapFont(Gdx.files.internal(fontString),false);
         font.setUseIntegerPositions(false);
         font.setColor(fontColorMain);
-        font.getData().setScale(2.0f, 2.0f);
+        font.getData().setScale(1.4f, 1.4f);
         return font;
     }
 
@@ -1539,6 +1541,12 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                     levelActor.isFacingRight = false;
                 }
             }
+        }
+        if (actor.equals("pro")) {
+            isMoving = true;
+            playerDir = value.cpy().nor();
+            movementValue = TILE_SIZE / PLAYER_SPEED;
+            moveVector = value.cpy().nor();
         }
     }
 

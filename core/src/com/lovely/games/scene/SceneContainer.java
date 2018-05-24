@@ -176,6 +176,15 @@ public class SceneContainer {
                 .verb(new DialogVerb("27"))
                 .build());
 
+        scenes.put("26", builder()
+                .verb(new DialogVerb("28"))
+                .build());
+
+        scenes.put("27", builder()
+                .verb(new DialogVerb("29"))
+                .verb(new MoveVerb(new Vector2(0, 32 * -1), "pro", true))
+                .build());
+
         scenes.put("new-game", builder()
                 .verb(new GameControlVerb("new-game"))
                 .build());

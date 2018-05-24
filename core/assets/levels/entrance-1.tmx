@@ -28,7 +28,7 @@
   <object id="2" name="200" type="connection" x="288" y="128" width="32" height="32">
    <properties>
     <property name="dir" value="down"/>
-    <property name="to" value="201"/>
+    <property name="to" value="202"/>
    </properties>
   </object>
   <object id="3" name="61" type="connection" x="288" y="448" width="32" height="32">

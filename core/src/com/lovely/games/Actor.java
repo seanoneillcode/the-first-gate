@@ -12,14 +12,14 @@ public class Actor {
     boolean isWalking;
     boolean isFacingRight;
 
-    public Actor(Vector2 pos, String id, boolean isHide) {
+    public Actor(Vector2 pos, String id, boolean isHide, boolean isRight) {
         this.pos = pos;
         this.id = id;
         this.originalIsHide = isHide;
         this.isHidden = isHide;
         this.originalPos = pos.cpy();
         this.isWalking = false;
-        this.isFacingRight = false;
+        this.isFacingRight = isRight;
     }
 
     public void start() {

@@ -217,6 +217,26 @@ public class DialogContainer {
         dialogs.put("27", Arrays.asList(
                 line(pro, "We will see", "angry")
         ));
+        dialogs.put("28", Arrays.asList(
+                line(ant, "I told you to leave"),
+                line(pro, "Leave? Not without taking the trials", "talk"),
+                line(ant, "These trials are not for wretched folk like you", "talk"),
+                line(pro, "You know nothing about me", "angry"),
+                line(ant, "Are you of noble blood?", "happy"),
+                line(ant, "...do you posses a fine education?", "happy"),
+                line(pro, "No...", "worried"),
+                line(ant, "Then be gone", "angry"),
+                line(pro, "I will not be gone! I have the most important quality", "angry"),
+                line(pro, "I am determined", "angry"),
+                line(ant, "You will find I'm greater than you, in all respects", "talk"),
+                line(ant, "Including determination to keep you away", "talk")
+        ));
+        dialogs.put("29", Arrays.asList(
+                line(ant, "I see you. If you try that again I'll have you jailed", "angry")
+        ));
+        dialogs.put("30", Arrays.asList(
+                line(pro, "I must be quick and press on. If the old man catches me I'm dead.", "worried")
+        ));
     }
 
     String currentDialog;
@@ -292,11 +312,11 @@ public class DialogContainer {
             rightDialogPointer.setPosition(dialogPos.x + 302, dialogPos.y + portraitHeight - 40);
         }
         if (actors.contains("pro")) {
-            leftPortrait.setPosition(dialogPos.x - 20, dialogPos.y + 4 - 100);
+            leftPortrait.setPosition(dialogPos.x - 20, dialogPos.y + 4 - 100 + 40);
             leftPortrait.draw(batch);
         }
         if (actors.contains("ant")) {
-            rightPortrait.setPosition(dialogPos.x + 302, dialogPos.y + 4 - 170);
+            rightPortrait.setPosition(dialogPos.x + 302, dialogPos.y + 4 - 170 + 40);
             rightPortrait.draw(batch);
         }
         if (dialogLine.getOwner().equals("info")) {

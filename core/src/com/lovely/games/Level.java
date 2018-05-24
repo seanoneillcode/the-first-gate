@@ -367,8 +367,8 @@ class Level {
             return this;
         }
 
-        Builder addActor(Vector2 pos, String id, boolean isHide) {
-            actors.add(new Actor(pos, id, isHide));
+        Builder addActor(Vector2 pos, String id, boolean isHide, boolean isRight) {
+            actors.add(new Actor(pos, id, isHide, isRight));
             return this;
         }
 
@@ -542,7 +542,11 @@ class Level {
                 if (properties.containsKey("isHide")) {
                     isHide = Boolean.parseBoolean(properties.get("isHide").toString());
                 }
-                builder.addActor(pos, rectObj.getName(), isHide);
+                boolean isRight = false;
+                if (properties.containsKey("isRight")) {
+                    isRight = Boolean.parseBoolean(properties.get("isRight").toString());
+                }
+                builder.addActor(pos, rectObj.getName(), isHide, isRight);
             }
             if (properties.containsKey("type") && properties.get("type").equals("door")) {
                 RectangleMapObject rectObj = (RectangleMapObject) obj;

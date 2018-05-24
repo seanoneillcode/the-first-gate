@@ -74,7 +74,7 @@
 </data>
  </layer>
  <objectgroup name="objects">
-  <object id="1" name="62" type="connection" x="512" y="480" width="32" height="32">
+  <object id="1" name="204" type="connection" x="512" y="480" width="32" height="32">
    <properties>
     <property name="dir" value="left"/>
     <property name="to" value="01"/>
