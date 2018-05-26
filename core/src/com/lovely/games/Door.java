@@ -19,7 +19,7 @@ public class Door implements Switchable {
         this.isOpen = isOpen;
         this.originalIsOpen = isOpen;
         this.switchId = switchId;
-        this.color = new Color(random(0.2f, 0.4f), random(0.2f, 0.4f), random(0.8f, 1.0f), 1.0f);
+        this.color = new Color(random(0.2f, 0.4f), random(0.8f, 1.0f), random(0.3f, 0.4f), 1.0f);
         this.soundPlayer = soundPlayer;
     }
 

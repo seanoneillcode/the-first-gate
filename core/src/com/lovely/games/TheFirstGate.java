@@ -182,7 +182,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("levels/tower-arrow-05.tmx", TiledMap.class);
         assetManager.load("levels/tower-switch-04.tmx", TiledMap.class);
         assetManager.load("levels/tower-switch-05.tmx", TiledMap.class);
-        assetManager.load("levels/start-room.tmx", TiledMap.class);
+        assetManager.load("levels/last-room.tmx", TiledMap.class);
         assetManager.load("levels/scene-test.tmx", TiledMap.class);
         assetManager.load("levels/tower-broken-level.tmx", TiledMap.class);
         assetManager.load("levels/tower-bridge-1.tmx", TiledMap.class);
@@ -356,7 +356,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         levels.add(Level.loadLevel(assetManager, "levels/tower-arrow-05.tmx", soundPlayer)); // 35
         levels.add(Level.loadLevel(assetManager, "levels/tower-switch-04.tmx", soundPlayer)); // 37
         levels.add(Level.loadLevel(assetManager, "levels/tower-switch-05.tmx", soundPlayer)); // 39
-        levels.add(Level.loadLevel(assetManager, "levels/start-room.tmx", soundPlayer)); // 1 // 20
+        levels.add(Level.loadLevel(assetManager, "levels/last-room.tmx", soundPlayer)); // 1 // 20
         levels.add(Level.loadLevel(assetManager, "levels/scene-test.tmx", soundPlayer)); // 1 // 22
         levels.add(Level.loadLevel(assetManager, "levels/tower-broken-level.tmx", soundPlayer)); // 51 // 23
         levels.add(Level.loadLevel(assetManager, "levels/tower-arrow-06.tmx", soundPlayer)); // 53 // 24
@@ -660,7 +660,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         for (Door door : currentLevel.doors) {
             lightHole.setColor(door.color);
             lightHole.setRegion(tr);
-            lightHole.setPosition((door.pos.x), (door.pos.y));
+            lightHole.setPosition((door.pos.x), (door.pos.y + 16));
             lightHole.draw(bufferBatch);
         }
         for (LevelLight light : currentLevel.lights) {

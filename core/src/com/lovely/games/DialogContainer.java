@@ -109,7 +109,7 @@ public class DialogContainer {
                 line(ant, "Fool, now I'll take what's mine.", "happy")
         ));
         dialogs.put("18", Arrays.asList(
-                line(pro, "This must be the stone")
+                line(pro, "There's something here...")
         ));
         dialogs.put("19", Arrays.asList(
                 line(ant, "Yes?"),
