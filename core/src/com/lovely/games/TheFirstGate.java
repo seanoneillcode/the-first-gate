@@ -41,7 +41,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private static final float CAST_ARROW_COOLDOWN = 0.6f;
     private static final float PLAYER_DEATH_TIME = 1.0f;
     private static final float PLAYER_SHOOTING_TIME = 0.3f;
-    private static final float PLAYER_ARROW_SPEED = TILE_SIZE * 4.0f;
+    protected static final float PLAYER_ARROW_SPEED = TILE_SIZE * 4.0f;
     private static final float ZOOM_AMOUNT = 0.005f;
     private static final float ZOOM_THRESHOLH = 0.01f;
     private static final float LEVEL_TRANSITION_TIMER = 0.5f;
@@ -57,7 +57,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private AssetManager assetManager;
     private OrthographicCamera camera;
 
-    private Level currentLevel;
+    protected Level currentLevel;
     private Vector2 playerPos, playerDir;
     private boolean isMoving;
     private Vector2 moveVector;
@@ -65,7 +65,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private float movementValue;
     private Connection lastConnection;
     private List<Level> levels;
-    private List<Arrow> arrows;
+    protected List<Arrow> arrows;
     private Texture platformImg;
     private Texture blockImage;
     private Texture groundBlockImage;
@@ -209,6 +209,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("levels/crossy-road-2.tmx", TiledMap.class);
         assetManager.load("levels/entrance-1.tmx", TiledMap.class);
         assetManager.load("levels/lobby-1.tmx", TiledMap.class);
+        assetManager.load("levels/boss-fight.tmx", TiledMap.class);
 
         assetManager.load("entity/platform.png", Texture.class);
         assetManager.load("entity/block.png", Texture.class);
@@ -384,6 +385,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         levels.add(Level.loadLevel(assetManager, "levels/crossy-road-2.tmx", soundPlayer)); // 49
         levels.add(Level.loadLevel(assetManager, "levels/entrance-1.tmx", soundPlayer)); // 50
         levels.add(Level.loadLevel(assetManager, "levels/lobby-1.tmx", soundPlayer)); // 50
+        levels.add(Level.loadLevel(assetManager, "levels/boss-fight.tmx", soundPlayer)); // 50
         gamma = 0.2f;
 
         antWalk = loadAnimation(assetManager.get("character/ant-walk.png"), 4, 0.165f);
@@ -572,6 +574,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             return new Vector3(280, 240, 0);
         }
         Vector3 target = new Vector3(pos.x, pos.y, 0);
+        if (currentLevel.name.equals("levels/boss-fight.tmx") && bossIsFighting()) {
+            target.y = target.y + 160;
+        }
         final float speed = CAMERA_CATCHUP_SPEED * Gdx.graphics.getDeltaTime();
         float ispeed = 1.0f - speed;
         Vector3 cameraPosition = camera.position.cpy();
@@ -594,6 +599,15 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         }
 
         return cameraPosition;
+    }
+
+    private boolean bossIsFighting() {
+        for (Actor actor : currentLevel.actors) {
+            if (actor.isBoss && !actor.isHidden) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void renderLightMasks() {
@@ -1126,9 +1140,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             }
         }
 
-        for (Actor actor : currentLevel.actors) {
-            actor.isWalking = false;
-        }
 
         soundPlayer.update(playerPos);
 
@@ -1198,6 +1209,16 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 isFallDeath = false;
                 return;
             }
+            for (Actor actor : currentLevel.actors) {
+                if (actor.isBoss) {
+                    if (arrow.getRect().overlaps(actor.getHitRect())) {
+                        actor.handleHit();
+                        explosions.add(new Explosion(arrow.pos.cpy()));
+                        soundPlayer.playSound("sound/blast-1.ogg", false, 0.3f,  MathUtils.random(0.7f, 1.3f));
+                        arrowIterator.remove();
+                    }
+                }
+            }
         }
 
         for (Platform platform : currentLevel.getPlatforms()) {
@@ -1206,6 +1227,16 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
         if (castCooldown > 0) {
             castCooldown = castCooldown - Gdx.graphics.getDeltaTime();
+        }
+        for (Actor actor : currentLevel.actors) {
+            actor.isWalking = false;
+            if (actor.isBoss) {
+                Platform platform = currentLevel.getPlatform(actor.pos);
+                if (platform != null) {
+                    actor.pos = platform.pos.cpy();
+                }
+                actor.update(this, platform);
+            }
         }
 
         for (Block block : currentLevel.blocks) {

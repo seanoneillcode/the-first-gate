@@ -237,6 +237,13 @@ public class DialogContainer {
         dialogs.put("30", Arrays.asList(
                 line(pro, "I must be quick and press on. If the old man catches me I'm dead.", "worried")
         ));
+        dialogs.put("31", Arrays.asList(
+                line(ant, "You have completed the trials"),
+                line(ant, "But you are NOT worthy"),
+                line(pro, "What must I do to be worthy?"),
+                line(ant, "Nothing, you are made wrong. I cannot let you leave.", "angry"),
+                line(ant, "you must die", "angry")
+        ));
     }
 
     String currentDialog;

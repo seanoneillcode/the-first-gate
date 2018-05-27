@@ -180,6 +180,13 @@ public class SceneContainer {
                 .verb(new MoveVerb(new Vector2(0, 32 * -1), "pro", true))
                 .build());
 
+        scenes.put("28", builder()
+                .verb(new DialogVerb("31"))
+                .verb(new HideShowActorVerb(true, "ant"))
+                .verb(new HideShowActorVerb(false, "boss"))
+                .verb(new SendEventVerb("a"))
+                .build());
+
         scenes.put("new-game", builder()
                 .verb(new GameControlVerb("new-game"))
                 .build());
