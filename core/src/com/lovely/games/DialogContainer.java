@@ -143,27 +143,43 @@ public class DialogContainer {
                 line(ant, "But the tests are taken in a linear fashion"),
                 line(ant, "You can start at the bottom right room if you're eager")
         ));
+//        dialogs.put("24", Arrays.asList(
+//                line(pro, "What next?"),
+//                line(ant, "You can rest here for a while. The Caen is not easy."),
+//                line(pro, "And after that?"),
+//                line(ant, "As always, that is up to you. You may leave with the stone."),
+//                line(pro, "So ... there's no gold?"),
+//                line(ant, "There is no gold."),
+//                line(pro, "I cannot eat the stone.", "angry"),
+//                line(ant, "Why not sell it?"),
+//                line(pro, "Sell it? This would turn a man into criminal, a noble into a tyrant.", "angry"),
+//                line(pro, "It is a curse", "angry"),
+//                line(ant, "Yes, now you understand.", "happy"),
+//                line(ant, "I am happy that you understand the nature of power. Listen to me.", "talk"),
+//                line(ant, "I can take you to Bryn, the hearth of Mages. There you can learn to control the power, to use it ethically."),
+//                line(pro, "You would turn me, a peasant, into a Mage?", "worried"),
+//                line(ant, "Yes, anyone who survives the Caen can enter Bryn."),
+//                line(ant, "It is another set of trials though. Not of block and switches but of people. Not in rooms but in the mind."),
+//                line(ant, "Surviving Bryn is much harder than the Caen."),
+//                line(pro, "But is the reward equal to the risk?"),
+//                line(ant, "well... a Mage will not go hungry..."),
+//                line(ant, "Take the night to rest and think on it.")
+//        ));
         dialogs.put("24", Arrays.asList(
-                line(pro, "What next?"),
-                line(ant, "You can rest here for a while. The Caen is not easy."),
-                line(pro, "And after that?"),
-                line(ant, "As always, that is up to you. You may leave with the stone."),
-                line(pro, "So ... there's no gold?"),
-                line(ant, "There is no gold."),
-                line(pro, "I cannot eat the stone.", "angry"),
-                line(ant, "Why not sell it?"),
-                line(pro, "Sell it? This would turn a man into criminal, a noble into a tyrant.", "angry"),
-                line(pro, "It is a curse", "angry"),
-                line(ant, "Yes, now you understand.", "happy"),
-                line(ant, "I am happy that you understand the nature of power. Listen to me.", "talk"),
-                line(ant, "I can take you to Bryn, the hearth of Mages. There you can learn to control the power, to use it ethically."),
-                line(pro, "You would turn me, a peasant, into a Mage?", "worried"),
-                line(ant, "Yes, anyone who survives the Caen can enter Bryn."),
-                line(ant, "It is another set of trials though. Not of block and switches but of people. Not in rooms but in the mind."),
-                line(ant, "Surviving Bryn is much harder than the Caen."),
-                line(pro, "But is the reward equal to the risk?"),
-                line(ant, "well... a Mage will not go hungry..."),
-                line(ant, "Take the night to rest and think on it.")
+                line(pro, "What now?"),
+                line(ant, "I suggest you rest"),
+                line(pro, "And then?"),
+                line(ant, "I suggest you come with me to Bryn, to the college of Mages"),
+                line(pro, "For another trial I suppose? One that puts me in jail or worse"),
+                line(ant, "Actually, you may join us. "),
+                line(ant, "We will provide everything you need. Food, shelter..."),
+                line(ant, "...education"),
+                line(pro, "I don't know"),
+                line(ant, "I was wrong."),
+                line(ant, "You have shown me this."),
+                line(ant, "Think on it. Perhaps you can show the rest of us what really matters"),
+                line(pro, "Determination?"),
+                line(ant, "Yes, and more...")
         ));
         dialogs.put("saveWarning", Arrays.asList(
                 line(info, "There is already a save game. Starting a new game will overwrite the save game."),
@@ -238,11 +254,19 @@ public class DialogContainer {
                 line(pro, "I must be quick and press on. If the old man catches me I'm dead.", "worried")
         ));
         dialogs.put("31", Arrays.asList(
-                line(ant, "You have completed the trials"),
-                line(ant, "But you are NOT worthy"),
-                line(pro, "What must I do to be worthy?"),
-                line(ant, "Nothing, you are made wrong. I cannot let you leave.", "angry"),
-                line(ant, "you must die", "angry")
+                line(ant, "Well done, you've completed the trials"),
+                line(ant, "However"),
+                line(ant, "I cannot let you leave."),
+                line(pro, "What? Why not?"),
+                line(ant, "You are capable, but not worthy. You would be a disgrace to us.", "angry"),
+                line(ant, "I will stop you", "angry")
+        ));
+        dialogs.put("32", Arrays.asList(
+                line(pro, "You are undone"),
+                line(pro, "Am I still unworthy?"),
+                line(ant, "..."),
+                line(ant, "There is a place to rest ahead. I will meet you there later.")
+
         ));
     }
 

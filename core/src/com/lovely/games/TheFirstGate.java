@@ -153,6 +153,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private boolean leaveLevel = false;
     private StonePrizeScene stonePrizeScene = null;
     private Map<String, Animation<TextureRegion>> guffImages;
+    private boolean hasBossLevelSceneDone;
 
     @Override
 	public void create () {
@@ -517,6 +518,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         movementValue = 0;
         lastConnection = startConnection;
         explosions = new ArrayList<>();
+        hasBossLevelSceneDone = false;
         for (ArrowSource arrowSource : currentLevel.getArrowSources()) {
             arrowSource.start();
         }
@@ -1174,6 +1176,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             }
         }
         currentScenes.addAll(newScenes);
+
         for (ArrowSource arrowSource : currentLevel.getArrowSources()) {
             arrowSource.update(this);
         }
@@ -1273,6 +1276,16 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
     private float tileRound(float in) {
         return MathUtils.round(in / TILE_SIZE) * TILE_SIZE;
+    }
+
+    protected void playScene(String id) {
+        if (sceneContainer.scenes.containsKey(id)) {
+            Scene scene = sceneContainer.scenes.get(id);
+            if (!currentScenes.contains(scene)) {
+                currentScenes.add(scene);
+            }
+            scene.start();
+        }
     }
 
     private void checkForSceneSources(Vector2 pos) {

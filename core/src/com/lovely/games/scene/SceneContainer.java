@@ -187,6 +187,13 @@ public class SceneContainer {
                 .verb(new SendEventVerb("a"))
                 .build());
 
+        scenes.put("29", builder()
+                .verb(new HideShowActorVerb(false, "ant"))
+                .verb(new HideShowActorVerb(true, "boss"))
+                .verb(new DialogVerb("32"))
+                .verb(new SendEventVerb("b"))
+                .build());
+
         scenes.put("new-game", builder()
                 .verb(new GameControlVerb("new-game"))
                 .build());

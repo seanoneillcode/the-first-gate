@@ -25,6 +25,7 @@ public class Actor {
     private Vector2 oldTeleportPos;
     private Vector2 newTeleportPos;
     private boolean wasHit = false;
+    boolean isDone = false;
 
     public Actor(Vector2 pos, String id, boolean isHide, boolean isRight, boolean isBoss) {
         this.pos = pos;
@@ -44,10 +45,16 @@ public class Actor {
     public void start() {
         this.pos = originalPos.cpy();
         this.isHidden = originalIsHide;
+        this.oldTeleportPos = originalPos.cpy();
+        this.newTeleportPos = originalPos.cpy();
+        this.shootTimer = 0;
+        this.bossLives = 3;
+        wasHit = false;
+        isDone = false;
     }
 
     public void update(TheFirstGate stage, Platform platform) {
-        if (isHidden) {
+        if (isHidden || isDone) {
             return;
         }
         shootTimer += Gdx.graphics.getDeltaTime();
@@ -61,6 +68,10 @@ public class Actor {
             bossLives = bossLives - 1;
             getNextPlatformPos(stage, platform);
             pos = newTeleportPos.cpy();
+        }
+        if (bossLives < 0) {
+            stage.playScene("29");
+            isDone = true;
         }
     }
 
