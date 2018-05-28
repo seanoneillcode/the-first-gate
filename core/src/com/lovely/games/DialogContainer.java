@@ -265,6 +265,7 @@ public class DialogContainer {
                 line(pro, "You are undone"),
                 line(pro, "Am I still unworthy?"),
                 line(ant, "..."),
+                line(ant, "No, you are more worthy than I"),
                 line(ant, "There is a place to rest ahead. I will meet you there later.")
 
         ));
