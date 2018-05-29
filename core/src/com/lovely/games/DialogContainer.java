@@ -229,7 +229,7 @@ public class DialogContainer {
                 line(ant, "You are missing a leg, you are clearly a beggar", "talk"),
                 line(pro, "I have travelled far and suffered much just to take these trials", "worried"),
                 line(ant, "Begone you fool, this place is for the most able men and women.", "angry"),
-                line(ant, "You must be of sound mind and body.", "talk")
+                line(ant, "You must be of sound mind and body.", "talk"),
                 line(ant, "Begone", "talk")
         ));
         dialogs.put("27", Arrays.asList(
