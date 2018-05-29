@@ -124,10 +124,11 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private boolean isPlayerShooting = false;
     private float playerShootingTimer = 0;
     private Sprite titleSprite;
-    private boolean isTitleMenu = false, isOptionsMenu = false;
+    private boolean isTitleMenu = false, isOptionsMenu = false, isCreditsMenu = false;
     private int titleSelectionIndex = 0;
     private List<String> titleOptions = Arrays.asList("credits", "options", "new game", "load game");
     private List<String> optionOptions = Arrays.asList("back",  "brightness", "music volume", "sound volume");
+    private List<String> creditOptions = Arrays.asList("Music - Daniel Lacey",  "Quality - Ben Kirimlidis", "Quality - Michalis Kirimlidis", "Code and Art - Sean O'Neill");
     private Sprite titleSelectionSprite;
     private boolean titleLock = false;
     private Animation<TextureRegion> arrowExplodeAnim;
@@ -932,6 +933,10 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 menuOptions = optionOptions;
                 selectedPos.x = 140;
             }
+            if (isCreditsMenu) {
+                menuOptions = creditOptions;
+                selectedPos.x = 280;
+            }
             for (int index = menuOptions.size() - 1; index > -1; index--) {
                 String option = menuOptions.get(index);
                 if (titleSelectionIndex == menuOptions.size() - 1 - index) {
@@ -1109,10 +1114,12 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             }
             Vector2 movement = dir.scl(Gdx.graphics.getDeltaTime() * PLAYER_SPEED * PLAYER_TRANSITION_SPEED);
             playerPos.add(movement);
-            if (!leaveLevel) {
-                setScreenFade(levelTransitionTimer/LEVEL_TRANSITION_TIMER, Color.BLACK);
-            } else {
-                setScreenFade((LEVEL_TRANSITION_TIMER - levelTransitionTimer)/LEVEL_TRANSITION_TIMER, Color.BLACK);
+            if (!isBrightnessOption()) {
+                if (!leaveLevel) {
+                    setScreenFade(levelTransitionTimer/LEVEL_TRANSITION_TIMER, Color.BLACK);
+                } else {
+                    setScreenFade((LEVEL_TRANSITION_TIMER - levelTransitionTimer)/LEVEL_TRANSITION_TIMER, Color.BLACK);
+                }
             }
             return;
         }
@@ -1394,6 +1401,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             if (isOptionsMenu) {
                 menuOptions = optionOptions;
             }
+            if (isCreditsMenu) {
+                menuOptions = creditOptions;
+            }
             if (titleSelectionIndex > menuOptions.size() - 1) {
                 titleSelectionIndex = menuOptions.size() - 1;
             }
@@ -1431,45 +1441,59 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                     }
                     if (titleSelectionIndex == 3) {
                         // show credits
-                    }
-                }
-                if (isOptionsMenu) {
-                    if (titleSelectionIndex == 0) {
-                        // sound volume
-                        if (inputVector.x > 0) {
-                            soundPlayer.increaseSoundVolume();
-                        }
-                        if (inputVector.x < 0) {
-                            soundPlayer.decreaseSoundVolume();
-                        }
-                    }
-                    if (titleSelectionIndex == 1) {
-                        // music volume
-                        if (inputVector.x > 0) {
-                            soundPlayer.increaseMusicVolume();
-                        }
-                        if (inputVector.x < 0) {
-                            soundPlayer.decreaseMusicVolume();
-                        }
-                    }
-                    if (titleSelectionIndex == 2) {
-                        // brightness
-
-                        if (inputVector.x > 0) {
-                            gamma += 0.01f;
-                        }
-                        if (inputVector.x < 0) {
-                            gamma -= 0.01f;
-                        }
-                        gamma = MathUtils.clamp(gamma, 0, 1.0f);
-                    }
-                    if (titleSelectionIndex == 3) {
-                        // go back
-                        isTitleMenu = true;
-                        isOptionsMenu = false;
+                        isCreditsMenu = true;
+                        isTitleMenu = false;
                         titleLock = true;
                         moveLock = true;
-                        titleSelectionIndex = 2;
+                        titleSelectionIndex = 0;
+                    }
+                } else {
+                    if (isCreditsMenu) {
+                        isTitleMenu = true;
+                        isCreditsMenu = false;
+                        titleLock = true;
+                        moveLock = true;
+                        titleSelectionIndex = 3;
+                    } else {
+                        if (isOptionsMenu) {
+                            if (titleSelectionIndex == 0) {
+                                // sound volume
+                                if (inputVector.x > 0) {
+                                    soundPlayer.increaseSoundVolume();
+                                }
+                                if (inputVector.x < 0) {
+                                    soundPlayer.decreaseSoundVolume();
+                                }
+                            }
+                            if (titleSelectionIndex == 1) {
+                                // music volume
+                                if (inputVector.x > 0) {
+                                    soundPlayer.increaseMusicVolume();
+                                }
+                                if (inputVector.x < 0) {
+                                    soundPlayer.decreaseMusicVolume();
+                                }
+                            }
+                            if (titleSelectionIndex == 2) {
+                                // brightness
+
+                                if (inputVector.x > 0) {
+                                    gamma += 0.01f;
+                                }
+                                if (inputVector.x < 0) {
+                                    gamma -= 0.01f;
+                                }
+                                gamma = MathUtils.clamp(gamma, 0, 1.0f);
+                            }
+                            if (titleSelectionIndex == 3) {
+                                // go back
+                                isTitleMenu = true;
+                                isOptionsMenu = false;
+                                titleLock = true;
+                                moveLock = true;
+                                titleSelectionIndex = 2;
+                            }
+                        }
                     }
                 }
             }
@@ -1771,7 +1795,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     }
 
     boolean isMenu() {
-        return isTitleMenu || isOptionsMenu;
+        return isTitleMenu || isOptionsMenu || isCreditsMenu;
     }
 
     boolean isBrightnessOption() {
