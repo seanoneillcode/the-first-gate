@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector2;
 
 public class StonePrizeScene {
 
+    private boolean needsReset;
     Sprite player;
     Sprite light;
     Sprite stone;
@@ -28,6 +29,8 @@ public class StonePrizeScene {
         stone.setScale(2.0f);
         light = new Sprite((Texture)assetManager.get("posters/stone-1.png"));
         light.setScale(2.0f);
+        timer = 0;
+        needsReset = true;
     }
 
     void reset() {
@@ -35,8 +38,9 @@ public class StonePrizeScene {
         playerPos = new Vector2(-134f, -24f);
         stonePos = new Vector2(96f, -24f);
         lightAlpha = 0;
-        amount = 0.02f;
+        amount = 0.01f;
         isIncrease = true;
+        needsReset = false;
     }
 
     void update(Stage stage) {
@@ -49,34 +53,22 @@ public class StonePrizeScene {
             stonePos.y = stonePos.y + 0.3f;
         }
         if (timer > 1f ) {
-            if (isIncrease) {
-                lightAlpha = lightAlpha + amount;
-                if (lightAlpha > 1.0f) {
-                    lightAlpha = 1.0f;
-                    isIncrease = false;
-                    amount = amount + 0.01f;
-                }
-            } else {
-                lightAlpha = lightAlpha - amount;
-                if (lightAlpha < 0f) {
-                    lightAlpha = 0f;
-                    isIncrease = true;
-                    amount = amount + 0.01f;
-                }
-            }
+            lightAlpha = lightAlpha + amount;
         }
         lightAlpha = MathUtils.clamp(lightAlpha, 0, 1.0f);
     }
 
-    void render(SpriteBatch batch, Vector2 pos) {
+    void render(SpriteBatch batch, Vector2 pos, float alpha) {
 //        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 //        player.setTexture(assetManager.get(posterImageName));
 //        player.setAlpha(posterAlpha);
         player.setPosition(pos.x + playerPos.x, pos.y + playerPos.y);
         player.draw(batch);
+        player.setAlpha(alpha);
         light.setPosition(pos.x + stonePos.x - 150,pos.y + stonePos.y);
-        light.setAlpha(lightAlpha);
+        light.setAlpha(MathUtils.clamp(lightAlpha * alpha, 0, 1f));
         light.draw(batch);
+        stone.setAlpha(alpha);
         stone.setPosition(pos.x + stonePos.x,pos.y + stonePos.y);
         stone.draw(batch);
     }

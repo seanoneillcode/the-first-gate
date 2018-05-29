@@ -911,7 +911,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 if (posterImageName.equals("posters/poster-prize.png")) {
                     stonePrizeScene.update(this);
                     Vector2 pos = new Vector2(camera.position.x - 150, camera.position.y - 120);
-                    stonePrizeScene.render(batch, pos);
+                    stonePrizeScene.render(batch, pos, posterAlpha);
                 } else {
                     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
                     posterSprite.setTexture(assetManager.get(posterImageName));
@@ -1752,10 +1752,14 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     }
 
     public void showPoster(float alpha, String poster) {
-        posterAlpha = alpha;
+        posterAlpha = MathUtils.clamp(alpha, 0f, 1f);
         posterImageName = poster;
-        if (poster != null && poster.equals("posters/poster-prize.png")) {
-            currentSpell = "arrow";
+        if (poster != null) {
+            if (poster.equals("posters/poster-prize.png")) {
+                currentSpell = "arrow";
+            }
+        } else {
+            stonePrizeScene.reset();
         }
     }
 
