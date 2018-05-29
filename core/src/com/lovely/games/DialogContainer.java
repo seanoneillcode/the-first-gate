@@ -16,6 +16,9 @@ import com.badlogic.gdx.math.Vector2;
 
 public class DialogContainer {
 
+    public static final float NORMAL_FACE_SCALE = 0.6f;
+    public static final float SMALL_FACE_SCALE = 0.54f;
+    public static final float SCALE_INCREASE_AMOUNT = 0.01f;
     private final Sprite rightDialogPointer;
     Map<String, List<DialogElement>> dialogs = new HashMap<>();
     String pro = "pro";
@@ -283,6 +286,7 @@ public class DialogContainer {
     private Sprite dialogPointer, optionPointer;
     private Set<String> actors;
     private String lastMood;
+    private float leftScaleTarget, rightScaleTarget, leftScaleAmount, rightScaleAmount;
 
     public DialogContainer(AssetManager assetManager) {
         currentDialog = null;
@@ -310,8 +314,12 @@ public class DialogContainer {
         this.leftPortrait = new Sprite(portraits.get("pro-talk"));
         this.rightPortrait = new Sprite(portraits.get("ant-talk"));
         this.rightPortrait.flip(true, false);
-        leftPortrait.setScale(0.6f);
-        rightPortrait.setScale(0.6f);
+        leftScaleTarget = NORMAL_FACE_SCALE;
+        rightScaleTarget = NORMAL_FACE_SCALE;
+        leftScaleTarget = NORMAL_FACE_SCALE;
+        rightScaleAmount = NORMAL_FACE_SCALE;
+        leftPortrait.setScale(leftScaleTarget);
+        rightPortrait.setScale(rightScaleTarget);
         lastMood = "pro-listening";
         lastAntMood = "ant-listening";
     }
@@ -332,6 +340,8 @@ public class DialogContainer {
             }
             dialogPointer.setPosition(dialogPos.x + 150, dialogPos.y + portraitHeight - 40);
             rightPortrait.setTexture(portraits.get(lastAntMood));
+            leftScaleTarget = NORMAL_FACE_SCALE;
+            rightScaleTarget = SMALL_FACE_SCALE;
         } else {
             if (dialogLine.getMood() != null) {
                 rightPortrait.setTexture(portraits.get("ant-" + dialogLine.getMood()));
@@ -342,7 +352,23 @@ public class DialogContainer {
             }
             leftPortrait.setTexture(portraits.get(lastMood));
             rightDialogPointer.setPosition(dialogPos.x + 302, dialogPos.y + portraitHeight - 40);
+            rightScaleTarget = NORMAL_FACE_SCALE;
+            leftScaleTarget = SMALL_FACE_SCALE;
         }
+        if (leftScaleAmount < leftScaleTarget) {
+            leftScaleAmount += SCALE_INCREASE_AMOUNT;
+        }
+        if (leftScaleAmount > leftScaleTarget) {
+            leftScaleAmount -= SCALE_INCREASE_AMOUNT;
+        }
+        if (rightScaleAmount < rightScaleTarget) {
+            rightScaleAmount += SCALE_INCREASE_AMOUNT;
+        }
+        if (rightScaleAmount > rightScaleTarget) {
+            rightScaleAmount -= SCALE_INCREASE_AMOUNT;
+        }
+        leftPortrait.setScale(leftScaleAmount);
+        rightPortrait.setScale(rightScaleAmount);
         if (actors.contains("pro")) {
             leftPortrait.setPosition(dialogPos.x - 20, dialogPos.y + 4 - 100 + 40);
             leftPortrait.draw(batch);
