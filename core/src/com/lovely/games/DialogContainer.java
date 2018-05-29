@@ -169,12 +169,11 @@ public class DialogContainer {
 //                line(ant, "Take the night to rest and think on it.")
 //        ));
         dialogs.put("24", Arrays.asList(
-                line(pro, "What now?"),
                 line(ant, "I suggest you rest"),
                 line(pro, "And then?"),
                 line(ant, "I suggest you come with me to Bryn, to the college of Mages"),
                 line(pro, "For another trial I suppose? One that puts me in jail or worse"),
-                line(ant, "Actually, you may join us. "),
+                line(ant, "Actually, I would like you to join us. "),
                 line(ant, "We will provide everything you need. Food, shelter..."),
                 line(ant, "...education"),
                 line(pro, "I don't know"),
@@ -182,7 +181,7 @@ public class DialogContainer {
                 line(ant, "You have shown me this."),
                 line(ant, "Think on it. Perhaps you can show the rest of us what really matters"),
                 line(pro, "Determination?"),
-                line(ant, "Yes, and more...")
+                line(ant, "Yes, determination and more...")
         ));
         dialogs.put("saveWarning", Arrays.asList(
                 line(info, "There is already a save game. Starting a new game will overwrite the save game."),
@@ -224,14 +223,14 @@ public class DialogContainer {
                 line(ant, "Good luck!", "happy")
         ));
         dialogs.put("26", Arrays.asList(
-                line(ant, "Why are you here?"),
+                line(ant, "Who are you? Why are you here!?"),
                 line(pro, "I am here to pass through the first gate", "worried"),
                 line(ant, "You are joking?", "happy"),
-                line(ant, "By your rags and limp you are clearly a beggar", "talk"),
-                line(pro, "I have travelled far and suffered much just to take these tests", "worried"),
-                line(ant, "Begone you fool, this place is for the finest men and women.", "angry"),
-                line(ant, "Those who wish to pass the first gate...", "talk"),
-                line(ant, "...to become a wizard", "happy")
+                line(ant, "You are missing a leg, you are clearly a beggar", "talk"),
+                line(pro, "I have travelled far and suffered much just to take these trials", "worried"),
+                line(ant, "Begone you fool, this place is for the most able men and women.", "angry"),
+                line(ant, "You must be of sound mind and body.", "talk")
+                line(ant, "Begone", "talk")
         ));
         dialogs.put("27", Arrays.asList(
                 line(pro, "We will see", "angry")
@@ -246,30 +245,30 @@ public class DialogContainer {
                 line(pro, "No...", "worried"),
                 line(ant, "Then be gone", "angry"),
                 line(pro, "I will not be gone! I have the most important quality", "angry"),
-                line(pro, "I am determined", "angry"),
-                line(ant, "You will find I'm greater than you, in all respects", "talk"),
-                line(ant, "Including determination to keep you away", "talk")
+                line(pro, "Determination", "angry")
         ));
         dialogs.put("29", Arrays.asList(
-                line(ant, "I see you. If you try that again I'll have you jailed", "angry")
+                line(ant, "I see you. If you try that again I will burn you to a cinder", "angry")
         ));
         dialogs.put("30", Arrays.asList(
                 line(pro, "I must be quick! If the old man catches me I'm dead...", "worried")
         ));
         dialogs.put("31", Arrays.asList(
                 line(ant, "Well done, you've completed the trials"),
-                line(ant, "However"),
+                line(ant, "However..."),
                 line(ant, "I cannot let you leave."),
                 line(pro, "What? Why not?"),
-                line(ant, "You are capable, but not worthy. You would be a disgrace to us.", "angry"),
-                line(ant, "I will stop you", "angry")
+                line(ant, "You have cheated I am sure, there is no other way you could get this far", "angry"),
+                line(ant, "I will stop this now, only those who actually take the trials may pass.", "angry")
         ));
         dialogs.put("32", Arrays.asList(
                 line(pro, "You are undone"),
-                line(pro, "Am I still unworthy?"),
+                line(pro, "By my hand?"),
                 line(ant, "..."),
-                line(ant, "No, you are more worthy than I"),
-                line(ant, "There is a place to rest ahead. I will meet you there later.")
+                line(ant, "Yes"),
+                line(ant, "I am very sorry, you are more the man than I"),
+                line(pro, "What now? I can leave?"),
+                line(ant, "There is a resting place ahead. Go there now and I will meet you momentarily.")
 
         ));
         dialogs.put("33", Arrays.asList(
