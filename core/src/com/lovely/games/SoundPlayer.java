@@ -7,9 +7,10 @@ import com.badlogic.gdx.math.Vector2;
 
 public class SoundPlayer {
 
+    public static final float VOLUME_RANGE = 240.0f;
     AssetManager assetManager;
     Vector2 playerPos;
-    private float soundVolume = 0.6f;
+    private float soundVolume = 1.0f;
     private float musicVolume = 0.8f;
 
 
@@ -21,12 +22,8 @@ public class SoundPlayer {
         this.playerPos = playerPos.cpy();
     }
 
-    public void playSound(String name, boolean loop, float volume) {
-//        playSound(name, playerPos, loop, volume, 1.0f);
-    }
-
-    public void playSound(String name, boolean loop, float volume, float pitch) {
-//        playSound(name, playerPos, loop, volume, pitch);
+    public void playSound(String name, boolean loop, Vector2 pos) {
+        playSound(name, pos, loop, 1.0f);
     }
 
     public void stopSound(String name) {
@@ -34,8 +31,17 @@ public class SoundPlayer {
         sound.stop();
     }
 
-    public long playSound(String name, Vector2 pos, boolean loop, float volume, float pitch) {
+    public long playSound(String name, Vector2 pos, boolean loop, float pitch) {
         Sound sound = assetManager.get(name);
+        float dist = pos.dst(playerPos);
+        float volume;
+        if (dist > VOLUME_RANGE) {
+            volume = 0.1f;
+        } else {
+            volume = ((VOLUME_RANGE - dist) / VOLUME_RANGE) * soundVolume;
+            System.out.println("dist " + dist);
+            System.out.println("volume " + volume);
+        }
         if (loop) {
             return sound.loop(volume, pitch, 0);
         } else {
