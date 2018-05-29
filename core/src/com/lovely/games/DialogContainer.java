@@ -254,7 +254,7 @@ public class DialogContainer {
                 line(ant, "I see you. If you try that again I'll have you jailed", "angry")
         ));
         dialogs.put("30", Arrays.asList(
-                line(pro, "I must be quick and press on. If the old man catches me I'm dead.", "worried")
+                line(pro, "I must be quick! If the old man catches me I'm dead...", "worried")
         ));
         dialogs.put("31", Arrays.asList(
                 line(ant, "Well done, you've completed the trials"),
@@ -270,6 +270,14 @@ public class DialogContainer {
                 line(ant, "..."),
                 line(ant, "No, you are more worthy than I"),
                 line(ant, "There is a place to rest ahead. I will meet you there later.")
+
+        ));
+        dialogs.put("33", Arrays.asList(
+                line(pro, "What does this say..."),
+                line(pro, "'RULES OF THE CAEN'"),
+                line(pro, "'1. All rooms have a solution'"),
+                line(pro, "'2. All rooms have one entrance and one exit'"),
+                line(pro, "'3. You must have fun'")
 
         ));
     }
