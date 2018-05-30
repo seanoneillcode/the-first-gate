@@ -1,10 +1,14 @@
 package com.lovely.games;
 
 import static com.badlogic.gdx.math.MathUtils.random;
+import static com.lovely.games.TheFirstGate.RANDOM_SOUND_ID_RANGE;
 import static com.lovely.games.TheFirstGate.TILE_SIZE;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
 public class Platform implements Switchable {
@@ -21,7 +25,7 @@ public class Platform implements Switchable {
     String switchId;
     boolean initialIsActive;
     Color color;
-    private long soundId;
+    private int soundId;
 
     public Platform(Vector2 start, Vector2 end, float offset, boolean isActive, String switchId) {
         this.pos = start.cpy();
@@ -34,6 +38,7 @@ public class Platform implements Switchable {
         this.initialIsActive = isActive;
         this.switchId = switchId;
         this.color = new Color(random(0.8f, 1.0f), random(0.8f, 0.8f), random(0.8f, 1.0f), 1.0f);
+        this.soundId = MathUtils.random(RANDOM_SOUND_ID_RANGE);
     }
 
     void start(SoundPlayer soundPlayer) {
@@ -41,7 +46,7 @@ public class Platform implements Switchable {
         pos = start.cpy();
         destination = end;
         isActive = initialIsActive;
-//        soundId = soundPlayer.playSound("sound/mechanical-1.ogg", true, 0.0f, 1.0f);
+//        soundPlayer.playSound(soundId, "sound/mechanical-1.ogg", pos, true);
     }
 
     public void update(SoundPlayer soundPlayer) {
@@ -59,7 +64,15 @@ public class Platform implements Switchable {
                     }
                 }
             }
+//            soundPlayer.playSound("sound/mechanical-1.ogg", false, pos);
 //            soundPlayer.updateVolume(soundId, "sound/mechanical-1.ogg", pos);
+//            if (!soundPlayer.isPlaying(soundId)) {
+                soundPlayer.playSound(soundId, "sound/platform-4.ogg", pos, true);
+//            }
+        } else {
+            if (soundPlayer.isPlaying(soundId)) {
+                soundPlayer.stopSound(soundId);
+            }
         }
     }
 

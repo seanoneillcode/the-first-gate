@@ -1,8 +1,10 @@
 package com.lovely.games;
 
 import static com.badlogic.gdx.math.MathUtils.random;
+import static com.lovely.games.TheFirstGate.RANDOM_SOUND_ID_RANGE;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
 public class Door implements Switchable {
@@ -13,6 +15,7 @@ public class Door implements Switchable {
     Color color;
     private boolean originalIsOpen;
     SoundPlayer soundPlayer;
+    int soundId;
 
     public Door(Vector2 pos, boolean isOpen, String switchId, SoundPlayer soundPlayer) {
         this.pos = pos;
@@ -21,6 +24,7 @@ public class Door implements Switchable {
         this.switchId = switchId;
         this.color = new Color(random(0.8f, 0.9f), random(0.2f, 0.3f), random(0.8f, 0.9f), 1.0f);
         this.soundPlayer = soundPlayer;
+        this.soundId = MathUtils.random(RANDOM_SOUND_ID_RANGE);
     }
 
     public void start() {
@@ -31,7 +35,7 @@ public class Door implements Switchable {
     public void handleMessage(String id) {
         if (switchId != null && switchId.equals(id)) {
             isOpen = !isOpen;
-            soundPlayer.playSound("sound/block-0.ogg", false, pos);
+            soundPlayer.playSound(soundId, "sound/block-0.ogg", pos, false);
         }
     }
 }

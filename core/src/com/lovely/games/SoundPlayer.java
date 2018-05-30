@@ -1,6 +1,13 @@
 package com.lovely.games;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -13,46 +20,87 @@ public class SoundPlayer {
     private float soundVolume = 1.0f;
     private float musicVolume = 0.8f;
 
+    Map<Integer, PositionSound> sounds;
+    boolean isPaused;
 
     SoundPlayer(AssetManager assetManager) {
         this.assetManager = assetManager;
+        this.sounds = new HashMap<>();
+        this.isPaused = false;
+    }
+
+    public void startLevel() {
+        sounds.clear();
+    }
+
+    public void pauseSounds() {
+        isPaused = true;
+        for (Integer id : sounds.keySet()) {
+            sounds.get(id).sound.pause();
+        }
+    }
+
+    public void resumeSounds() {
+        isPaused = false;
+        for (Integer id : sounds.keySet()) {
+            sounds.get(id).sound.play();
+        }
     }
 
     public void update(Vector2 playerPos) {
+        if (isPaused) {
+            return;
+        }
         this.playerPos = playerPos.cpy();
+        List<Integer> removes = new ArrayList<>();
+        for (Integer id : sounds.keySet()) {
+            if (!sounds.get(id).sound.isPlaying()) {
+                removes.add(id);
+            } else {
+                sounds.get(id).sound.setVolume(getVolume(playerPos, sounds.get(id).pos));
+            }
+        }
+        Iterator<Integer> iterator = removes.iterator();
+        while (iterator.hasNext()) {
+            Integer i = iterator.next();
+            sounds.remove(i);
+        }
     }
 
-    public void playSound(String name, boolean loop, Vector2 pos) {
-        playSound(name, pos, loop, 1.0f);
+    public boolean isPlaying(int id) {
+        if (sounds.containsKey(id)) {
+            return sounds.get(id).sound.isPlaying();
+        }
+        return false;
     }
 
-    public void stopSound(String name) {
-        Sound sound = assetManager.get(name);
-        sound.stop();
+    public void stopSound(int id) {
+        if (sounds.containsKey(id)) {
+            Music sound = sounds.get(id).sound;
+            sound.stop();
+        }
     }
 
-    public long playSound(String name, Vector2 pos, boolean loop, float pitch) {
-        Sound sound = assetManager.get(name);
-        float dist = pos.dst(playerPos);
+    public void playSound(int id, String name, Vector2 pos, boolean isLooping) {
+        if (!sounds.containsKey(id)) {
+            Music sound = assetManager.get(name);
+            sounds.put(id, new PositionSound(sound, pos));
+        }
+        Music sound = sounds.get(id).sound;
+        sound.setVolume(getVolume(playerPos, pos));
+        sound.play();
+        sound.setLooping(isLooping);
+    }
+
+    private float getVolume(Vector2 playerPos, Vector2 soundPos) {
+        float dist = playerPos != null ? soundPos.dst(playerPos) : 0;
         float volume;
         if (dist > VOLUME_RANGE) {
             volume = 0.1f;
         } else {
             volume = ((VOLUME_RANGE - dist) / VOLUME_RANGE) * soundVolume;
-            System.out.println("dist " + dist);
-            System.out.println("volume " + volume);
         }
-        if (loop) {
-            return sound.loop(volume, pitch, 0);
-        } else {
-            return sound.play(volume, pitch, 0);
-        }
-    }
-
-    public void updateVolume(long id, String name, Vector2 pos) {
-        Sound sound = assetManager.get(name);
-        float dst2 = pos.dst2(playerPos);
-        sound.setVolume(id, dst2 / (32 * 4) * (32 * 4));
+        return volume;
     }
 
     public float getSoundVolume() {
