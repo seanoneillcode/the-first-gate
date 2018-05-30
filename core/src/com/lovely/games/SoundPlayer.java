@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
@@ -63,7 +64,8 @@ public class SoundPlayer {
         Iterator<Integer> iterator = removes.iterator();
         while (iterator.hasNext()) {
             Integer i = iterator.next();
-            sounds.remove(i);
+            PositionSound ps = sounds.remove(i);
+            ps.sound.dispose();
         }
     }
 
@@ -83,10 +85,13 @@ public class SoundPlayer {
 
     public void playSound(int id, String name, Vector2 pos, boolean isLooping) {
         if (!sounds.containsKey(id)) {
-            Music sound = assetManager.get(name);
+            Music sound = Gdx.audio.newMusic(Gdx.files.internal(name));
             sounds.put(id, new PositionSound(sound, pos));
         }
         Music sound = sounds.get(id).sound;
+        if (sound.isPlaying()) {
+            return;
+        }
         sound.setVolume(getVolume(playerPos, pos));
         sound.play();
         sound.setLooping(isLooping);

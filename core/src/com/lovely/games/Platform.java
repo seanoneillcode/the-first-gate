@@ -64,15 +64,9 @@ public class Platform implements Switchable {
                     }
                 }
             }
-//            soundPlayer.playSound("sound/mechanical-1.ogg", false, pos);
-//            soundPlayer.updateVolume(soundId, "sound/mechanical-1.ogg", pos);
-//            if (!soundPlayer.isPlaying(soundId)) {
-                soundPlayer.playSound(soundId, "sound/platform-4.ogg", pos, true);
-//            }
+            soundPlayer.playSound(soundId, "sound/platform-4.ogg", pos, false);
         } else {
-            if (soundPlayer.isPlaying(soundId)) {
-                soundPlayer.stopSound(soundId);
-            }
+            soundPlayer.stopSound(soundId);
         }
     }
 
