@@ -35,7 +35,7 @@ public class Door implements Switchable {
     public void handleMessage(String id) {
         if (switchId != null && switchId.equals(id)) {
             isOpen = !isOpen;
-            soundPlayer.playSound(soundId, "sound/block-0.ogg", pos, false);
+            soundPlayer.playSound(soundId, "sound/door.ogg", pos, false);
         }
     }
 }

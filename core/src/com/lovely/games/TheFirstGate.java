@@ -52,6 +52,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     public static final int RANDOM_SOUND_ID_RANGE = 1000000;
     private static final int CHIRP_SOUND_ID = MathUtils.random(RANDOM_SOUND_ID_RANGE);
     private static final int CRICKET_SOUND_ID = MathUtils.random(RANDOM_SOUND_ID_RANGE);
+    private static final int BLIP_SELECT_ITEM_SOUND_ID = MathUtils.random(RANDOM_SOUND_ID_RANGE);
 
     private float lazerSoundTimer = 0;
     private float stepTimer = 0;
@@ -1058,6 +1059,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 		assetManager.dispose();
 		bufferBatch.dispose();
 		buffer.dispose();
+		soundPlayer.dispose();
 	}
 
 	private void update() {
@@ -1135,12 +1137,12 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         for (PressureTile pressureTile : currentLevel.pressureTiles) {
             boolean handled = false;
             if (playerPos.dst2(pressureTile.pos) < 64) {
-                pressureTile.handleAction();
+                pressureTile.handleAction(soundPlayer);
                 handled = true;
             }
             for (BlockLike block : currentLevel.getBlockLikes()) {
                 if (block.getPos().dst2(pressureTile.pos) < 64) {
-                    pressureTile.handleAction();
+                    pressureTile.handleAction(soundPlayer);
                     handled = true;
                 }
             }
@@ -1171,7 +1173,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 BlockLike block = currentLevel.getBlockLike(playerPos.cpy().add(QUARTER_TILE_SIZE,QUARTER_TILE_SIZE), false);
                 if (!(block != null && block.isGround())) {
                     playerDeathTimer = PLAYER_DEATH_TIME;
-                    soundPlayer.playSound(MathUtils.random(RANDOM_SOUND_ID_RANGE), "sound/fall-0.ogg", playerPos, false);
+                    soundPlayer.playSound("sound/scream-hurt.ogg", playerPos);
                     playerIsDead = true;
                     animationDelta = 0;
                     isFallDeath = true;
@@ -1245,7 +1247,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             arrow.update();
             if (currentLevel.isWall(arrow.pos) || currentLevel.isOutOfBounds(arrow.pos) || currentLevel.getDoor(arrow.pos.cpy(), false) != null) {
                 explosions.add(new Explosion(arrow.pos.cpy()));
-                soundPlayer.playSound(MathUtils.random(RANDOM_SOUND_ID_RANGE), "sound/blast-1.ogg", arrow.pos, false);
+                soundPlayer.playSound("sound/blast-1.ogg", arrow.pos);
                 arrowIterator.remove();
                 continue;
             }
@@ -1260,13 +1262,13 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                     arrowIterator.remove();
                     block.move(arrow.dir);
                 }
-                soundPlayer.playSound(MathUtils.random(RANDOM_SOUND_ID_RANGE), "sound/blast-1.ogg",block.getPos(), false);
-                soundPlayer.playSound(MathUtils.random(RANDOM_SOUND_ID_RANGE), "sound/block-3.ogg", block.getPos(), false);
+                soundPlayer.playSound("sound/blast-1.ogg",block.getPos());
+                soundPlayer.playSound("sound/block-3.ogg", block.getPos());
             }
             if (!playerIsDead && getPlayerRect().overlaps(arrow.getRect())) {
                 playerDeathTimer = PLAYER_DEATH_TIME;
                 playerIsDead = true;
-                soundPlayer.playSound(MathUtils.random(RANDOM_SOUND_ID_RANGE), "sound/flame-0.ogg", arrow.pos, false);
+                soundPlayer.playSound("sound/flame-0.ogg", arrow.pos);
                 animationDelta = 0;
                 isFallDeath = false;
                 return;
@@ -1276,7 +1278,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                     if (arrow.getRect().overlaps(actor.getHitRect())) {
                         actor.handleHit();
                         explosions.add(new Explosion(arrow.pos.cpy()));
-                        soundPlayer.playSound(MathUtils.random(RANDOM_SOUND_ID_RANGE), "sound/blast-1.ogg", arrow.pos, false);
+                        soundPlayer.playSound("sound/blast-1.ogg", arrow.pos);
                         arrowIterator.remove();
                     }
                 }
@@ -1321,6 +1323,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                         if (!alreadyGround) {
                             blocksDirty = true;
                             blockLike.setGround(true);
+                            soundPlayer.playSound("sound/switch-1.ogg", blockLike.getPos());
                         }
                     }
                 } else {
@@ -1402,6 +1405,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         }
 
         if (isMenu() && !titleLock && !showSaveWarning) {
+            int oldTitleIndex = titleSelectionIndex;
             titleSelectionIndex = titleSelectionIndex - (int) inputVector.y;
             if (inputVector.y != 0) {
                 titleLock = true;
@@ -1427,7 +1431,11 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                     }
                 }
             }
+            if (oldTitleIndex != titleSelectionIndex) {
+                soundPlayer.playSound("sound/select-2.ogg", playerPos);
+            }
             if (inputVector.x != 0 || Gdx.input.isKeyPressed(Input.Keys.SPACE) || Gdx.input.isKeyPressed(Input.Keys.ENTER)) {
+                soundPlayer.playSound(BLIP_SELECT_ITEM_SOUND_ID, "sound/select-3.ogg", playerPos, false);
                 if (isTitleMenu) {
                     if (titleSelectionIndex == 0) {
                         isTitleMenu = false;
@@ -1524,7 +1532,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 inputVector.x = 1;
             }
             if ((inputVector.x != 0 || inputVector.y != 0) && !dialogLock) {
-
+                soundPlayer.playSound("sound/select-2.ogg", playerPos);
                 if (!conversation.isFinished()) {
                     conversation.handleInput(inputVector);
                 }
@@ -1565,7 +1573,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                             } else {
                                 block.move(moveVector);
                                 playerIsPushing = true;
-                                soundPlayer.playSound(MathUtils.random(RANDOM_SOUND_ID_RANGE), "sound/block-3.ogg", block.getPos(), false);
+                                soundPlayer.playSound("sound/block-3.ogg", block.getPos());
                             }
                         }
                     }
@@ -1584,7 +1592,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                                 } else {
                                     block.move(moveVector);
                                     playerIsPushing = true;
-                                    soundPlayer.playSound(MathUtils.random(RANDOM_SOUND_ID_RANGE), "sound/block-3.ogg", block.getPos(), false);
+                                    soundPlayer.playSound("sound/block-3.ogg", block.getPos());
                                 }
                                 nextTileAgain = moveVector.cpy().scl(TILE_SIZE * 3.0f).add(playerPos).add(QUARTER_TILE_SIZE, QUARTER_TILE_SIZE);
                                 if (currentLevel.isTileBlocked(nextTileAgain)) {
@@ -1592,7 +1600,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                                 } else {
                                     block.move(moveVector);
                                     playerIsPushing = true;
-                                    soundPlayer.playSound(MathUtils.random(RANDOM_SOUND_ID_RANGE), "sound/block-3.ogg", block.getPos(), false);
+                                    soundPlayer.playSound("sound/block-3.ogg", block.getPos());
                                 }
                             }
                         }
@@ -1637,7 +1645,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             if (isMoving) {
                 float pitch = MathUtils.random(0.75f, 1.25f);
                 if (stepTimer < 0) {
-                    soundPlayer.playSound(MathUtils.random(RANDOM_SOUND_ID_RANGE), "sound/step-2.ogg", playerPos, false);
+                    soundPlayer.playSound("sound/step-2.ogg", playerPos);
                     stepTimer = 0.165f * 4f;
                 }
             }
@@ -1750,13 +1758,13 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     }
 
     void addArrow(Vector2 pos, Vector2 dir, float speed) {
-        soundPlayer.playSound(MathUtils.random(RANDOM_SOUND_ID_RANGE), "sound/arrow-source.ogg", pos, false);
+        soundPlayer.playSound("sound/arrow-source.ogg", pos);
         arrows.add(new Arrow(true, pos, dir, speed));
     }
 
     void addLazer(Vector2 pos, Vector2 dir) {
         if (lazerSoundTimer <= 0) {
-            soundPlayer.playSound(MathUtils.random(RANDOM_SOUND_ID_RANGE), "sound/lazer-4.ogg", pos, false);
+            soundPlayer.playSound("sound/lazer-4.ogg", pos);
             lazerSoundTimer = 0.5f;
         }
         arrows.add(new Arrow(false, pos.cpy().add(dir.x * HALF_TILE_SIZE, dir.y * HALF_TILE_SIZE), dir, TILE_SIZE * 16.0f));
@@ -1788,6 +1796,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         if (state.equals("new-game")) {
             isTitleMenu = false;
             startLevel(levels.get(START_LEVEL_NUM), levels.get(START_LEVEL_NUM).getConnection("61"));
+            soundPlayer.playSound("sound/new-game-1.ogg", playerPos);
+
         }
         if (state.equals("menu")) {
             isTitleMenu = true;
@@ -1821,5 +1831,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
     public boolean isArrowBlocking(Vector2 checkPos) {
         return currentLevel.isTileBlocked(checkPos);
+    }
+
+    public void playSound(int id, String name, Vector2 pos) {
+        soundPlayer.playSound(id, name, pos, false);
     }
 }

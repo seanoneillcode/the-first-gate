@@ -42,10 +42,11 @@ class PressureTile {
         this.handledAction = false;
     }
 
-    void handleAction() {
+    void handleAction(SoundPlayer soundPlayer) {
         if (!handledAction && trunk != null) {
             trunk.broadcast(switchId);
             handledAction = true;
+            soundPlayer.playSound("sound/thunk.ogg", pos);
         }
     }
 }

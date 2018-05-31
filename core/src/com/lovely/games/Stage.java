@@ -29,4 +29,6 @@ public interface Stage {
     void fadeScreen(boolean inDirection, float time, Color color);
 
     void gotoState(String state);
+
+    void playSound(int id, String name, Vector2 pos);
 }

@@ -1,5 +1,7 @@
 package com.lovely.games;
 
+import static com.lovely.games.TheFirstGate.RANDOM_SOUND_ID_RANGE;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -83,6 +85,14 @@ public class SoundPlayer {
         }
     }
 
+    public void playSound(String name, Vector2 pos) {
+        int id = MathUtils.random(RANDOM_SOUND_ID_RANGE);
+        Music sound = Gdx.audio.newMusic(Gdx.files.internal(name));
+        sounds.put(id, new PositionSound(sound, pos));
+        sound.setVolume(getVolume(playerPos, pos));
+        sound.play();
+    }
+
     public void playSound(int id, String name, Vector2 pos, boolean isLooping) {
         if (!sounds.containsKey(id)) {
             Music sound = Gdx.audio.newMusic(Gdx.files.internal(name));
@@ -134,5 +144,11 @@ public class SoundPlayer {
 
     public float getMusicVolume() {
         return musicVolume;
+    }
+
+    public void dispose() {
+        for (Integer id : sounds.keySet()) {
+            sounds.get(id).sound.dispose();
+        }
     }
 }
