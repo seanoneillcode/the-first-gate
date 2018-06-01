@@ -295,6 +295,8 @@ public class DialogContainer {
     private String lastMood;
     private float leftScaleTarget, rightScaleTarget, leftScaleAmount, rightScaleAmount;
 
+    String lastChar;
+
     public DialogContainer(AssetManager assetManager) {
         currentDialog = null;
         dialogIndex = 0;
@@ -323,7 +325,7 @@ public class DialogContainer {
         this.rightPortrait.flip(true, false);
         leftScaleTarget = NORMAL_FACE_SCALE;
         rightScaleTarget = NORMAL_FACE_SCALE;
-        leftScaleTarget = NORMAL_FACE_SCALE;
+        leftScaleAmount = NORMAL_FACE_SCALE;
         rightScaleAmount = NORMAL_FACE_SCALE;
         leftPortrait.setScale(leftScaleTarget);
         rightPortrait.setScale(rightScaleTarget);
@@ -331,7 +333,7 @@ public class DialogContainer {
         lastAntMood = "ant-listening";
     }
 
-    void render(SpriteBatch batch, Vector2 offset, Conversation conversation) {
+    void render(SpriteBatch batch, Vector2 offset, Conversation conversation, SoundPlayer soundPlayer) {
         Vector2 dialogPos = offset.cpy().add(0, 16);
         DialogElement dialogLine = conversation.getCurrentDialog();
         actors = new HashSet<>(conversation.getActors());
@@ -428,6 +430,22 @@ public class DialogContainer {
 
             ypos = ypos - 32;
         }
+
+        String lastLine = lines.get(lines.size() - 1);
+        if (!lastLine.isEmpty()) {
+            String thisChar = lastLine.substring(lastLine.length() - 1);
+            if (!thisChar.isEmpty() && (lastChar == null || !thisChar.equals(lastChar))) {
+                if (!thisChar.equals(" ")) {
+                    if (isLeft) {
+                        soundPlayer.playSound("sound/talk-high-beep.ogg");
+                    } else {
+                        soundPlayer.playSound("sound/talk-shift.ogg");
+                    }
+                    lastChar = thisChar;
+                }
+            }
+        }
+
     }
 
     private BitmapFont loadFonts(String fontString) {

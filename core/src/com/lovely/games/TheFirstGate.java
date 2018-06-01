@@ -53,6 +53,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private static final int CHIRP_SOUND_ID = MathUtils.random(RANDOM_SOUND_ID_RANGE);
     private static final int CRICKET_SOUND_ID = MathUtils.random(RANDOM_SOUND_ID_RANGE);
     private static final int BLIP_SELECT_ITEM_SOUND_ID = MathUtils.random(RANDOM_SOUND_ID_RANGE);
+    static final float DEFAULT_SOUND_LEVEL = 0.5f;
+    private static final float DEFAULT_MUSIC_LEVEL = 0.5f;
+    private static final float DEFAULT_GAMMA = 0.5f;
 
     private float lazerSoundTimer = 0;
     private float stepTimer = 0;
@@ -460,6 +463,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         isTitleMenu = true;
         isViewDirty = true;
         titleLock = true;
+        loadSettings();
 	}
 
 	private void loadExternalData() {
@@ -483,6 +487,22 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         prefs.flush();
         hasContinue = true;
     }
+
+    private void saveSettings() {
+        Preferences prefs = Gdx.app.getPreferences("caen-preferences");
+        prefs.putFloat("sound-level", soundPlayer.getSoundVolume());
+        prefs.putFloat("music-level", soundPlayer.getMusicVolume());
+        prefs.putFloat("brightness-level", gamma);
+        prefs.flush();
+    }
+
+    private void loadSettings() {
+        Preferences prefs = Gdx.app.getPreferences("caen-preferences");
+        soundPlayer.setSoundVolume(prefs.getFloat("sound-level", DEFAULT_SOUND_LEVEL));
+        soundPlayer.setSoundVolume(prefs.getFloat("music-level", DEFAULT_MUSIC_LEVEL));
+        gamma = prefs.getFloat("brightness-level", DEFAULT_GAMMA);
+    }
+
 
     @Override
     public void pause() {
@@ -912,7 +932,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
             if (conversation != null) {
-                dialogContainer.render(batch, new Vector2(camera.position.x - (VIEWPORT_WIDTH / 2.0f) + 100, camera.position.y - (VIEWPORT_HEIGHT / 2.0f) + 100), conversation);
+                dialogContainer.render(batch, new Vector2(camera.position.x - (VIEWPORT_WIDTH / 2.0f) + 100, camera.position.y - (VIEWPORT_HEIGHT / 2.0f) + 100), conversation, soundPlayer);
             } else {
                 dialogContainer.reset();
             }
@@ -966,7 +986,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             }
             if (showSaveWarning && conversation != null) {
                 conversation.update();
-                dialogContainer.render(batch, new Vector2(camera.position.x - (VIEWPORT_WIDTH / 2.0f), camera.position.y - (VIEWPORT_HEIGHT / 2.0f)), conversation);
+                dialogContainer.render(batch, new Vector2(camera.position.x - (VIEWPORT_WIDTH / 2.0f), camera.position.y - (VIEWPORT_HEIGHT / 2.0f)), conversation, soundPlayer);
             }
             batch.end();
         }
@@ -1512,6 +1532,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                                 titleLock = true;
                                 moveLock = true;
                                 titleSelectionIndex = 2;
+                                saveSettings();
                             }
                         }
                     }
@@ -1532,7 +1553,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 inputVector.x = 1;
             }
             if ((inputVector.x != 0 || inputVector.y != 0) && !dialogLock) {
-                soundPlayer.playSound("sound/select-2.ogg", playerPos);
+                soundPlayer.playSound("sound/talk-beep.ogg", playerPos);
                 if (!conversation.isFinished()) {
                     conversation.handleInput(inputVector);
                 }

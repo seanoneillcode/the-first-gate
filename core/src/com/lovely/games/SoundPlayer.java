@@ -1,5 +1,6 @@
 package com.lovely.games;
 
+import static com.lovely.games.TheFirstGate.DEFAULT_SOUND_LEVEL;
 import static com.lovely.games.TheFirstGate.RANDOM_SOUND_ID_RANGE;
 
 import java.util.ArrayList;
@@ -20,8 +21,8 @@ public class SoundPlayer {
     public static final float VOLUME_RANGE = 240.0f;
     AssetManager assetManager;
     Vector2 playerPos;
-    private float soundVolume = 1.0f;
-    private float musicVolume = 0.8f;
+    private float soundVolume;
+    private float musicVolume;
 
     Map<Integer, PositionSound> sounds;
     boolean isPaused;
@@ -30,6 +31,7 @@ public class SoundPlayer {
         this.assetManager = assetManager;
         this.sounds = new HashMap<>();
         this.isPaused = false;
+        this.soundVolume = DEFAULT_SOUND_LEVEL;
     }
 
     public void startLevel() {
@@ -84,6 +86,15 @@ public class SoundPlayer {
             sound.stop();
         }
     }
+
+    public void playSound(String name) {
+        int id = MathUtils.random(RANDOM_SOUND_ID_RANGE);
+        Music sound = Gdx.audio.newMusic(Gdx.files.internal(name));
+        sounds.put(id, new PositionSound(sound, playerPos));
+        sound.setVolume(getVolume(playerPos, playerPos));
+        sound.play();
+    }
+
 
     public void playSound(String name, Vector2 pos) {
         int id = MathUtils.random(RANDOM_SOUND_ID_RANGE);
@@ -151,4 +162,13 @@ public class SoundPlayer {
             sounds.get(id).sound.dispose();
         }
     }
+
+    public void setSoundVolume(float volume) {
+        soundVolume = volume;
+    }
+
+    public void setMusicVolume(float volume) {
+        musicVolume = volume;
+    }
+
 }
