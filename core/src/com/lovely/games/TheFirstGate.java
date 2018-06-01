@@ -442,7 +442,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 //        actorImages = new HashMap<>();
 //        actorImages.put("ant", assetManager.get("char-style-4.png"));
         currentScenes = new ArrayList<>();
-        loadExternalData();
+        currentSpell = "";
+        loadEverything();
 
         stonePrizeScene = new StonePrizeScene(assetManager);
 
@@ -459,15 +460,34 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         // special
 //        startLevel(startLevel, startLevel.getPreviousConnection());
 //        Gdx.app.getPreferences("caen-preferences").clear();
+
         loadLevelFromPrefs();
         isTitleMenu = true;
         isViewDirty = true;
         titleLock = true;
-        loadSettings();
 	}
 
-	private void loadExternalData() {
+    private void saveEverything() {
+        saveEverything(levels.indexOf(currentLevel), lastConnectionNumber);
+    }
+
+    private void saveEverything(int levelNumber, String lastConnectionNumber) {
         Preferences prefs = Gdx.app.getPreferences("caen-preferences");
+        prefs.putInteger("last-level", levelNumber);
+        prefs.putString("last-connection-number", lastConnectionNumber);
+        prefs.putFloat("sound-level", soundPlayer.getSoundVolume());
+        prefs.putFloat("music-level", soundPlayer.getMusicVolume());
+        prefs.putFloat("brightness-level", gamma);
+        prefs.putString("current-spell", currentSpell);
+        prefs.flush();
+        hasContinue = true;
+    }
+
+    private void loadEverything() {
+        Preferences prefs = Gdx.app.getPreferences("caen-preferences");
+        soundPlayer.setSoundVolume(prefs.getFloat("sound-level", DEFAULT_SOUND_LEVEL));
+        soundPlayer.setSoundVolume(prefs.getFloat("music-level", DEFAULT_MUSIC_LEVEL));
+        gamma = prefs.getFloat("brightness-level", DEFAULT_GAMMA);
         if (prefs.contains("current-spell")) {
             currentSpell = prefs.getString("current-spell");
         } else {
@@ -479,30 +499,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             hasContinue = false;
         }
     }
-
-    private void saveLevelNumber(int levelNumber, String lastConnectionNumber) {
-        Preferences prefs = Gdx.app.getPreferences("caen-preferences");
-        prefs.putInteger("last-level", levelNumber);
-        prefs.putString("last-connection-number", lastConnectionNumber);
-        prefs.flush();
-        hasContinue = true;
-    }
-
-    private void saveSettings() {
-        Preferences prefs = Gdx.app.getPreferences("caen-preferences");
-        prefs.putFloat("sound-level", soundPlayer.getSoundVolume());
-        prefs.putFloat("music-level", soundPlayer.getMusicVolume());
-        prefs.putFloat("brightness-level", gamma);
-        prefs.flush();
-    }
-
-    private void loadSettings() {
-        Preferences prefs = Gdx.app.getPreferences("caen-preferences");
-        soundPlayer.setSoundVolume(prefs.getFloat("sound-level", DEFAULT_SOUND_LEVEL));
-        soundPlayer.setSoundVolume(prefs.getFloat("music-level", DEFAULT_MUSIC_LEVEL));
-        gamma = prefs.getFloat("brightness-level", DEFAULT_GAMMA);
-    }
-
 
     @Override
     public void pause() {
@@ -556,7 +552,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         stepTimer = -1;
         loadLevel(level);
         currentLevel = level;
-        saveLevelNumber(levels.indexOf(currentLevel), startConnection.name);
+        saveEverything(levels.indexOf(currentLevel), startConnection.name);
         playerPos = startConnection.pos.cpy();
         isMoving = false;
         inputVector = new Vector2();
@@ -1532,7 +1528,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                                 titleLock = true;
                                 moveLock = true;
                                 titleSelectionIndex = 2;
-                                saveSettings();
+                                saveEverything();
                             }
                         }
                     }
@@ -1709,7 +1705,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     }
 
     private void castCurrentSpell() {
-        currentSpell = "arrow";
+//        currentSpell = "arrow";
         if (castCooldown > 0) {
             return;
         }
@@ -1818,7 +1814,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             isTitleMenu = false;
             startLevel(levels.get(START_LEVEL_NUM), levels.get(START_LEVEL_NUM).getConnection("61"));
             soundPlayer.playSound("sound/new-game-1.ogg", playerPos);
-
+            currentSpell = "";
+            saveEverything();
         }
         if (state.equals("menu")) {
             isTitleMenu = true;
