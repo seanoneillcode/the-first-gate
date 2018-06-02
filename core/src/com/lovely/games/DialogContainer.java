@@ -269,7 +269,6 @@ public class DialogContainer {
                 line(ant, "I am very sorry, you are more the man than I"),
                 line(pro, "What now? I can leave?"),
                 line(ant, "There is a resting place ahead. Go there now and I will meet you momentarily.")
-
         ));
         dialogs.put("33", Arrays.asList(
                 line(pro, "What does this say..."),
@@ -277,7 +276,22 @@ public class DialogContainer {
                 line(pro, "'1. All rooms have a solution'"),
                 line(pro, "'2. All rooms have one entrance and one exit'"),
                 line(pro, "'3. You must have fun'")
-
+        ));
+        dialogs.put("34", Arrays.asList(
+                line(ant, "What!? Someone is taking the trials?"),
+                line(ant, "...but no-one has been here except that beggar...")
+        ));
+        dialogs.put("35", Arrays.asList(
+                line(ant, "NO!!", "angry"),
+                line(ant, "I must stop him", "angry"),
+                line(ant, "If he gets the crystal...", "angry")
+        ));
+        dialogs.put("36", Arrays.asList(
+                line(pro, "What does this say..."),
+                line(info, "'The First Gate'")
+        ));
+        dialogs.put("37", Arrays.asList(
+                line(pro, "Ominous...")
         ));
     }
 

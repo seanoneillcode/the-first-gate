@@ -168,6 +168,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private Sprite volumePointerSprite;
     private Sprite volumeLevelOnSprite;
     private Sprite volumeLevelOffSprite;
+    private boolean isHidePlayer;
 
     @Override
 	public void create () {
@@ -226,6 +227,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("levels/lobby-1.tmx", TiledMap.class);
         assetManager.load("levels/boss-fight.tmx", TiledMap.class);
         assetManager.load("levels/options.tmx", TiledMap.class);
+        assetManager.load("levels/lobby-2.tmx", TiledMap.class);
+        assetManager.load("levels/gate-1.tmx", TiledMap.class);
 
         assetManager.load("entity/platform.png", Texture.class);
         assetManager.load("entity/block.png", Texture.class);
@@ -413,7 +416,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         levels.add(Level.loadLevel(assetManager, "levels/entrance-1.tmx", soundPlayer)); // 50
         levels.add(Level.loadLevel(assetManager, "levels/lobby-1.tmx", soundPlayer)); // 50
         levels.add(Level.loadLevel(assetManager, "levels/boss-fight.tmx", soundPlayer)); // 50
-        levels.add(Level.loadLevel(assetManager, "levels/options.tmx", soundPlayer)); // 50
+        levels.add(Level.loadLevel(assetManager, "levels/lobby-2.tmx", soundPlayer)); // 50
+        levels.add(Level.loadLevel(assetManager, "levels/gate-1.tmx", soundPlayer)); // 50
         gamma = 0.2f;
 
         antWalk = loadAnimation(assetManager.get("character/ant-walk.png"), 4, 0.165f);
@@ -586,6 +590,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         for (Door door : currentLevel.doors) {
             door.start();
         }
+        for (Torch torch : currentLevel.torches) {
+            torch.start();
+        }
         for (SceneSource sceneSource : currentLevel.scenes) {
             sceneSource.start();
             sceneContainer.scenes.get(sceneSource.id).start();
@@ -602,6 +609,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             soundPlayer.stopSound(CHIRP_SOUND_ID);
             soundPlayer.stopSound(CRICKET_SOUND_ID);
             staticLevel = false;
+        }
+        if (level.name.equals("levels/lobby-2.tmx")) {
+            staticLevel = true;
         }
         nextLevel = null;
         nextConnection = null;
@@ -735,16 +745,18 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             lightHole.draw(bufferBatch);
         }
         for (Torch torch : currentLevel.torches) {
-            if (torch.isFire) {
-                lightHole.setColor(torch.color);
-                lightHole.setRegion(slow);
-                lightHole.setPosition((torch.pos.x), (torch.pos.y));
-                lightHole.draw(bufferBatch);
-            } else {
-                lightHole.setColor(torch.color);
-                lightHole.setRegion(tr);
-                lightHole.setPosition((torch.pos.x), (torch.pos.y));
-                lightHole.draw(bufferBatch);
+            if (torch.isOn) {
+                if (torch.isFire) {
+                    lightHole.setColor(torch.color);
+                    lightHole.setRegion(slow);
+                    lightHole.setPosition((torch.pos.x), (torch.pos.y));
+                    lightHole.draw(bufferBatch);
+                } else {
+                    lightHole.setColor(torch.color);
+                    lightHole.setRegion(tr);
+                    lightHole.setPosition((torch.pos.x), (torch.pos.y));
+                    lightHole.draw(bufferBatch);
+                }
             }
         }
         if (!staticLevel) {
@@ -842,7 +854,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 }
             }
             for (Torch torch : currentLevel.torches) {
-                if (torch.pos.y >= threeDeeLinePos.y) {
+                if (torch.pos.y >= threeDeeLinePos.y && torch.isOn) {
                     if (torch.isFire) {
                         TextureRegion torchFrame = campfireAnim.getKeyFrame(animationDelta, true);
                         batch.draw(torchFrame, torch.pos.x - 20, torch.pos.y - 10);
@@ -879,7 +891,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             if (playerFacingLeft) {
                 playerSprite.flip(true, false);
             }
-            playerSprite.draw(batch);
+            if (!isHidePlayer) {
+                playerSprite.draw(batch);
+            }
 
             for (BlockLike blockLike : blockLikes) {
                 if (!(blockLike instanceof Enemy)) {
@@ -899,7 +913,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 }
             }
             for (Torch torch : currentLevel.torches) {
-                if (torch.pos.y < threeDeeLinePos.y) {
+                if (torch.pos.y < threeDeeLinePos.y && torch.isOn) {
                     if (torch.isFire) {
                         TextureRegion torchFrame = campfireAnim.getKeyFrame(animationDelta, true);
                         batch.draw(torchFrame, torch.pos.x - 20, torch.pos.y - 10);
@@ -1270,7 +1284,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             BlockLike block = currentLevel.getBlockLike(arrow.pos.cpy(), true);
             if (block != null) {
                 blocksDirty = true;
-                Vector2 nextTileAgain = arrow.dir.cpy().scl(TILE_SIZE * 2.0f).add(arrow.pos).add(QUARTER_TILE_SIZE, QUARTER_TILE_SIZE);
+                Vector2 nextTileAgain = arrow.dir.cpy().scl(TILE_SIZE * 1.2f).add(arrow.pos);
                 explosions.add(new Explosion(arrow.pos.cpy()));
                 if (currentLevel.isTileBlocked(nextTileAgain)) {
                     arrowIterator.remove();
@@ -1768,6 +1782,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 levelActor.isHidden = isHide;
             }
         }
+        if (id.equals("pro")) {
+            isHidePlayer = isHide;
+        }
     }
 
     public Trunk getTrunk() {
@@ -1812,6 +1829,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     public void gotoState(String state) {
         if (state.equals("new-game")) {
             isTitleMenu = false;
+            isHidePlayer = false;
             startLevel(levels.get(START_LEVEL_NUM), levels.get(START_LEVEL_NUM).getConnection("61"));
             soundPlayer.playSound("sound/new-game-1.ogg", playerPos);
             currentSpell = "";

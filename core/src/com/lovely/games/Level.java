@@ -344,8 +344,12 @@ class Level {
             return this;
         }
 
-        Builder addTorch(Vector2 pos, Color color, boolean isFire) {
-            this.torches.add(new Torch(pos, color, isFire));
+        Builder addTorch(Vector2 pos, Color color, boolean isFire, boolean isOn, String switchId) {
+            Torch torch = new Torch(pos, color, isFire, switchId, isOn);
+            if (switchId != null) {
+                trunk.addListener(torch);
+            }
+            this.torches.add(torch);
             return this;
         }
 
@@ -533,7 +537,15 @@ class Level {
                     float a = Float.valueOf(properties.get("a").toString());
                     color = new Color(r, g, b, a);
                 }
-                builder.addTorch(pos, color, isFire);
+                String switchId = null;
+                if (properties.containsKey("switch")) {
+                    switchId = properties.get("switch").toString();
+                }
+                boolean isOn = true;
+                if (properties.containsKey("isOn")) {
+                    isOn = Boolean.parseBoolean(properties.get("isOn").toString());
+                }
+                builder.addTorch(pos, color, isFire, isOn, switchId);
             }
             if (properties.containsKey("type") && properties.get("type").equals("actor")) {
                 RectangleMapObject rectObj = (RectangleMapObject) obj;

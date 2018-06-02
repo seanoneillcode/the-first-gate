@@ -199,6 +199,37 @@ public class SceneContainer {
                 .verb(new DialogVerb("33"))
                 .build());
 
+        scenes.put("31", builder()
+                .verb(new HideShowActorVerb(true, "pro"))
+                .verb(new WaitVerb(0.5f))
+                .verb(new SendEventVerb("b"))
+                .verb(new MoveVerb(new Vector2(0, -32), "ant", true))
+                .verb(new WaitVerb(0.5f))
+                .verb(new MoveVerb(new Vector2(32 * 2, 0), "ant", true))
+                .verb(new DialogVerb("34"))
+                .verb(new WaitVerb(0.5f))
+                .verb(new DialogVerb("35"))
+                .verb(new MoveVerb(new Vector2(0, 32 * 6), "ant", true))
+                .verb(new ConnectionVerb("33"))
+                .verb(new HideShowActorVerb(false, "pro"))
+                .build());
+
+        scenes.put("32", builder()
+                .verb(new DialogVerb("36"))
+                .verb(new WaitVerb(0.5f))
+                .verb(new SendEventVerb("a"))
+                .verb(new WaitVerb(1f))
+                .verb(new ConnectionVerb("209"))
+                .build());
+
+        scenes.put("33", builder()
+                .verb(new DialogVerb("36"))
+                .verb(new WaitVerb(0.5f))
+                .verb(new SendEventVerb("a"))
+                .verb(new WaitVerb(1f))
+                .verb(new ConnectionVerb("209"))
+                .build());
+
         scenes.put("new-game", builder()
                 .verb(new GameControlVerb("new-game"))
                 .build());
