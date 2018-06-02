@@ -293,6 +293,16 @@ public class DialogContainer {
         dialogs.put("37", Arrays.asList(
                 line(pro, "Ominous...")
         ));
+        dialogs.put("38", Arrays.asList(
+                line(pro, "I hear something...")
+        ));
+        dialogs.put("39", Arrays.asList(
+                line(pro, "He knows I'm here..."),
+                line(pro, "I'm dead! I'm dead! I need to keep ahead or I'm dead...")
+        ));
+        dialogs.put("40", Arrays.asList(
+                line(info, "'The Second Gate'")
+        ));
     }
 
     String currentDialog;
