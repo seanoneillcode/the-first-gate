@@ -230,6 +230,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("levels/lobby-2.tmx", TiledMap.class);
         assetManager.load("levels/gate-1.tmx", TiledMap.class);
         assetManager.load("levels/gate-2.tmx", TiledMap.class);
+        assetManager.load("levels/gate-3.tmx", TiledMap.class);
 
         assetManager.load("entity/platform.png", Texture.class);
         assetManager.load("entity/block.png", Texture.class);
@@ -420,6 +421,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         levels.add(Level.loadLevel(assetManager, "levels/lobby-2.tmx", soundPlayer)); // 50
         levels.add(Level.loadLevel(assetManager, "levels/gate-1.tmx", soundPlayer)); // 50
         levels.add(Level.loadLevel(assetManager, "levels/gate-2.tmx", soundPlayer)); // 50
+        levels.add(Level.loadLevel(assetManager, "levels/gate-3.tmx", soundPlayer)); // 50
         gamma = 0.2f;
 
         antWalk = loadAnimation(assetManager.get("character/ant-walk.png"), 4, 0.165f);

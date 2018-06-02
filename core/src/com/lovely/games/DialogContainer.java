@@ -303,6 +303,10 @@ public class DialogContainer {
         dialogs.put("40", Arrays.asList(
                 line(info, "'The Second Gate'")
         ));
+        dialogs.put("41", Arrays.asList(
+                line(info, "'The Third Gate'"),
+                line(pro, "Great, only one left and I'm free")
+        ));
     }
 
     String currentDialog;
