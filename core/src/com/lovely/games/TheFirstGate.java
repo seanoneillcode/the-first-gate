@@ -1,6 +1,7 @@
 package com.lovely.games;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -231,6 +232,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("levels/gate-1.tmx", TiledMap.class);
         assetManager.load("levels/gate-2.tmx", TiledMap.class);
         assetManager.load("levels/gate-3.tmx", TiledMap.class);
+        assetManager.load("levels/ant-catch-up.tmx", TiledMap.class);
 
         assetManager.load("entity/platform.png", Texture.class);
         assetManager.load("entity/block.png", Texture.class);
@@ -422,6 +424,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         levels.add(Level.loadLevel(assetManager, "levels/gate-1.tmx", soundPlayer)); // 50
         levels.add(Level.loadLevel(assetManager, "levels/gate-2.tmx", soundPlayer)); // 50
         levels.add(Level.loadLevel(assetManager, "levels/gate-3.tmx", soundPlayer)); // 50
+        levels.add(Level.loadLevel(assetManager, "levels/ant-catch-up.tmx", soundPlayer)); // 50
         gamma = 0.2f;
 
         antWalk = loadAnimation(assetManager.get("character/ant-walk.png"), 4, 0.165f);
@@ -1279,7 +1282,14 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         while(arrowIterator.hasNext()) {
             Arrow arrow = arrowIterator.next();
             arrow.update();
-            if (currentLevel.isWall(arrow.pos) || currentLevel.isOutOfBounds(arrow.pos) || currentLevel.getDoor(arrow.pos.cpy(), false) != null) {
+            for (Arrow otherArrow : arrows) {
+                if (otherArrow != arrow && otherArrow.getRect().overlaps(arrow.getRect())) {
+                    otherArrow.isDead = true;
+                    arrow.isDead = true;
+                }
+            }
+
+            if (arrow.isDead || currentLevel.isWall(arrow.pos) || currentLevel.isOutOfBounds(arrow.pos) || currentLevel.getDoor(arrow.pos.cpy(), false) != null) {
                 explosions.add(new Explosion(arrow.pos.cpy()));
                 soundPlayer.playSound("sound/blast-1.ogg", arrow.pos);
                 arrowIterator.remove();

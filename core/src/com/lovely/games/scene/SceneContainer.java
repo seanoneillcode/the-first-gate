@@ -264,6 +264,32 @@ public class SceneContainer {
                 .verb(new SendEventVerb("a"))
                 .build());
 
+        scenes.put("37", builder()
+                .verb(new SendEventVerb("a"))
+                .verb(new HideShowActorVerb(false, "ant"))
+                .verb(new CameraVerb(new Vector2(544, 1184)))
+                .verb(new MoveVerb(new Vector2(0, 32), "ant", true))
+                .verb(new MoveVerb(new Vector2(32 * -2, 0), "ant", true))
+                .verb(new MoveVerb(new Vector2(0, -32 * 4), "ant", true))
+                .build());
+
+        scenes.put("38", builder()
+                .verb(new HideShowActorVerb(false, "ant"))
+                .verb(new MoveVerb(new Vector2(0, 3 * -32), "ant", true))
+                .verb(new MoveVerb(new Vector2(32 * 3, 0), "ant", true))
+                .verb(new MoveVerb(new Vector2(0, -32), "ant", true))
+                .verb(new MoveVerb(new Vector2(32 * 2, 0), "ant", true))
+                .build());
+
+        scenes.put("39", builder()
+                .verb(new SendEventVerb("b"))
+                .build());
+
+        scenes.put("40", builder()
+                .verb(new SendEventVerb("b"))
+                .verb(new SendEventVerb("c"))
+                .build());
+
         scenes.put("new-game", builder()
                 .verb(new GameControlVerb("new-game"))
                 .build());

@@ -62,7 +62,7 @@
   <object id="9" name="81" type="connection" x="64" y="64" width="32" height="32">
    <properties>
     <property name="dir" value="down"/>
-    <property name="to" value="237"/>
+    <property name="to" value="239"/>
    </properties>
   </object>
   <object id="10" name="82" type="connection" x="352" y="224" width="32" height="32">

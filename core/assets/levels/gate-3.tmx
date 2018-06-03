@@ -83,7 +83,7 @@
   <object id="10" name="237" type="connection" x="480" y="480" width="32" height="32">
    <properties>
     <property name="dir" value="up"/>
-    <property name="to" value="81"/>
+    <property name="to" value="238"/>
    </properties>
   </object>
   <object id="25" type="torch" x="319.667" y="299.667" width="32" height="32">

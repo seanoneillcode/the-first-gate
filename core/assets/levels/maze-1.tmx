@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="1.1.5" orientation="orthogonal" renderorder="right-down" width="30" height="40" tilewidth="32" tileheight="32" infinite="0" nextobjectid="50">
+<map version="1.0" tiledversion="1.1.5" orientation="orthogonal" renderorder="right-down" width="30" height="40" tilewidth="32" tileheight="32" infinite="0" nextobjectid="53">
  <tileset firstgid="1" source="tower-tileset.tsx"/>
  <layer name="ground" width="30" height="40">
   <data encoding="csv">
@@ -148,5 +148,18 @@
   </object>
   <object id="48" type="torch" x="896" y="1056" width="32" height="32"/>
   <object id="49" type="torch" x="832" y="1056" width="32" height="32"/>
+  <object id="50" name="37" type="scene" x="864" y="864" width="32" height="32"/>
+  <object id="51" name="ant" type="actor" x="544" y="64" width="32" height="32">
+   <properties>
+    <property name="isHide" value="true"/>
+    <property name="isRight" value="true"/>
+   </properties>
+  </object>
+  <object id="52" type="torch" x="512" y="0" width="32" height="32">
+   <properties>
+    <property name="isOn" value="false"/>
+    <property name="switch" value="a"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>

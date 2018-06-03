@@ -19,11 +19,13 @@ public class Arrow {
     Vector2 dir;
     Color color;
     float speed;
+    boolean isDead;
 
     public Arrow(boolean isArrow, Vector2 pos, Vector2 dir, float speed) {
         this.isArrow = isArrow;
         this.pos = pos;
         this.dir = dir;
+        this.isDead = false;
         this.speed = speed;
         this.color = new Color(random(0.2f, 0.4f), random(0.7f, 1.0f) , random(0.5f, 0.8f), 1.0f);
     }

@@ -305,7 +305,7 @@ public class DialogContainer {
         ));
         dialogs.put("41", Arrays.asList(
                 line(info, "'The Third Gate'"),
-                line(pro, "Great, only one left and I'm free")
+                line(pro, "Great, only one left and I'm safe")
         ));
     }
 

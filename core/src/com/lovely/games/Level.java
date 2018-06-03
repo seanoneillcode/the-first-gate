@@ -314,8 +314,8 @@ class Level {
             return this;
         }
 
-        Builder addArrowSource(Vector2 dir, Vector2 pos, float offset, float delay, boolean isActive, String switchId, boolean isRandom) {
-            ArrowSource arrowSource = new ArrowSource(pos, dir, offset, delay, isActive, switchId, isRandom);
+        Builder addArrowSource(Vector2 dir, Vector2 pos, float offset, float delay, boolean isActive, String switchId, boolean isRandom, float speed) {
+            ArrowSource arrowSource = new ArrowSource(pos, dir, offset, delay, isActive, switchId, isRandom, speed);
             if (switchId != null) {
                 trunk.addListener(arrowSource);
             }
@@ -456,6 +456,7 @@ class Level {
                 Vector2 dir = new Vector2(0, 0);
                 float offset = 0;
                 float delay = DEFAULT_DELAY;
+                float speed = 1f;
                 boolean isRandom = false;
                 if (properties.containsKey("xdir")) {
                     dir.x = Integer.parseInt(properties.get("xdir").toString());
@@ -469,6 +470,9 @@ class Level {
                 if (properties.containsKey("delay")) {
                     delay = Float.parseFloat(properties.get("delay").toString());
                 }
+                if (properties.containsKey("speed")) {
+                    speed = Float.parseFloat(properties.get("speed").toString());
+                }
                 if (properties.containsKey("isRandom")) {
                     isRandom = Boolean.parseBoolean(properties.get("isRandom").toString());
                 }
@@ -481,7 +485,7 @@ class Level {
                     switchId = properties.get("switch").toString();
                 }
                 Vector2 midPos = new Vector2(rectObj.getRectangle().x, rectObj.getRectangle().y);
-                builder.addArrowSource(dir, midPos, offset, delay, isActive, switchId, isRandom);
+                builder.addArrowSource(dir, midPos, offset, delay, isActive, switchId, isRandom, speed);
             }
             if (properties.containsKey("type") && properties.get("type").equals("platform")) {
                 RectangleMapObject rectObj = (RectangleMapObject) obj;
