@@ -13,7 +13,8 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Arrow {
 
-//    public static final float ARROW_SPD = TILE_SIZE * 2.0f;
+    boolean isRed;
+    //    public static final float ARROW_SPD = TILE_SIZE * 2.0f;
     boolean isArrow;
     Vector2 pos;
     Vector2 dir;
@@ -22,7 +23,7 @@ public class Arrow {
     boolean isDead;
     boolean isCollidingSelf;
 
-    public Arrow(boolean isArrow, Vector2 pos, Vector2 dir, float speed, boolean isCollidingSelf) {
+    public Arrow(boolean isArrow, Vector2 pos, Vector2 dir, float speed, boolean isCollidingSelf, boolean isRed) {
         this.isArrow = isArrow;
         this.pos = pos;
         this.dir = dir;
@@ -30,6 +31,10 @@ public class Arrow {
         this.speed = speed;
         this.color = new Color(random(0.2f, 0.4f), random(0.7f, 1.0f) , random(0.5f, 0.8f), 1.0f);
         this.isCollidingSelf = isCollidingSelf;
+        this.isRed = isRed;
+        if (isRed) {
+            this.color = new Color(random(0.9f, 1f), random(0.1f, 0.2f) , random(0.1f, 0.2f), 1.0f);
+        }
     }
 
     public void update() {

@@ -37,7 +37,7 @@ public class Actor {
         this.isFacingRight = isRight;
         this.isBoss = isBoss;
         this.shootTimer = 0;
-        this.bossLives = 3;
+        this.bossLives = 2;
         this.oldTeleportPos = pos.cpy();
         this.newTeleportPos = pos.cpy();
     }
@@ -61,7 +61,7 @@ public class Actor {
         if (shootTimer > SHOOT_TIMER_LIMIT) {
             shootTimer = 0;
             Vector2 arrowPos = pos.cpy().add(0, -24);
-            stage.addArrow(arrowPos, new Vector2(0, -1), PLAYER_ARROW_SPEED);
+            stage.addArrow(arrowPos, new Vector2(0, -1), PLAYER_ARROW_SPEED, true);
         }
         if (wasHit) {
             wasHit = false;

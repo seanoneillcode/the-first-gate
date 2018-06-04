@@ -295,18 +295,34 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("volume-level-on.png", Texture.class);
         assetManager.load("volume-level-off.png", Texture.class);
 
-        assetManager.load("sound/step-2.ogg", Music.class);
+        assetManager.load("sound/arrow-source.ogg", Music.class);
+        assetManager.load("sound/blast-0.ogg", Music.class);
+        assetManager.load("sound/blast-1.ogg", Music.class);
+        assetManager.load("sound/blip-select.ogg", Music.class);
+        assetManager.load("sound/blip-select-high.ogg", Music.class);
         assetManager.load("sound/block-0.ogg", Music.class);
+        assetManager.load("sound/block-3.ogg", Music.class);
         assetManager.load("sound/chirp-1.ogg", Music.class);
+        assetManager.load("sound/clacking.ogg", Music.class);
         assetManager.load("sound/cricket-2.ogg", Music.class);
+        assetManager.load("sound/door.ogg", Music.class);
         assetManager.load("sound/fall-0.ogg", Music.class);
         assetManager.load("sound/flame-0.ogg", Music.class);
-        assetManager.load("sound/blast-1.ogg", Music.class);
-        assetManager.load("sound/block-3.ogg", Music.class);
+        assetManager.load("sound/get-magic.ogg", Music.class);
         assetManager.load("sound/lazer-4.ogg", Music.class);
-        assetManager.load("sound/arrow-source.ogg", Music.class);
+        assetManager.load("sound/mechanical-1.ogg", Music.class);
+        assetManager.load("sound/new-game-1.ogg", Music.class);
         assetManager.load("sound/platform-4.ogg", Music.class);
-
+        assetManager.load("sound/scream-hurt.ogg", Music.class);
+        assetManager.load("sound/select-1.ogg", Music.class);
+        assetManager.load("sound/select-2.ogg", Music.class);
+        assetManager.load("sound/select-3.ogg", Music.class);
+        assetManager.load("sound/step-2.ogg", Music.class);
+        assetManager.load("sound/switch-1.ogg", Music.class);
+        assetManager.load("sound/talk-beep.ogg", Music.class);
+        assetManager.load("sound/talk-high-beep.ogg", Music.class);
+        assetManager.load("sound/talk-shift.ogg", Music.class);
+        assetManager.load("sound/thunk.ogg", Music.class);
         assetManager.finishLoading();
 
         dialogContainer = new DialogContainer(assetManager);
@@ -639,7 +655,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         }
         Vector3 target = new Vector3(pos.x, pos.y, 0);
         if (currentLevel.name.equals("levels/boss-fight.tmx") && bossIsFighting()) {
-            target.y = target.y + 160;
+            target.y = target.y + 210;
         }
         final float speed = CAMERA_CATCHUP_SPEED * Gdx.graphics.getDeltaTime();
         float ispeed = 1.0f - speed;
@@ -842,6 +858,11 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                     TextureRegion currentFrame = arrowAnim.getKeyFrame(animationDelta, true);
                     arrowSprite.setPosition(arrow.pos.x, arrow.pos.y + 12);
                     arrowSprite.setRegion(currentFrame);
+                    if (arrow.isRed) {
+                        arrowSprite.setColor(new Color(1f, 0.1f, 0.1f, 1f));
+                    } else {
+                        arrowSprite.setColor(Color.WHITE);
+                    }
                     arrowSprite.draw(batch);
                 } else {
                     Texture img = arrow.dir.x != 0 ? horizontalLazerImage : lazerImage;
@@ -1285,7 +1306,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             arrow.update();
             for (Arrow otherArrow : arrows) {
                 if (otherArrow != arrow && otherArrow.getRect().overlaps(arrow.getRect())) {
-                    if (otherArrow.isCollidingSelf && arrow.isCollidingSelf) {
+                    if (!otherArrow.isRed && !arrow.isRed) {
                         otherArrow.isDead = true;
                         arrow.isDead = true;
                     }
@@ -1742,7 +1763,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         }
         if (currentSpell != null && currentSpell.equals("arrow")) {
             Vector2 nextTilePos = playerDir.cpy().scl(24f).add(playerPos);
-            addArrow(nextTilePos, playerDir, PLAYER_ARROW_SPEED);
+            addArrow(nextTilePos, playerDir, PLAYER_ARROW_SPEED, false);
             castCooldown = CAST_ARROW_COOLDOWN;
         }
     }
@@ -1808,9 +1829,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 	    return currentLevel.trunk;
     }
 
-    void addArrow(Vector2 pos, Vector2 dir, float speed) {
+    void addArrow(Vector2 pos, Vector2 dir, float speed, boolean isRed) {
         soundPlayer.playSound("sound/arrow-source.ogg", pos);
-        arrows.add(new Arrow(true, pos, dir, speed, true));
+        arrows.add(new Arrow(true, pos, dir, speed, true, isRed));
     }
 
     void addLazer(Vector2 pos, Vector2 dir) {
@@ -1818,7 +1839,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             soundPlayer.playSound("sound/lazer-4.ogg", pos);
             lazerSoundTimer = 0.5f;
         }
-        arrows.add(new Arrow(false, pos.cpy().add(dir.x * HALF_TILE_SIZE, dir.y * HALF_TILE_SIZE), dir, TILE_SIZE * 16.0f, false));
+        arrows.add(new Arrow(false, pos.cpy().add(dir.x * HALF_TILE_SIZE, dir.y * HALF_TILE_SIZE), dir, TILE_SIZE * 16.0f, false, true));
     }
 
     public void showPoster(float alpha, String poster) {

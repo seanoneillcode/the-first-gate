@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Vector2;
 public class ArrowSource implements Switchable {
 
     private static final float STEP = 0.5f;
+    boolean isRed;
     Vector2 pos;
     Vector2 dir;
     float offset;
@@ -22,7 +23,7 @@ public class ArrowSource implements Switchable {
     float goal;
     float speed;
 
-    public ArrowSource(Vector2 pos, Vector2 dir, float offset, float delay, boolean isActive, String switchId, boolean isRandom, float speed) {
+    public ArrowSource(Vector2 pos, Vector2 dir, float offset, float delay, boolean isActive, String switchId, boolean isRandom, float speed, boolean isRed) {
         this.pos = pos;
         this.dir = dir;
         this.offset = offset;
@@ -33,6 +34,7 @@ public class ArrowSource implements Switchable {
         this.switchId = switchId;
         this.speed = speed;
         this.isRandom = isRandom;
+        this.isRed = isRed;
     }
 
     public void start() {
@@ -53,7 +55,7 @@ public class ArrowSource implements Switchable {
                 }
                 timer = 0;
                 Vector2 startPos = pos.cpy().add(dir.cpy().scl(TILE_SIZE));
-                theFirstGate.addArrow(startPos, dir, ARROW_SPEED * speed);
+                theFirstGate.addArrow(startPos, dir, ARROW_SPEED * speed, isRed);
             }
         }
     }
