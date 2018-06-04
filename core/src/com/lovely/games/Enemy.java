@@ -1,5 +1,6 @@
 package com.lovely.games;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 
@@ -10,7 +11,8 @@ public class Enemy extends Block implements BlockLike {
     Vector2 dir;
     Color color;
     String stringDir;
-    float targetSize = 16.0f;
+    float coolDown = 0f;
+    float MAX_COOLDOWN = 0.02f;
 
     public Enemy(Vector2 pos, String dir) {
         super(pos);
@@ -48,9 +50,13 @@ public class Enemy extends Block implements BlockLike {
                     break;
                 }        }
             if (colliding) {
-                theFirstGate.addLazer(pos.cpy().add(dir.x, dir.y), dir.cpy());
+                if (coolDown < 0) {
+                    theFirstGate.addLazer(pos.cpy().add(dir.x, dir.y), dir.cpy());
+                    coolDown = MAX_COOLDOWN;
+                }
             }
         }
+        coolDown = coolDown - Gdx.graphics.getDeltaTime();
     }
 
     private boolean contains(Vector2 checkPos, Vector2 size, Vector2 player) {

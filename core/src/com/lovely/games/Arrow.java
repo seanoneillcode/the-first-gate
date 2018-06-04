@@ -20,14 +20,16 @@ public class Arrow {
     Color color;
     float speed;
     boolean isDead;
+    boolean isCollidingSelf;
 
-    public Arrow(boolean isArrow, Vector2 pos, Vector2 dir, float speed) {
+    public Arrow(boolean isArrow, Vector2 pos, Vector2 dir, float speed, boolean isCollidingSelf) {
         this.isArrow = isArrow;
         this.pos = pos;
         this.dir = dir;
         this.isDead = false;
         this.speed = speed;
         this.color = new Color(random(0.2f, 0.4f), random(0.7f, 1.0f) , random(0.5f, 0.8f), 1.0f);
+        this.isCollidingSelf = isCollidingSelf;
     }
 
     public void update() {
@@ -36,7 +38,7 @@ public class Arrow {
 
     public Rectangle getRect() {
         float buffer = TILE_SIZE * 0.2f;
-        float playerSize = TILE_SIZE - buffer - buffer;
-        return new Rectangle(pos.x + buffer, pos.y + buffer, playerSize, playerSize);
+        float size = TILE_SIZE - buffer - buffer;
+        return new Rectangle(pos.x + buffer, pos.y + buffer, size, size);
     }
 }

@@ -32,6 +32,7 @@ public class SoundPlayer {
         this.sounds = new HashMap<>();
         this.isPaused = false;
         this.soundVolume = DEFAULT_SOUND_LEVEL;
+        this.musicVolume = DEFAULT_SOUND_LEVEL;
     }
 
     public void startLevel() {

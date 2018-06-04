@@ -454,7 +454,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 //        actorImages.put("ant", assetManager.get("char-style-4.png"));
         currentScenes = new ArrayList<>();
         currentSpell = "";
-        loadEverything();
 
         stonePrizeScene = new StonePrizeScene(assetManager);
 
@@ -472,10 +471,12 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 //        startLevel(startLevel, startLevel.getPreviousConnection());
 //        Gdx.app.getPreferences("caen-preferences").clear();
 
+        loadEverything();
         loadLevelFromPrefs();
         isTitleMenu = true;
         isViewDirty = true;
         titleLock = true;
+
 	}
 
     private void saveEverything() {
@@ -502,7 +503,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         if (prefs.contains("current-spell")) {
             currentSpell = prefs.getString("current-spell");
         } else {
-            currentSpell = null;
+            currentSpell = "";
         }
         if (prefs.contains("last-level")) {
             hasContinue = prefs.getInteger("last-level") != START_LEVEL_NUM;
@@ -1284,8 +1285,10 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             arrow.update();
             for (Arrow otherArrow : arrows) {
                 if (otherArrow != arrow && otherArrow.getRect().overlaps(arrow.getRect())) {
-                    otherArrow.isDead = true;
-                    arrow.isDead = true;
+                    if (otherArrow.isCollidingSelf && arrow.isCollidingSelf) {
+                        otherArrow.isDead = true;
+                        arrow.isDead = true;
+                    }
                 }
             }
 
@@ -1807,7 +1810,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
     void addArrow(Vector2 pos, Vector2 dir, float speed) {
         soundPlayer.playSound("sound/arrow-source.ogg", pos);
-        arrows.add(new Arrow(true, pos, dir, speed));
+        arrows.add(new Arrow(true, pos, dir, speed, true));
     }
 
     void addLazer(Vector2 pos, Vector2 dir) {
@@ -1815,7 +1818,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             soundPlayer.playSound("sound/lazer-4.ogg", pos);
             lazerSoundTimer = 0.5f;
         }
-        arrows.add(new Arrow(false, pos.cpy().add(dir.x * HALF_TILE_SIZE, dir.y * HALF_TILE_SIZE), dir, TILE_SIZE * 16.0f));
+        arrows.add(new Arrow(false, pos.cpy().add(dir.x * HALF_TILE_SIZE, dir.y * HALF_TILE_SIZE), dir, TILE_SIZE * 16.0f, false));
     }
 
     public void showPoster(float alpha, String poster) {
