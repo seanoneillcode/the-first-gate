@@ -51,6 +51,7 @@ public class Actor {
         this.bossLives = 3;
         wasHit = false;
         isDone = false;
+        isWalking = false;
     }
 
     public void update(TheFirstGate stage, Platform platform) {

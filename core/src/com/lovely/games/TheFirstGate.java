@@ -1313,6 +1313,16 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         if (conversation != null) {
             conversation.update();
         }
+        for (Actor actor : currentLevel.actors) {
+            actor.isWalking = false;
+            if (actor.isBoss) {
+                Platform platform = currentLevel.getPlatform(actor.pos);
+                if (platform != null) {
+                    actor.pos = platform.pos.cpy();
+                }
+                actor.update(this, platform);
+            }
+        }
         checkForSceneSources(playerPos);
         currentLevel.resetSceneSources(playerPos);
         List<Scene> newScenes = new ArrayList<>();
@@ -1397,16 +1407,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         if (castCooldown > 0) {
             castCooldown = castCooldown - Gdx.graphics.getDeltaTime();
         }
-        for (Actor actor : currentLevel.actors) {
-            actor.isWalking = false;
-            if (actor.isBoss) {
-                Platform platform = currentLevel.getPlatform(actor.pos);
-                if (platform != null) {
-                    actor.pos = platform.pos.cpy();
-                }
-                actor.update(this, platform);
-            }
-        }
+
 
         for (Block block : currentLevel.blocks) {
             block.update();
