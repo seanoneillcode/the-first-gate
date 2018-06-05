@@ -648,7 +648,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         stonePrizeScene.reset();
         soundPlayer.startLevel();
         if (currentLevel.isWind) {
-            soundPlayer.playSound(WIND_BGR_SOUND_ID, "sound/wind-background.ogg", playerPos, true);
+            soundPlayer.playMusic(WIND_BGR_SOUND_ID, "sound/wind-background.ogg", true);
         }
     }
 
