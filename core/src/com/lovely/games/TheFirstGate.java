@@ -82,12 +82,10 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private Texture groundBlockImage;
     private Texture pressureImage;
     private Platform currentPlatform;
-    private Texture doorImage;
     private Texture lazerImage, horizontalLazerImage;
-    private Texture openDoorImage;
     private Sprite lightHole;
-    private Animation<TextureRegion> walkRight, idleAnim;
-    private Animation<TextureRegion> lightAnim, playerLightAnim, arrowAnim, torchAnim, campfireAnim;
+    private Animation<TextureRegion> walkRight, idleAnim, pressureOnAnim, pressureOffAnim;
+    private Animation<TextureRegion> lightAnim, playerLightAnim, arrowAnim, torchAnim, campfireAnim, doorOpenAnim, doorCloseAnim;
     private float animationDelta = 0;
     private float walkAnimDelta = 0;
     private DialogContainer dialogContainer;
@@ -240,8 +238,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("entity/block.png", Texture.class);
         assetManager.load("entity/pressure.png", Texture.class);
         assetManager.load("entity/ground-block.png", Texture.class);
-        assetManager.load("entity/door.png", Texture.class);
-        assetManager.load("entity/open-door.png", Texture.class);
         assetManager.load("entity/arrow-explode.png", Texture.class);
         assetManager.load("entity/arrow-sheet.png", Texture.class);
         assetManager.load("entity/torch-sheet.png", Texture.class);
@@ -256,6 +252,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("entity/grass-4.png", Texture.class);
         assetManager.load("entity/dust-air.png", Texture.class);
         assetManager.load("entity/dust-air-2.png", Texture.class);
+        assetManager.load("entity/door-open.png", Texture.class);
+        assetManager.load("entity/pressure-on.png", Texture.class);
 
         assetManager.load("character/pro-simple-fall-death.png", Texture.class);
         assetManager.load("character/pro-simple-fire-death.png", Texture.class);
@@ -347,8 +345,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         blockImage = assetManager.get("entity/block.png");
         pressureImage = assetManager.get("entity/pressure.png");
         groundBlockImage = assetManager.get("entity/ground-block.png");
-        doorImage = assetManager.get("entity/door.png");
-        openDoorImage = assetManager.get("entity/open-door.png");
         lightHole = new Sprite((Texture) assetManager.get("light-hole.png"));
         lightHole.setScale(6.0f);
         playerLight = new Sprite((Texture) assetManager.get("player-light.png"));
@@ -459,6 +455,12 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         arrowExplodeAnim = loadAnimation(assetManager.get("entity/arrow-explode.png"), 8, 0.05f);
         torchAnim = loadAnimation(assetManager.get("entity/torch-sheet.png"), 2, 0.5f);
         campfireAnim = loadAnimation(assetManager.get("entity/campfire.png"), 8, 0.1f);
+        doorOpenAnim = loadAnimation(assetManager.get("entity/door-open.png"), 6, 0.03f);
+        doorCloseAnim = loadAnimation(assetManager.get("entity/door-open.png"), 6, 0.03f);
+        pressureOnAnim = loadAnimation(assetManager.get("entity/pressure-on.png"), 4, 0.02f);
+        pressureOffAnim = loadAnimation(assetManager.get("entity/pressure-on.png"), 4, 0.02f);
+        doorCloseAnim.setPlayMode(Animation.PlayMode.REVERSED);
+        pressureOffAnim.setPlayMode(Animation.PlayMode.REVERSED);
         guffImages = new HashMap<>();
         guffImages.put("entity/grass-1.png", loadAnimation(assetManager.get("entity/grass-1.png"), 4, 0.515f));
         guffImages.put("entity/grass-2.png", loadAnimation(assetManager.get("entity/grass-2.png"), 4, 0.52f));
@@ -836,10 +838,12 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 batch.draw(currentFrame, guff.pos.x, guff.pos.y, guff.size.x, guff.size.y);
             }
             for (PressureTile pressureTile : currentLevel.pressureTiles) {
-                batch.draw(pressureImage, pressureTile.pos.x, pressureTile.pos.y);
+                Animation<TextureRegion> animation = pressureTile.isPressure ? pressureOnAnim : pressureOffAnim;
+                TextureRegion frame = animation.getKeyFrame(pressureTile.animTimer, false);
+                batch.draw(frame, pressureTile.pos.x, pressureTile.pos.y);
             }
             for (Platform platform : currentLevel.getPlatforms()) {
-                float height = ((platform.getAnimTimer() % 0.4f) * 8f);
+                float height = 0;//((platform.getAnimTimer() % 0.4f) * 4f);
                 batch.draw(platformImg, platform.pos.x, platform.pos.y + height);
             }
             List<BlockLike> blockLikes = currentLevel.getBlockLikes();
@@ -880,11 +884,13 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 }
             }
             for (Door door : currentLevel.doors) {
+                Animation<TextureRegion> animation = door.isOpen ? doorOpenAnim : doorCloseAnim;
+                TextureRegion frame = animation.getKeyFrame(door.animTimer, false);
                 if (door.isOpen) {
-                    batch.draw(openDoorImage, door.pos.x, door.pos.y);
+                    batch.draw(frame, door.pos.x, door.pos.y);
                 }
                 if (!door.isOpen && door.pos.y >= threeDeeLinePos.y) {
-                    batch.draw(doorImage, door.pos.x, door.pos.y);
+                    batch.draw(frame, door.pos.x, door.pos.y);
                 }
             }
             for (Actor actor : currentLevel.actors) {
@@ -908,9 +914,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 float height = (MathUtils.sinDeg(currentImageHeight.getAnimTimer() * 360) * 2f);
                 heightAdjustment = height + 2f;
             }
-            if (currentPlatform != null) {
-                heightAdjustment = ((currentPlatform.getAnimTimer() % 0.4f) * -8f);
-            }
+//            if (currentPlatform != null) {
+//                heightAdjustment = ((currentPlatform.getAnimTimer() % 0.4f) * -4f);
+//            }
             playerSprite.setPosition(playerPos.x, playerPos.y + QUARTER_TILE_SIZE - heightAdjustment );
             TextureRegion currentFrame;
             if (!playerIsDead && (levelTransitionTimer > 0 || isMoving)) {
@@ -955,8 +961,10 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 }
             }
             for (Door door : currentLevel.doors) {
+                Animation<TextureRegion> animation = door.isOpen ? doorOpenAnim : doorCloseAnim;
+                TextureRegion frame = animation.getKeyFrame(door.animTimer, false);
                 if (door.pos.y < threeDeeLinePos.y && !door.isOpen) {
-                    batch.draw(doorImage, door.pos.x, door.pos.y);
+                    batch.draw(frame, door.pos.x, door.pos.y);
                 }
             }
             for (Torch torch : currentLevel.torches) {
@@ -1180,6 +1188,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 playerPos.add(currentPlatform.getMovement());
             }
         }
+        for (Door door : currentLevel.doors) {
+            door.update();
+        }
         if (lazerSoundTimer > 0) {
             lazerSoundTimer = lazerSoundTimer - Gdx.graphics.getDeltaTime();
         }
@@ -1212,7 +1223,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             return;
         }
         for (PressureTile pressureTile : currentLevel.pressureTiles) {
+            pressureTile.update();
             boolean handled = false;
+
             if (playerPos.dst2(pressureTile.pos) < 64) {
                 pressureTile.handleAction(soundPlayer);
                 handled = true;
@@ -1224,7 +1237,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 }
             }
             if (!handled) {
-                pressureTile.handlePressureOff();
+                pressureTile.handlePressureOff(soundPlayer);
             }
         }
         Wind wind = currentLevel.getWind(playerPos.cpy().add(4,4));
