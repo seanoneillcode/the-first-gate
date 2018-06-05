@@ -24,6 +24,7 @@ import com.lovely.games.scene.SceneSource;
 class Level {
 
     static final int DEFAULT_DELAY = 1;
+    boolean isWind = false;
 
     List<Connection> connections;
     List<ArrowSource> arrowSources;
@@ -50,7 +51,7 @@ class Level {
           int numYTiles, List<ArrowSource> arrowSources, List<Platform> platforms, List<Block> blocks,
           List<PressureTile> pressureTiles, List<Door> doors, List<DialogSource> dialogSources,
           List<LevelLight> lights, List<Torch> torches, List<SceneSource> scenes, Trunk trunk, List<Actor> actors,
-          List<Wind> winds, List<Enemy> enemies, List<Guff> guffs) {
+          List<Wind> winds, List<Enemy> enemies, List<Guff> guffs, boolean isWind) {
         this.connections = connections;
         this.walls = walls;
         this.deaths = deaths;
@@ -71,6 +72,7 @@ class Level {
         this.winds = winds;
         this.enemies = enemies;
         this.guffs = guffs;
+        this.isWind = isWind;
     }
 
     Vector2 getConnectionPosition(String name) {
@@ -267,6 +269,7 @@ class Level {
      * BUILDEr
      */
     private static class Builder {
+        private final boolean isWind;
         List<Connection> connections = new ArrayList<>();
         List<ArrowSource> arrowSources = new ArrayList<>();
         List<Block> blocks = new ArrayList<>();
@@ -288,10 +291,11 @@ class Level {
         List<Enemy> enemies = new ArrayList<>();
         private List<Guff> guffs = new ArrayList<>();
 
-        Builder(String name, int numXTiles, int numYTiles) {
+        Builder(String name, int numXTiles, int numYTiles, boolean isWind) {
             this.name = name;
             this.numXTiles = numXTiles;
             this.numYTiles = numYTiles;
+            this.isWind = isWind;
         }
 
         Builder addConnection(String name, String to, Vector2 pos, Vector2 dir) {
@@ -407,7 +411,7 @@ class Level {
                 deaths = new boolean[numXTiles][numYTiles];
             }
             return new Level(connections, walls, deaths, name, numXTiles, numYTiles, arrowSources, platforms, blocks,
-                    pressureTiles, doors, dialogSources, lights, torches, scenes, trunk, actors, winds, enemies, guffs);
+                    pressureTiles, doors, dialogSources, lights, torches, scenes, trunk, actors, winds, enemies, guffs, isWind);
         }
 
 
@@ -418,7 +422,8 @@ class Level {
         MapProperties mapProperties = tiledMap.getProperties();
         int levelWidth = (Integer) mapProperties.get("width");
         int levelHeight = (Integer) mapProperties.get("height");
-        Builder builder = new Builder(name, levelWidth, levelHeight);
+        boolean isWind = mapProperties.containsKey("isWind") && Boolean.valueOf((String) mapProperties.get("isWind"));
+        Builder builder = new Builder(name, levelWidth, levelHeight, isWind);
 
         MapLayer objectLayer = tiledMap.getLayers().get("objects");
         MapObjects mapObjects = objectLayer.getObjects();

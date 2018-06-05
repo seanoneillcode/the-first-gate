@@ -54,6 +54,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private static final int CHIRP_SOUND_ID = MathUtils.random(RANDOM_SOUND_ID_RANGE);
     private static final int CRICKET_SOUND_ID = MathUtils.random(RANDOM_SOUND_ID_RANGE);
     private static final int BLIP_SELECT_ITEM_SOUND_ID = MathUtils.random(RANDOM_SOUND_ID_RANGE);
+    private static final int WIND_BGR_SOUND_ID = MathUtils.random(RANDOM_SOUND_ID_RANGE);
     static final float DEFAULT_SOUND_LEVEL = 0.5f;
     private static final float DEFAULT_MUSIC_LEVEL = 0.5f;
     private static final float DEFAULT_GAMMA = 0.5f;
@@ -627,11 +628,11 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         playerDir = new Vector2(1,0);
         if (level.name.equals("levels/camp-fire.tmx")) {
             staticLevel = true;
-            soundPlayer.playSound(CHIRP_SOUND_ID, "sound/chirp-1.ogg", playerPos, true);
-            soundPlayer.playSound(CRICKET_SOUND_ID, "sound/cricket-2.ogg", playerPos, true);
+//            soundPlayer.playSound(CHIRP_SOUND_ID, "sound/chirp-1.ogg", playerPos, true);
+//            soundPlayer.playSound(CRICKET_SOUND_ID, "sound/cricket-2.ogg", playerPos, true);
         } else {
-            soundPlayer.stopSound(CHIRP_SOUND_ID);
-            soundPlayer.stopSound(CRICKET_SOUND_ID);
+//            soundPlayer.stopSound(CHIRP_SOUND_ID);
+//            soundPlayer.stopSound(CRICKET_SOUND_ID);
             staticLevel = false;
         }
         if (level.name.equals("levels/lobby-2.tmx")) {
@@ -643,6 +644,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         leaveLevel = false;
         stonePrizeScene.reset();
         soundPlayer.startLevel();
+        if (currentLevel.isWind) {
+            soundPlayer.playSound(WIND_BGR_SOUND_ID, "sound/wind-background.ogg", playerPos, true);
+        }
     }
 
     private Vector3 getCameraPosition() {
