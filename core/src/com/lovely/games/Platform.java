@@ -26,6 +26,7 @@ public class Platform implements Switchable {
     boolean initialIsActive;
     Color color;
     private int soundId;
+    private float animTimer;
 
     public Platform(Vector2 start, Vector2 end, float offset, boolean isActive, String switchId) {
         this.pos = start.cpy();
@@ -39,6 +40,7 @@ public class Platform implements Switchable {
         this.switchId = switchId;
         this.color = new Color(random(0.8f, 1.0f), random(0.8f, 0.8f), random(0.8f, 1.0f), 1.0f);
         this.soundId = MathUtils.random(RANDOM_SOUND_ID_RANGE);
+        animTimer = MathUtils.random(4.0f);
     }
 
     void start(SoundPlayer soundPlayer) {
@@ -51,6 +53,7 @@ public class Platform implements Switchable {
 
     public void update(SoundPlayer soundPlayer) {
         if (isActive) {
+            animTimer = animTimer + Gdx.graphics.getDeltaTime();
             if (timer < 0) {
                 timer = timer + Gdx.graphics.getDeltaTime();
             } else {
@@ -82,5 +85,9 @@ public class Platform implements Switchable {
         if (this.switchId != null && this.switchId.equals(id)) {
             isActive = !isActive;
         }
+    }
+
+    public float getAnimTimer() {
+        return animTimer;
     }
 }

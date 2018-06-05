@@ -5,6 +5,7 @@ import static com.lovely.games.TheFirstGate.TILE_SIZE;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
 class Block implements BlockLike {
@@ -16,6 +17,7 @@ class Block implements BlockLike {
     Vector2 startPos;
     boolean isMoving;
     float movementValue;
+    float animTimer;
     boolean isGround;
     Color color;
 
@@ -27,6 +29,7 @@ class Block implements BlockLike {
         this.movementValue = 0;
         this.isGround = false;
         this.color = new Color(random(0.8f, 1.0f), random(0.1f, 0.2f), random(0.1f, 0.2f), 1.0f);
+        animTimer = MathUtils.random(4.0f);
     }
 
     void start() {
@@ -54,6 +57,11 @@ class Block implements BlockLike {
     }
 
     @Override
+    public float getAnimTimer() {
+        return animTimer;
+    }
+
+    @Override
     public void setGround(boolean isGround) {
         this.isGround = isGround;
     }
@@ -68,6 +76,7 @@ class Block implements BlockLike {
     }
 
     public void update() {
+        animTimer += Gdx.graphics.getDeltaTime();
         if (isMoving) {
             float movementDelta = Gdx.graphics.getDeltaTime();
             movementValue = movementValue - movementDelta;

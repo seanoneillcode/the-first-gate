@@ -9,6 +9,7 @@ public interface BlockLike {
     boolean isGround();
     Vector2 getPos();
     void setPos(Vector2 pos);
+    float getAnimTimer();
 
     void setGround(boolean isGround);
 }

@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
@@ -36,6 +37,9 @@ public class SoundPlayer {
     }
 
     public void startLevel() {
+        sounds.forEach((integer, positionSound) -> {
+            positionSound.sound.stop();
+        });
         sounds.clear();
     }
 

@@ -171,6 +171,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private Sprite volumeLevelOnSprite;
     private Sprite volumeLevelOffSprite;
     private boolean isHidePlayer;
+    private BlockLike currentImageHeight = null;
 
     @Override
 	public void create () {
@@ -838,14 +839,19 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 batch.draw(pressureImage, pressureTile.pos.x, pressureTile.pos.y);
             }
             for (Platform platform : currentLevel.getPlatforms()) {
-                batch.draw(platformImg, platform.pos.x, platform.pos.y);
+                float height = ((platform.getAnimTimer() % 0.4f) * 8f);
+                batch.draw(platformImg, platform.pos.x, platform.pos.y + height);
             }
             List<BlockLike> blockLikes = currentLevel.getBlockLikes();
             blockLikes.sort((o1, o2) -> (int)(o2.getPos().y - o1.getPos().y));
             for (BlockLike blockLike : blockLikes) {
+                float height = (MathUtils.sinDeg(blockLike.getAnimTimer() * 360) * 2f);
+                if (currentImageHeight != null && currentImageHeight == blockLike) {
+                    height = height + 2f;
+                }
                 if (!(blockLike instanceof Enemy)) {
                     if (blockLike.isGround()) {
-                        batch.draw(groundBlockImage, blockLike.getPos().x, blockLike.getPos().y);
+                        batch.draw(groundBlockImage, blockLike.getPos().x, blockLike.getPos().y - height);
                     }
                     if (blockLike.getPos().y > threeDeeLinePos.y && !blockLike.isGround()) {
                         batch.draw(blockImage, blockLike.getPos().x, blockLike.getPos().y);
@@ -853,7 +859,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 }
                 if (blockLike instanceof Enemy) {
                     if (blockLike.getPos().y > threeDeeLinePos.y) {
-                        drawEnemy((Enemy) blockLike);
+                        drawEnemy((Enemy) blockLike, height);
                     }
                 }
             }
@@ -897,7 +903,15 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                     }
                 }
             }
-            playerSprite.setPosition(playerPos.x, playerPos.y + QUARTER_TILE_SIZE );
+            float heightAdjustment = 0f;
+            if (currentImageHeight != null) {
+                float height = (MathUtils.sinDeg(currentImageHeight.getAnimTimer() * 360) * 2f);
+                heightAdjustment = height + 2f;
+            }
+            if (currentPlatform != null) {
+                heightAdjustment = ((currentPlatform.getAnimTimer() % 0.4f) * -8f);
+            }
+            playerSprite.setPosition(playerPos.x, playerPos.y + QUARTER_TILE_SIZE - heightAdjustment );
             TextureRegion currentFrame;
             if (!playerIsDead && (levelTransitionTimer > 0 || isMoving)) {
                 if (playerIsPushing || playerWasPushing) {
@@ -936,7 +950,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 }
                 if (blockLike instanceof Enemy) {
                     if (blockLike.getPos().y <= threeDeeLinePos.y && !blockLike.isGround()) {
-                        drawEnemy((Enemy) blockLike);
+                        drawEnemy((Enemy) blockLike, 0);
                     }
                 }
             }
@@ -1108,11 +1122,11 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         antSprite.draw(batch);
     }
 
-    private void drawEnemy(Enemy enemy) {
+    private void drawEnemy(Enemy enemy, float height) {
         String enemyImg = enemy.isGround() ? "entity/enemy-ground.png" : "entity/enemy.png";
         enemySprite.setTexture(assetManager.get(enemyImg));
         enemySprite.setRotation(enemy.getRotation());
-        enemySprite.setPosition(enemy.pos.x, enemy.pos.y + 8);
+        enemySprite.setPosition(enemy.pos.x, enemy.pos.y + 8 - (enemy.isGround() ? height : 0));
         enemySprite.draw(batch);
     }
 
@@ -1225,6 +1239,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             explosion.update();
         }
         explosions.removeIf(Explosion::isDone);
+
         if (!isMoving && !playerIsDead) {
             Platform platform = currentLevel.getPlatform(playerPos);
             if (platform != null) {
@@ -1232,6 +1247,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             } else {
                 currentPlatform = null;
             }
+            currentImageHeight = null;
             if (currentPlatform == null && currentLevel.isDeath(playerPos.cpy().add(HALF_TILE_SIZE,HALF_TILE_SIZE))) {
                 BlockLike block = currentLevel.getBlockLike(playerPos.cpy().add(QUARTER_TILE_SIZE,QUARTER_TILE_SIZE), false);
                 if (!(block != null && block.isGround())) {
@@ -1241,6 +1257,10 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                     animationDelta = 0;
                     isFallDeath = true;
                 }
+                if (block != null && block.isGround()) {
+                    currentImageHeight = block;
+                }
+
             }
             if (wind == null) {
                 playerPos.x = MathUtils.round(playerPos.x / TILE_SIZE) * TILE_SIZE;
