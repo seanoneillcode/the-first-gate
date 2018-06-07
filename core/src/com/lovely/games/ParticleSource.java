@@ -22,6 +22,7 @@ public class ParticleSource {
     int numParticles;
     private Color startColor;
     private Color targetColor;
+    boolean isActive;
 
     public ParticleSource(float lifeTimer, String image, Vector2 pos, Vector2 mov, Vector2 randMov, Vector2 randPos, Vector2 randLife, int numParticles, Color startColor, Color targetColor) {
         this.lifeTimer = lifeTimer;
@@ -35,6 +36,7 @@ public class ParticleSource {
         this.startColor = startColor;
         this.targetColor = targetColor;
         particles = new ArrayList<>();
+        isActive = true;
     }
 
     public void start() {
@@ -45,6 +47,9 @@ public class ParticleSource {
 
     public void update() {
         lifeTimer = lifeTimer - Gdx.graphics.getDeltaTime();
+        if (!isActive) {
+            return;
+        }
         for (Particle particle : particles) {
             particle.update();
             if (!particle.isAlive()) {

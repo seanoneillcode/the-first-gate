@@ -34,8 +34,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     public static final float TILE_SIZE = 32f;
     public static final float ARROW_SPEED = TILE_SIZE * 2.0f;
 
-    private static final float HALF_TILE_SIZE = 16f;
-    private static final float QUARTER_TILE_SIZE = 8f;
+    protected static final float HALF_TILE_SIZE = 16f;
+    static final float QUARTER_TILE_SIZE = 8f;
     private static final float PLAYER_SPEED = TILE_SIZE * 4.0f;
     private static final float CAMERA_MARGIN = 0.5f;
     private static final float CAMERA_CATCHUP_SPEED = 2.0f;
@@ -628,8 +628,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             door.start();
         }
         for (Torch torch : currentLevel.torches) {
-            torch.start();
-            particleSources.add(getTorchParticleSource(torch));
+            torch.start(this);
+
         }
         for (SceneSource sceneSource : currentLevel.scenes) {
             sceneSource.start();
@@ -920,11 +920,13 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 }
             }
             for (ParticleSource particleSource : particleSources) {
-                for (Particle particle : particleSource.particles) {
-                    particleSprite.setRegion((Texture) assetManager.get(particle.image));
-                    particleSprite.setPosition(particle.pos.x, particle.pos.y);
-                    particleSprite.setColor(particle.color);
-                    particleSprite.draw(batch);
+                if (particleSource.isActive) {
+                    for (Particle particle : particleSource.particles) {
+                        particleSprite.setRegion((Texture) assetManager.get(particle.image));
+                        particleSprite.setPosition(particle.pos.x, particle.pos.y);
+                        particleSprite.setColor(particle.color);
+                        particleSprite.draw(batch);
+                    }
                 }
             }
             float heightAdjustment = 0f;
@@ -1418,6 +1420,10 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                     }
                 }
             }
+        }
+
+        for ( Torch torch : currentLevel.torches) {
+            torch.update();
         }
 
         for (Platform platform : currentLevel.getPlatforms()) {
@@ -1969,20 +1975,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         soundPlayer.playSound(id, name, pos, false);
     }
 
-    public ParticleSource getTorchParticleSource(Torch torch) {
-        float lifeTimer = -1f;
-        String image = "particles/fire.png";
-        Vector2 pos = torch.pos.cpy().add(QUARTER_TILE_SIZE, HALF_TILE_SIZE);
-        Vector2 mov = new Vector2(0.2f, 0.2f);
-        Vector2 randPos = new Vector2(HALF_TILE_SIZE, HALF_TILE_SIZE);
-        Vector2 randMov = new Vector2(0.1f, 0.1f);
-        Vector2 randLife = new Vector2(1, 1.5f);
-        int numParticles = 10;
-        Color startColor = Color.RED;
-        Color targetColor = Color.YELLOW;
-        targetColor.a = 0.6f;
-        ParticleSource p = new ParticleSource(lifeTimer, image, pos, mov, randMov, randPos, randLife, numParticles, startColor, targetColor);
-        p.start();
-        return p;
+
+    public void addParticle(ParticleSource particleSource) {
+        particleSources.add(particleSource);
     }
 }
