@@ -170,6 +170,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private Sprite volumeLevelOffSprite;
     private boolean isHidePlayer;
     private BlockLike currentImageHeight = null;
+    private List<ParticleSource> particleSources;
+    private Sprite particleSprite;
 
     @Override
 	public void create () {
@@ -280,6 +282,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("posters/stone-1.png", Texture.class);
         assetManager.load("posters/stone-2.png", Texture.class);
 
+        assetManager.load("particles/fire.png", Texture.class);
+
         assetManager.load("dialog-bottom.png", Texture.class);
         assetManager.load("dialog-top.png", Texture.class);
         assetManager.load("dialog-line.png", Texture.class);
@@ -369,6 +373,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         volumeLevelOnSprite.setScale(2);
         volumeLevelOffSprite = new Sprite((Texture) assetManager.get("volume-level-off.png"));
         volumeLevelOffSprite.setScale(2);
+
+        particleSprite = new Sprite((Texture) assetManager.get("particles/fire.png"));
+        particleSprite.setScale(2);
 
         lazerImage = assetManager.get("entity/lazer.png");
         horizontalLazerImage = assetManager.get("entity/lazer-horizontal.png");
@@ -496,6 +503,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         isTitleMenu = true;
         isViewDirty = true;
         titleLock = true;
+        particleSources = new ArrayList<>();
 
 	}
 
@@ -593,6 +601,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         movementValue = 0;
         lastConnection = startConnection;
         explosions = new ArrayList<>();
+        particleSources = new ArrayList<>();
         hasBossLevelSceneDone = false;
         for (ArrowSource arrowSource : currentLevel.getArrowSources()) {
             arrowSource.start();
@@ -620,6 +629,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         }
         for (Torch torch : currentLevel.torches) {
             torch.start();
+            particleSources.add(getTorchParticleSource(torch));
         }
         for (SceneSource sceneSource : currentLevel.scenes) {
             sceneSource.start();
@@ -907,6 +917,14 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                         TextureRegion torchFrame = torchAnim.getKeyFrame(animationDelta, true);
                         batch.draw(torchFrame, torch.pos.x, torch.pos.y);
                     }
+                }
+            }
+            for (ParticleSource particleSource : particleSources) {
+                for (Particle particle : particleSource.particles) {
+                    particleSprite.setRegion((Texture) assetManager.get(particle.image));
+                    particleSprite.setPosition(particle.pos.x, particle.pos.y);
+                    particleSprite.setColor(particle.color);
+                    particleSprite.draw(batch);
                 }
             }
             float heightAdjustment = 0f;
@@ -1299,7 +1317,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         }
 
 
-
+        for (ParticleSource particleSource : particleSources) {
+            particleSource.update();
+        }
 
         for (Enemy enemy : currentLevel.enemies) {
             enemy.update(playerPos.cpy().add(HALF_TILE_SIZE,HALF_TILE_SIZE), this);
@@ -1947,5 +1967,22 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
     public void playSound(int id, String name, Vector2 pos) {
         soundPlayer.playSound(id, name, pos, false);
+    }
+
+    public ParticleSource getTorchParticleSource(Torch torch) {
+        float lifeTimer = -1f;
+        String image = "particles/fire.png";
+        Vector2 pos = torch.pos.cpy().add(QUARTER_TILE_SIZE, HALF_TILE_SIZE);
+        Vector2 mov = new Vector2(0.2f, 0.2f);
+        Vector2 randPos = new Vector2(HALF_TILE_SIZE, HALF_TILE_SIZE);
+        Vector2 randMov = new Vector2(0.1f, 0.1f);
+        Vector2 randLife = new Vector2(1, 1.5f);
+        int numParticles = 10;
+        Color startColor = Color.RED;
+        Color targetColor = Color.YELLOW;
+        targetColor.a = 0.6f;
+        ParticleSource p = new ParticleSource(lifeTimer, image, pos, mov, randMov, randPos, randLife, numParticles, startColor, targetColor);
+        p.start();
+        return p;
     }
 }
