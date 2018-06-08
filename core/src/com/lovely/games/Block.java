@@ -1,6 +1,8 @@
 package com.lovely.games;
 
 import static com.badlogic.gdx.math.MathUtils.random;
+import static com.lovely.games.TheFirstGate.HALF_TILE_SIZE;
+import static com.lovely.games.TheFirstGate.QUARTER_TILE_SIZE;
 import static com.lovely.games.TheFirstGate.TILE_SIZE;
 
 import com.badlogic.gdx.Gdx;
@@ -86,8 +88,6 @@ class Block implements BlockLike {
             }
             Vector2 movement = dir.cpy().scl(movementDelta * TILE_SPEED);
             pos.add(movement);
-        } else {
-
         }
     }
 }

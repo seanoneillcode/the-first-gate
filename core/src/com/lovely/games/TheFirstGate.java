@@ -170,8 +170,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private Sprite volumeLevelOffSprite;
     private boolean isHidePlayer;
     private BlockLike currentImageHeight = null;
-    private List<ParticleSource> particleSources;
-    private Sprite particleSprite;
+    private Animation<TextureRegion> openingScene;
 
     @Override
 	public void create () {
@@ -282,8 +281,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("posters/stone-1.png", Texture.class);
         assetManager.load("posters/stone-2.png", Texture.class);
 
-        assetManager.load("particles/fire.png", Texture.class);
-
         assetManager.load("dialog-bottom.png", Texture.class);
         assetManager.load("dialog-top.png", Texture.class);
         assetManager.load("dialog-line.png", Texture.class);
@@ -298,6 +295,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("volume-pointer.png", Texture.class);
         assetManager.load("volume-level-on.png", Texture.class);
         assetManager.load("volume-level-off.png", Texture.class);
+        assetManager.load("player-large.png", Texture.class);
 
         assetManager.load("sound/arrow-source.ogg", Music.class);
         assetManager.load("sound/blast-0.ogg", Music.class);
@@ -373,9 +371,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         volumeLevelOnSprite.setScale(2);
         volumeLevelOffSprite = new Sprite((Texture) assetManager.get("volume-level-off.png"));
         volumeLevelOffSprite.setScale(2);
-
-        particleSprite = new Sprite((Texture) assetManager.get("particles/fire.png"));
-        particleSprite.setScale(2);
 
         lazerImage = assetManager.get("entity/lazer.png");
         horizontalLazerImage = assetManager.get("entity/lazer-horizontal.png");
@@ -466,6 +461,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         doorCloseAnim = loadAnimation(assetManager.get("entity/door-open.png"), 6, 0.03f);
         pressureOnAnim = loadAnimation(assetManager.get("entity/pressure-on.png"), 4, 0.02f);
         pressureOffAnim = loadAnimation(assetManager.get("entity/pressure-on.png"), 4, 0.02f);
+        openingScene = loadAnimation(assetManager.get("player-large.png"), 8, 0.1f);
         doorCloseAnim.setPlayMode(Animation.PlayMode.REVERSED);
         pressureOffAnim.setPlayMode(Animation.PlayMode.REVERSED);
         guffImages = new HashMap<>();
@@ -503,7 +499,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         isTitleMenu = true;
         isViewDirty = true;
         titleLock = true;
-        particleSources = new ArrayList<>();
 
 	}
 
@@ -601,7 +596,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         movementValue = 0;
         lastConnection = startConnection;
         explosions = new ArrayList<>();
-        particleSources = new ArrayList<>();
         hasBossLevelSceneDone = false;
         for (ArrowSource arrowSource : currentLevel.getArrowSources()) {
             arrowSource.start();
@@ -628,7 +622,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             door.start();
         }
         for (Torch torch : currentLevel.torches) {
-            torch.start(this);
+            torch.start();
 
         }
         for (SceneSource sceneSource : currentLevel.scenes) {
@@ -916,16 +910,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                     } else {
                         TextureRegion torchFrame = torchAnim.getKeyFrame(animationDelta, true);
                         batch.draw(torchFrame, torch.pos.x, torch.pos.y);
-                    }
-                }
-            }
-            for (ParticleSource particleSource : particleSources) {
-                if (particleSource.isActive) {
-                    for (Particle particle : particleSource.particles) {
-                        particleSprite.setRegion((Texture) assetManager.get(particle.image));
-                        particleSprite.setPosition(particle.pos.x, particle.pos.y);
-                        particleSprite.setColor(particle.color);
-                        particleSprite.draw(batch);
                     }
                 }
             }
@@ -1318,11 +1302,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             }
         }
 
-
-        for (ParticleSource particleSource : particleSources) {
-            particleSource.update();
-        }
-
         for (Enemy enemy : currentLevel.enemies) {
             enemy.update(playerPos.cpy().add(HALF_TILE_SIZE,HALF_TILE_SIZE), this);
         }
@@ -1420,10 +1399,6 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                     }
                 }
             }
-        }
-
-        for ( Torch torch : currentLevel.torches) {
-            torch.update();
         }
 
         for (Platform platform : currentLevel.getPlatforms()) {
@@ -1930,6 +1905,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     @Override
     public void gotoState(String state) {
         if (state.equals("new-game")) {
+            // openingScene
+
             isTitleMenu = false;
             isHidePlayer = false;
             startLevel(levels.get(START_LEVEL_NUM), levels.get(START_LEVEL_NUM).getConnection("61"));
@@ -1975,8 +1952,4 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         soundPlayer.playSound(id, name, pos, false);
     }
 
-
-    public void addParticle(ParticleSource particleSource) {
-        particleSources.add(particleSource);
-    }
 }
