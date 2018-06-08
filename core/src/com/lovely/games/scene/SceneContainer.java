@@ -290,6 +290,10 @@ public class SceneContainer {
                 .verb(new SendEventVerb("c"))
                 .build());
 
+        scenes.put("42", builder()
+                .verb(new PosterVerb("new-game-scene"))
+                .build());
+
         scenes.put("new-game", builder()
                 .verb(new GameControlVerb("new-game"))
                 .build());

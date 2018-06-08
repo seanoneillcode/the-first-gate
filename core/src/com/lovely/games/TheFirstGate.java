@@ -163,6 +163,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private float levelTransitionTimer = 0;
     private boolean leaveLevel = false;
     private StonePrizeScene stonePrizeScene = null;
+    private NewGameScene newGameScene = null;
     private Map<String, Animation<TextureRegion>> guffImages;
     private boolean hasBossLevelSceneDone;
     private Sprite volumePointerSprite;
@@ -171,6 +172,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private boolean isHidePlayer;
     private BlockLike currentImageHeight = null;
     private Animation<TextureRegion> openingScene;
+    boolean isPlayingOpeningScene;
 
     @Override
 	public void create () {
@@ -461,7 +463,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         doorCloseAnim = loadAnimation(assetManager.get("entity/door-open.png"), 6, 0.03f);
         pressureOnAnim = loadAnimation(assetManager.get("entity/pressure-on.png"), 4, 0.02f);
         pressureOffAnim = loadAnimation(assetManager.get("entity/pressure-on.png"), 4, 0.02f);
-        openingScene = loadAnimation(assetManager.get("player-large.png"), 8, 0.1f);
+        openingScene = loadAnimation(assetManager.get("player-large.png"), 8, 0.3f);
         doorCloseAnim.setPlayMode(Animation.PlayMode.REVERSED);
         pressureOffAnim.setPlayMode(Animation.PlayMode.REVERSED);
         guffImages = new HashMap<>();
@@ -479,6 +481,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         currentSpell = "";
 
         stonePrizeScene = new StonePrizeScene(assetManager);
+        newGameScene = new NewGameScene(openingScene);
 
         font = loadFonts("fonts/kells.fnt");
 
@@ -817,14 +820,14 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         updateCameraZoom();
         camera.update();
         batch.setProjectionMatrix(camera.combined);
-        if (!isMenu() || isBrightnessOption()) {
+        if ((!isMenu() || isBrightnessOption()) && !isPlayingOpeningScene) {
             mapRenderer.setView(camera);
             update();
         }
 //        screenFader.update(this);
 	    getInput();
 	    animationDelta = animationDelta + Gdx.graphics.getDeltaTime();
-        if (!isMenu() || isBrightnessOption()) {
+        if ((!isMenu() || isBrightnessOption()) && !isPlayingOpeningScene) {
             renderLightMasks();
         }
 		Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -832,7 +835,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
 
 
-        if (!isLevelDirty && (!isMenu() || isBrightnessOption()) && !isViewDirty ) {
+        if (!isLevelDirty && (!isMenu() || isBrightnessOption()) && !isViewDirty && !isPlayingOpeningScene) {
             Vector2 threeDeeLinePos = playerPos.cpy().add(0, 0);
             mapRenderer.render();
             batch.setProjectionMatrix(camera.combined);
@@ -1020,7 +1023,15 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             }
             batch.end();
         }
-        if (isMenu() && !isViewDirty) {
+        if (isPlayingOpeningScene) {
+            newGameScene.update(this);
+            batch.setProjectionMatrix(camera.combined);
+            batch.begin();
+            Vector2 pos = new Vector2(camera.position.x - 100, camera.position.y - 100);
+            newGameScene.render(batch, pos);
+            batch.end();
+        }
+        if (isMenu() && !isViewDirty && !isPlayingOpeningScene) {
             batch.setProjectionMatrix(camera.combined);
             batch.begin();
             titleSprite.setPosition(180, 300);
@@ -1555,7 +1566,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                             startDialog("saveWarning", new DialogVerb("new-game"));
                         } else {
                             soundPlayer.resumeSounds();
-                            gotoState("new-game");
+                            //gotoState("new-game");
+                            startOpeningScene();
                             return;
                         }
                     }
@@ -1648,7 +1660,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                     String chosenOption = conversation.getCurrentDialog().getChosenOption();
                     if (showSaveWarning) {
                         if (chosenOption.equals("new-game")) {
-                            gotoState("new-game");
+                            //gotoState("new-game");
+                            startOpeningScene();
                         } else {
                             gotoState("menu");
                         }
@@ -1890,6 +1903,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             }
         } else {
             stonePrizeScene.reset();
+            newGameScene.reset();
         }
     }
 
@@ -1902,6 +1916,14 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         screenFader.fadeScreen(inDirection, time, color);
     }
 
+    private void startOpeningScene() {
+        isPlayingOpeningScene = true;
+        isTitleMenu = false;
+        isHidePlayer = true;
+        newGameScene.reset();
+        soundPlayer.playSound("sound/new-game-1.ogg", playerPos);
+    }
+
     @Override
     public void gotoState(String state) {
         if (state.equals("new-game")) {
@@ -1910,9 +1932,10 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             isTitleMenu = false;
             isHidePlayer = false;
             startLevel(levels.get(START_LEVEL_NUM), levels.get(START_LEVEL_NUM).getConnection("61"));
-            soundPlayer.playSound("sound/new-game-1.ogg", playerPos);
+
             currentSpell = "";
             saveEverything();
+
         }
         if (state.equals("menu")) {
             isTitleMenu = true;
