@@ -73,7 +73,7 @@ public class NewGameScene {
         }
         if (phase.id.equals("start")) {
             alpha = phase.timer / phase.length;
-            pos.y = pos.y + (Gdx.graphics.getDeltaTime() * 10f);
+//            pos.y = pos.y + (Gdx.graphics.getDeltaTime() * 10f);
         }
         if (phase.id.equals("middle")) {
             alpha = 1f;
@@ -91,6 +91,10 @@ public class NewGameScene {
             sprite.setAlpha(alpha);
             sprite.draw(batch);
         }
+    }
+
+    public void finish() {
+        phaseIndex = phases.size() - 1;
     }
 
     private class Phase {

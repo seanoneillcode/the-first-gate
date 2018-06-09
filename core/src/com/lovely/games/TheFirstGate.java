@@ -783,9 +783,11 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             lightHole.draw(bufferBatch);
         }
         for (LevelLight light : currentLevel.lights) {
-            levelLight.setColor(light.color);
-            levelLight.setBounds(light.pos.x, light.pos.y, light.size.x, light.size.y);
-            levelLight.draw(bufferBatch);
+            if (light.isActive) {
+                levelLight.setColor(light.color);
+                levelLight.setBounds(light.pos.x, light.pos.y, light.size.x, light.size.y);
+                levelLight.draw(bufferBatch);
+            }
         }
         for (Enemy enemy : currentLevel.enemies) {
             lightHole.setColor(enemy.color);
@@ -1811,10 +1813,14 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         gamma = MathUtils.clamp(gamma, 0, 1.0f);
 
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
-            isTitleMenu = true;
-            isViewDirty = true;
-            titleLock = true;
-            soundPlayer.pauseSounds();
+            if (isPlayingOpeningScene) {
+                newGameScene.finish();
+            } else {
+                isTitleMenu = true;
+                isViewDirty = true;
+                titleLock = true;
+                soundPlayer.pauseSounds();
+            }
         }
         if (Gdx.input.isKeyPressed(Input.Keys.R)) {
             restartLevel();
@@ -2003,5 +2009,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
     public void addEffect(String name, Vector2 pos, float life) {
         effects.add(new MyEffect(name, pos, life));
+    }
+
+    public void removeArrows() {
+        arrows.clear();
     }
 }

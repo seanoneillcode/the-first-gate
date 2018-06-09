@@ -371,6 +371,9 @@ class Level {
         }
 
         Builder addLight(LevelLight levelLight) {
+            if (levelLight.switchId != null) {
+                trunk.addListener(levelLight);
+            }
             lights.add(levelLight);
             return this;
         }
@@ -603,7 +606,11 @@ class Level {
                     float a = Float.valueOf(properties.get("a").toString());
                     color = new Color(r, g, b, a);
                 }
-                builder.addLight(new LevelLight(pos, size, color));
+                String switchId = null;
+                if (properties.containsKey("switch")) {
+                    switchId = properties.get("switch").toString();
+                }
+                builder.addLight(new LevelLight(pos, size, color, switchId));
             }
             if (properties.containsKey("type") && properties.get("type").equals("guff")) {
                 RectangleMapObject rectObj = (RectangleMapObject) obj;

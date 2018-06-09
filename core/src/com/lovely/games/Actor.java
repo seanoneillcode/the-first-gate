@@ -73,6 +73,7 @@ public class Actor {
         if (bossLives < 0) {
             stage.playScene("29");
             isDone = true;
+            stage.removeArrows();
         }
     }
 

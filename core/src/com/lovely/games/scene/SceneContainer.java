@@ -117,11 +117,10 @@ public class SceneContainer {
                 .build());
 
         scenes.put("14", builder()
-                .verb(new PlaySoundVerb("sound/get-magic.ogg", new Vector2(320, 324)))
                 .verb(new DialogVerb("18"))
                 .verb(new PosterVerb("posters/poster-prize.png"))
-                .verb(new DialogVerb("13"))
                 .verb(new SendEventVerb("a"))
+                .verb(new DialogVerb("13"))
                 .build());
 
         scenes.put("15", builder()
