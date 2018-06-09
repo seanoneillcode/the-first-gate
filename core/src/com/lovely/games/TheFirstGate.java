@@ -173,6 +173,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private BlockLike currentImageHeight = null;
     private Animation<TextureRegion> openingScene;
     boolean isPlayingOpeningScene;
+    private Animation<TextureRegion> platformAnim;
+    private Animation<TextureRegion> platformParticleAnim;
+    private List<MyEffect> effects;
 
     @Override
 	public void create () {
@@ -238,12 +241,14 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("levels/ant-catch-up.tmx", TiledMap.class);
 
         assetManager.load("entity/platform.png", Texture.class);
+        assetManager.load("entity/platform-anim.png", Texture.class);
+        assetManager.load("entity/platform-particle-1.png", Texture.class);
         assetManager.load("entity/block.png", Texture.class);
         assetManager.load("entity/pressure.png", Texture.class);
         assetManager.load("entity/ground-block.png", Texture.class);
         assetManager.load("entity/arrow-explode.png", Texture.class);
         assetManager.load("entity/arrow-sheet.png", Texture.class);
-        assetManager.load("entity/torch-sheet.png", Texture.class);
+        assetManager.load("entity/torch-anim.png", Texture.class);
         assetManager.load("entity/enemy.png", Texture.class);
         assetManager.load("entity/enemy-ground.png", Texture.class);
         assetManager.load("entity/lazer.png", Texture.class);
@@ -266,6 +271,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("character/pro-simple-walk.png", Texture.class);
         assetManager.load("character/ant-idle.png", Texture.class);
         assetManager.load("character/ant-walk.png", Texture.class);
+        assetManager.load("character/player-shadow.png", Texture.class);
 
         assetManager.load("portraits/portrait-pro.png", Texture.class);
         assetManager.load("portraits/portrait-pro-listening.png", Texture.class);
@@ -457,12 +463,14 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         playerLightAnim = loadAnimation(assetManager.get("player-light.png"), 4, 0.5f);
         arrowAnim = loadAnimation(assetManager.get("entity/arrow-sheet.png"), 8, 0.05f);
         arrowExplodeAnim = loadAnimation(assetManager.get("entity/arrow-explode.png"), 8, 0.05f);
-        torchAnim = loadAnimation(assetManager.get("entity/torch-sheet.png"), 2, 0.5f);
+        torchAnim = loadAnimation(assetManager.get("entity/torch-anim.png"), 8, 0.2f);
         campfireAnim = loadAnimation(assetManager.get("entity/campfire.png"), 8, 0.1f);
         doorOpenAnim = loadAnimation(assetManager.get("entity/door-open.png"), 6, 0.03f);
         doorCloseAnim = loadAnimation(assetManager.get("entity/door-open.png"), 6, 0.03f);
         pressureOnAnim = loadAnimation(assetManager.get("entity/pressure-on.png"), 4, 0.02f);
         pressureOffAnim = loadAnimation(assetManager.get("entity/pressure-on.png"), 4, 0.02f);
+        platformAnim = loadAnimation(assetManager.get("entity/platform-anim.png"), 8, 0.1f);
+//        platformParticleAnim = loadAnimation(assetManager.get("entity/platform-particles.png"), 8, 0.1f);
         openingScene = loadAnimation(assetManager.get("player-large.png"), 8, 0.3f);
         doorCloseAnim.setPlayMode(Animation.PlayMode.REVERSED);
         pressureOffAnim.setPlayMode(Animation.PlayMode.REVERSED);
@@ -473,6 +481,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         guffImages.put("entity/grass-4.png", loadAnimation(assetManager.get("entity/grass-4.png"), 4, 0.53f));
         guffImages.put("entity/dust-air.png", loadAnimation(assetManager.get("entity/dust-air.png"), 16, 0.2f));
         guffImages.put("entity/dust-air-2.png", loadAnimation(assetManager.get("entity/dust-air-2.png"), 16, 0.2f));
+        guffImages.put("entity/platform-particle-1.png", loadAnimation(assetManager.get("entity/platform-particle-1.png"), 8, 0.1f));
         arrowSprite = new Sprite();
         arrowSprite.setBounds(0,0,32,32);
 //        actorImages = new HashMap<>();
@@ -480,6 +489,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         currentScenes = new ArrayList<>();
         currentSpell = "";
 
+        effects = new ArrayList<>();
         stonePrizeScene = new StonePrizeScene(assetManager);
         newGameScene = new NewGameScene(openingScene);
 
@@ -585,6 +595,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private void startLevel(Level level, Connection startConnection) {
         //setScreenFade(1.0f, Color.BLACK);
         currentPlatform = null;
+        effects.clear();
         playerIsDead = false;
         playerDeathTimer = 0;
         stepTimer = -1;
@@ -850,8 +861,15 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 batch.draw(frame, pressureTile.pos.x, pressureTile.pos.y);
             }
             for (Platform platform : currentLevel.getPlatforms()) {
+                TextureRegion frame = platformAnim.getKeyFrame(platform.getAnimTimer(), true);
                 float height = 0;//((platform.getAnimTimer() % 0.4f) * 4f);
-                batch.draw(platformImg, platform.pos.x, platform.pos.y + height);
+                batch.draw(frame, platform.pos.x, platform.pos.y + height);
+//                TextureRegion smoke = platformParticleAnim.getKeyFrame(platform.getAnimTimer(), true);
+//                batch.draw(smoke, platform.pos.x - 16, platform.pos.y + height - 8);
+            }
+            for (MyEffect effect : effects) {
+                TextureRegion currentFrame = guffImages.get(effect.name).getKeyFrame(effect.timer, true);
+                batch.draw(currentFrame, effect.pos.x, effect.pos.y);
             }
             List<BlockLike> blockLikes = currentLevel.getBlockLikes();
             blockLikes.sort((o1, o2) -> (int)(o2.getPos().y - o1.getPos().y));
@@ -924,7 +942,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 //            if (currentPlatform != null) {
 //                heightAdjustment = ((currentPlatform.getAnimTimer() % 0.4f) * -4f);
 //            }
-            playerSprite.setPosition(playerPos.x, playerPos.y + QUARTER_TILE_SIZE - heightAdjustment );
+            playerSprite.setPosition(playerPos.x, playerPos.y + HALF_TILE_SIZE  - heightAdjustment );
             TextureRegion currentFrame;
             if (!playerIsDead && (levelTransitionTimer > 0 || isMoving)) {
                 if (playerIsPushing || playerWasPushing) {
@@ -952,6 +970,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 playerSprite.flip(true, false);
             }
             if (!isHidePlayer) {
+                if (!playerIsDead) {
+                    batch.draw(assetManager.get("character/player-shadow.png",Texture.class), playerPos.x, playerPos.y);
+                }
                 playerSprite.draw(batch);
             }
 
@@ -1413,8 +1434,11 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         }
 
         for (Platform platform : currentLevel.getPlatforms()) {
-            platform.update(soundPlayer);
+            platform.update(soundPlayer, this);
         }
+
+        effects.forEach(MyEffect::update);
+        effects.removeIf(e -> e.timer > e.life);
 
         if (castCooldown > 0) {
             castCooldown = castCooldown - Gdx.graphics.getDeltaTime();
@@ -1976,4 +2000,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         soundPlayer.playSound(id, name, pos, false);
     }
 
+
+    public void addEffect(String name, Vector2 pos, float life) {
+        effects.add(new MyEffect(name, pos, life));
+    }
 }

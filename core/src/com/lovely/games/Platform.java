@@ -27,6 +27,8 @@ public class Platform implements Switchable {
     Color color;
     private int soundId;
     private float animTimer;
+    float smokeTimer;
+    float smokeTotal;
 
     public Platform(Vector2 start, Vector2 end, float offset, boolean isActive, String switchId) {
         this.pos = start.cpy();
@@ -38,7 +40,7 @@ public class Platform implements Switchable {
         this.isActive = isActive;
         this.initialIsActive = isActive;
         this.switchId = switchId;
-        this.color = new Color(random(0.8f, 1.0f), random(0.8f, 0.8f), random(0.8f, 1.0f), 1.0f);
+        this.color = new Color(random(0.7f, 0.8f), random(0.5f, 0.6f), random(0.4f, 0.5f), 1.0f);
         this.soundId = MathUtils.random(RANDOM_SOUND_ID_RANGE);
         animTimer = MathUtils.random(4.0f);
     }
@@ -49,11 +51,19 @@ public class Platform implements Switchable {
         destination = end;
         isActive = initialIsActive;
 //        soundPlayer.playSound(soundId, "sound/mechanical-1.ogg", pos, true);
+        smokeTimer = MathUtils.random(8f);
+        smokeTotal = MathUtils.random(8f);
     }
 
-    public void update(SoundPlayer soundPlayer) {
+    public void update(SoundPlayer soundPlayer, TheFirstGate theFirstGate) {
         if (isActive) {
             animTimer = animTimer + Gdx.graphics.getDeltaTime();
+            smokeTimer += Gdx.graphics.getDeltaTime();
+            if (smokeTimer > smokeTotal) {
+                smokeTimer = 0;
+                smokeTotal = MathUtils.random(8f);
+                theFirstGate.addEffect("entity/platform-particle-1.png", pos.cpy().add(8,8).add(getMovement().cpy().scl(8)), 0.8f);
+            }
             if (timer < 0) {
                 timer = timer + Gdx.graphics.getDeltaTime();
             } else {
