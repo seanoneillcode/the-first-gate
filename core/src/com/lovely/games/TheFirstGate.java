@@ -1922,6 +1922,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         isHidePlayer = true;
         newGameScene.reset();
         soundPlayer.playSound("sound/new-game-1.ogg", playerPos);
+        soundPlayer.playMusic(WIND_BGR_SOUND_ID, "sound/wind-background.ogg", true);
     }
 
     @Override

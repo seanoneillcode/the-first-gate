@@ -3,7 +3,7 @@
  <properties>
   <property name="isWind" value="true"/>
  </properties>
- <tileset firstgid="1" source="tower-tileset.tsx"/>
+ <tileset firstgid="1" source="brown.tsx"/>
  <layer name="ground" width="15" height="18">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
