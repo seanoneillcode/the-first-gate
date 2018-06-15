@@ -169,19 +169,18 @@ public class DialogContainer {
 //                line(ant, "Take the night to rest and think on it.")
 //        ));
         dialogs.put("24", Arrays.asList(
-                line(ant, "I suggest you rest"),
+                line(ant, "Arthur, I suggest you rest"),
                 line(pro, "And then?"),
-                line(ant, "I suggest you come with me to Bryn, to the college of Mages"),
-                line(pro, "For another trial I suppose? One that puts me in jail or worse"),
-                line(ant, "Actually, I would like you to join us. "),
-                line(ant, "We will provide everything you need. Food, shelter..."),
-                line(ant, "...education"),
-                line(pro, "I don't know"),
-                line(ant, "I was wrong."),
-                line(ant, "You have shown me this."),
-                line(ant, "Think on it. Perhaps you can show the rest of us what really matters"),
-                line(pro, "Determination?"),
-                line(ant, "Yes, determination and more...")
+                line(ant, "Come with me to Bryn, to the college of Mages"),
+                line(pro, "For another trial I suppose? One that ends in jail or worse", "angry"),
+                line(ant, "No more trials. Join us, become a Mage"),
+                line(pro, "What about my leg?", "angry"),
+                line(ant, "I was wrong. You have shown me this. You have passed the trials."),
+                line(pro, "...", "talk"),
+                line(ant, "You must know though..."),
+                line(ant, "...restoring that leg is beyond us."),
+                line(pro, "I did not pass the trials to gain a leg.", "talk"),
+                line(pro, "I paid a leg to pass the trials", "talk")
         ));
         dialogs.put("saveWarning", Arrays.asList(
                 line(info, "There is already a save game. Starting a new game will overwrite the save game."),
@@ -223,68 +222,63 @@ public class DialogContainer {
                 line(ant, "Good luck!", "happy")
         ));
         dialogs.put("26", Arrays.asList(
-                line(ant, "Who are you? Why are you here!?"),
-                line(pro, "I am here to pass through the first gate", "worried"),
-                line(ant, "You are joking?", "happy"),
-                line(ant, "You are missing a leg, you are clearly a beggar", "talk"),
-                line(pro, "I have travelled far and suffered much just to take these trials", "worried"),
-                line(ant, "Begone you fool, this place is for the most able men and women.", "angry"),
-                line(ant, "You must be of sound mind and body.", "talk"),
-                line(ant, "Begone", "talk")
+                line(ant, "Arthur? Is that really you?"),
+                line(pro, "Yes", "happy"),
+                line(ant, "By the gods..."),
+                line(ant, "Why are you here?"),
+                line(pro, "I've healed up and rested. I'm here to take the trial again", "talk"),
+                line(ant, "What!? Are you mad?", "talk"),
+                line(ant, "No... I will not let you do this...", "talk")
         ));
         dialogs.put("27", Arrays.asList(
-                line(pro, "We will see", "angry")
+                line(pro, "You will not stop me", "angry")
         ));
         dialogs.put("28", Arrays.asList(
-                line(ant, "I told you to leave"),
-                line(pro, "Leave? Not without taking the trials", "talk"),
-                line(ant, "These trials are not for wretched folk like you", "talk"),
-                line(pro, "You know nothing about me", "angry"),
-                line(ant, "Are you of noble blood?", "happy"),
-                line(ant, "...do you posses a fine education?", "happy"),
-                line(pro, "No...", "worried"),
-                line(ant, "Then be gone", "angry"),
-                line(pro, "I will not be gone! I have the most important quality", "angry"),
-                line(pro, "Determination", "angry")
+                line(ant, "No... Arthur, please leave"),
+                line(pro, "I am here to take these trials", "talk"),
+                line(ant, "You have already failed. You cannot take them again", "talk"),
+                line(pro, "Why not? I am more determined, more skilled and experienced", "talk"),
+                line(ant, "A Mage must be sound in mind... and in body. These trials are an extreme test of both.", "talk"),
+                line(ant, "Now take what's left of your life and begone", "talk"),
+                line(pro, "I will show you", "angry")
         ));
         dialogs.put("29", Arrays.asList(
-                line(ant, "I see you. If you try that again I will burn you to a cinder", "angry")
+                line(ant, "I see you trying to sneak past. If I catch you again I will kill you.", "angry")
         ));
         dialogs.put("30", Arrays.asList(
-                line(pro, "I must be quick! If the old man catches me I'm dead...", "worried")
+                line(pro, "I must be quick! If he catches me I'm dead...", "worried")
         ));
         dialogs.put("31", Arrays.asList(
-                line(ant, "Well done, you've completed the trials"),
+                line(ant, "Arthur!"),
+                line(ant, "You actually did it, you completed the trials"),
                 line(ant, "However..."),
                 line(ant, "I cannot let you leave."),
-                line(pro, "What? Why not?"),
-                line(ant, "You have cheated I am sure, there is no other way you could get this far", "angry"),
-                line(ant, "I will stop this now, only those who actually take the trials may pass.", "angry")
+                line(pro, "What!? Why not?"),
+                line(ant, "You must have cheated. There is no other way a cripple could get this far", "angry"),
+                line(ant, "It is sad to see your desire corrupt you", "talk"),
+                line(ant, "I'm afraid, I must stop this.")
         ));
         dialogs.put("32", Arrays.asList(
                 line(pro, "You are undone"),
                 line(pro, "By my hand?"),
                 line(ant, "..."),
-                line(ant, "Yes"),
-                line(ant, "I am very sorry, you are more the man than I"),
-                line(pro, "What now? I can leave?"),
-                line(ant, "There is a resting place ahead. Go there now and I will meet you momentarily.")
+                line(ant, "There is a resting place ahead. Go there now and I will meet you in a moment.")
         ));
         dialogs.put("33", Arrays.asList(
                 line(pro, "What does this say..."),
                 line(pro, "'RULES OF THE CAEN'"),
-                line(pro, "'1. All rooms have a solution'"),
+                line(pro, "'1. All rooms have at least one solution'"),
                 line(pro, "'2. All rooms have one entrance and one exit'"),
-                line(pro, "'3. You must have fun'")
+                line(pro, "'3. You must light the four gates'")
         ));
         dialogs.put("34", Arrays.asList(
                 line(ant, "What!? Someone is taking the trials?"),
-                line(ant, "...but no-one has been here except that beggar...")
+                line(ant, "...but no-one has been here except Arthur...")
         ));
         dialogs.put("35", Arrays.asList(
                 line(ant, "NO!!", "angry"),
                 line(ant, "I must stop him", "angry"),
-                line(ant, "If he gets the crystal...", "angry")
+                line(ant, "If he succeeds...", "angry")
         ));
         dialogs.put("36", Arrays.asList(
                 line(pro, "What does this say..."),
@@ -298,14 +292,14 @@ public class DialogContainer {
         ));
         dialogs.put("39", Arrays.asList(
                 line(pro, "He knows I'm here..."),
-                line(pro, "I'm dead! I'm dead! I need to keep ahead or I'm dead...")
+                line(pro, "I'm dead! I must keep ahead or I'm dead...")
         ));
         dialogs.put("40", Arrays.asList(
                 line(info, "'The Second Gate'")
         ));
         dialogs.put("41", Arrays.asList(
                 line(info, "'The Third Gate'"),
-                line(pro, "Great, only one left and I'm safe")
+                line(pro, "Only one left and I'm safe")
         ));
     }
 
