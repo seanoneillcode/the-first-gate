@@ -13,12 +13,19 @@ public class Enemy extends Block implements BlockLike {
     String stringDir;
     float coolDown = 0f;
     float MAX_COOLDOWN = 0.02f;
+    public boolean isShooting;
 
     public Enemy(Vector2 pos, String dir) {
         super(pos);
         this.stringDir = dir;
         this.dir = getDir(dir);
         this.color = new Color(0.4f, 0.8f, 0.7f, 1.0f);
+        isShooting = false;
+    }
+
+    void start() {
+        super.start();
+        isShooting = false;
     }
 
     private Vector2 getDir(String dir) {
@@ -38,6 +45,8 @@ public class Enemy extends Block implements BlockLike {
     public void update(Vector2 playerPos, TheFirstGate theFirstGate) {
         super.update();
         boolean colliding = false;
+        boolean prevShooting = isShooting;
+        isShooting = false;
         if (!isGround) {
             Vector2 checkPos = pos.cpy();
             for (int i = 0; i < 10; i++) {
@@ -47,11 +56,16 @@ public class Enemy extends Block implements BlockLike {
                 }
                 if (contains(checkPos.cpy().add(8, 8), new Vector2(16, 16), playerPos)) {
                     colliding = true;
+                    if (!prevShooting) {
+                        animTimer = 0;
+                    }
+                    isShooting = true;
                     break;
-                }        }
+                }
+            }
             if (colliding) {
                 if (coolDown < 0) {
-                    theFirstGate.addLazer(pos.cpy().add(dir.x, dir.y), dir.cpy());
+                    theFirstGate.addLazer(pos.cpy().add(dir.x, dir.y + 8), dir.cpy());
                     coolDown = MAX_COOLDOWN;
                 }
             }

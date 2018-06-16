@@ -177,7 +177,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private Animation<TextureRegion> platformAnim;
     private Animation<TextureRegion> arrowSourceAnim;
     private List<MyEffect> effects;
-    private Animation<TextureRegion> walkUp, walkDown;
+    private Animation<TextureRegion> walkUp, walkDown, enemyIdle, enemyShoot;
 
     @Override
 	public void create () {
@@ -253,6 +253,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("entity/arrow-source.png", Texture.class);
         assetManager.load("entity/torch-anim.png", Texture.class);
         assetManager.load("entity/enemy.png", Texture.class);
+        assetManager.load("entity/enemy-idle.png", Texture.class);
+        assetManager.load("entity/enemy-shoot.png", Texture.class);
         assetManager.load("entity/enemy-ground.png", Texture.class);
         assetManager.load("entity/lazer.png", Texture.class);
         assetManager.load("entity/lazer-horizontal.png", Texture.class);
@@ -370,7 +372,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         posterSprite = new Sprite((Texture) assetManager.get("posters/poster-prize.png"));
         posterSprite.setBounds(0,0,VIEWPORT_WIDTH,VIEWPORT_HEIGHT);
         enemySprite = new Sprite((Texture) assetManager.get("entity/enemy.png"));
-        enemySprite.setSize(32, 32);
+        enemySprite.setSize(40, 40);
         arrowSourceSprite = new Sprite((Texture) assetManager.get("entity/arrow-source.png"));
         arrowSourceSprite.setSize(32, 48);
         playerSprite = new Sprite();
@@ -460,6 +462,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
         antWalk = loadAnimation(assetManager.get("character/ant-walk.png"), 4, 0.165f);
         antIdle = loadAnimation(assetManager.get("character/ant-idle.png"), 2, 0.5f);
+        enemyIdle = loadAnimation(assetManager.get("entity/enemy-idle.png"), 4, 0.25f);
+        enemyShoot = loadAnimation(assetManager.get("entity/enemy-shoot.png"), 4, 0.05f);
         walkRight = loadAnimation(assetManager.get("character/pro-simple-walk.png"), 4, 0.16f); // 0.165
         walkUp = loadAnimation(assetManager.get("character/pro-simple-walk-up.png"), 4, 0.16f); // 0.165
         walkDown = loadAnimation(assetManager.get("character/pro-simple-walk-down.png"), 4, 0.16f); // 0.165
@@ -1214,10 +1218,17 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     }
 
     private void drawEnemy(Enemy enemy, float height) {
-        String enemyImg = enemy.isGround() ? "entity/enemy-ground.png" : "entity/enemy.png";
-        enemySprite.setTexture(assetManager.get(enemyImg));
+        if (enemy.isGround()) {
+            return;
+        }
+        TextureRegion frame = enemyIdle.getKeyFrame(enemy.animTimer, true);
+        if (enemy.isShooting) {
+            frame = enemyShoot.getKeyFrame(enemy.animTimer, false);
+        }
+        enemySprite.setRegion(frame);
         enemySprite.setRotation(enemy.getRotation());
-        enemySprite.setPosition(enemy.pos.x, enemy.pos.y + 8 - (enemy.isGround() ? height : 0));
+        enemySprite.setOrigin(20, 20);
+        enemySprite.setPosition(enemy.pos.x - 4, enemy.pos.y + 4);
         enemySprite.draw(batch);
     }
 
