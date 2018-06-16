@@ -43,7 +43,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private static final int VIEWPORT_HEIGHT = 480;
     private static final float CAST_ARROW_COOLDOWN = 0.6f;
     private static final float PLAYER_DEATH_TIME = 1.0f;
-    private static final float PLAYER_SHOOTING_TIME = 0.4f;
+    private static final float PLAYER_SHOOTING_TIME = 0.34f;
     protected static final float PLAYER_ARROW_SPEED = TILE_SIZE * 4.0f;
     private static final float ZOOM_AMOUNT = 0.005f;
     private static final float ZOOM_THRESHOLH = 0.01f;
@@ -460,7 +460,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         walkRight = loadAnimation(assetManager.get("character/pro-simple-walk.png"), 4, 0.16f); // 0.165
         fireDeath = loadAnimation(assetManager.get("character/pro-simple-fire-death.png"), 8, 0.085f);
         fallDeath = loadAnimation(assetManager.get("character/pro-simple-fall-death.png"), 5, 0.08f);
-        playerShoot = loadAnimation(assetManager.get("character/pro-simple-shoot.png"), 6, 0.066f);
+        playerShoot = loadAnimation(assetManager.get("character/pro-simple-shoot.png"), 6, 0.07f);
         pushBlock = loadAnimation(assetManager.get("character/pro-simple-push.png"), 4, 0.165f);
         idleAnim = loadAnimation(assetManager.get("character/pro-simple-idle.png"), 2, 0.5f);
         lightAnim = loadAnimation(assetManager.get("light-magic.png"), 4, 0.6f);
@@ -1235,6 +1235,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             playerShootingTimer = playerShootingTimer - Gdx.graphics.getDeltaTime();
             if (playerShootingTimer < 0) {
                 isPlayerShooting = false;
+                playerShootingTimer = 0;
             }
             if (playerShootingTimer < 0.1f) {
                 castCurrentSpell();
