@@ -60,6 +60,18 @@ public class ArrowSource implements Switchable {
         }
     }
 
+    public float getAnimTimer() {
+        if (!isActive) {
+            return 0;
+        }
+        float start = goal - 0.8f;
+        if (timer > start) {
+            return timer - start;
+        } else {
+            return 0;
+        }
+    }
+
     @Override
     public void handleMessage(String id) {
         if (this.switchId != null && this.switchId.equals(id)) {

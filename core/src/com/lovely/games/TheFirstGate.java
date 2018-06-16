@@ -169,12 +169,13 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private Sprite volumePointerSprite;
     private Sprite volumeLevelOnSprite;
     private Sprite volumeLevelOffSprite;
+    private Sprite arrowSourceSprite;
     private boolean isHidePlayer;
     private BlockLike currentImageHeight = null;
     private Animation<TextureRegion> openingScene;
     boolean isPlayingOpeningScene;
     private Animation<TextureRegion> platformAnim;
-    private Animation<TextureRegion> platformParticleAnim;
+    private Animation<TextureRegion> arrowSourceAnim;
     private List<MyEffect> effects;
 
     @Override
@@ -248,6 +249,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("entity/ground-block.png", Texture.class);
         assetManager.load("entity/arrow-explode.png", Texture.class);
         assetManager.load("entity/arrow-sheet.png", Texture.class);
+        assetManager.load("entity/arrow-source.png", Texture.class);
         assetManager.load("entity/torch-anim.png", Texture.class);
         assetManager.load("entity/enemy.png", Texture.class);
         assetManager.load("entity/enemy-ground.png", Texture.class);
@@ -366,6 +368,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         posterSprite.setBounds(0,0,VIEWPORT_WIDTH,VIEWPORT_HEIGHT);
         enemySprite = new Sprite((Texture) assetManager.get("entity/enemy.png"));
         enemySprite.setSize(32, 32);
+        arrowSourceSprite = new Sprite((Texture) assetManager.get("entity/arrow-source.png"));
+        arrowSourceSprite.setSize(32, 48);
         playerSprite = new Sprite();
         playerSprite.setSize(32,32);
         antSprite = new Sprite();
@@ -470,7 +474,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         pressureOnAnim = loadAnimation(assetManager.get("entity/pressure-on.png"), 4, 0.02f);
         pressureOffAnim = loadAnimation(assetManager.get("entity/pressure-on.png"), 4, 0.02f);
         platformAnim = loadAnimation(assetManager.get("entity/platform-anim.png"), 8, 0.1f);
-//        platformParticleAnim = loadAnimation(assetManager.get("entity/platform-particles.png"), 8, 0.1f);
+        arrowSourceAnim = loadAnimation(assetManager.get("entity/arrow-source.png"), 8, 0.1f);
         openingScene = loadAnimation(assetManager.get("player-large.png"), 8, 0.3f);
         doorCloseAnim.setPlayMode(Animation.PlayMode.REVERSED);
         pressureOffAnim.setPlayMode(Animation.PlayMode.REVERSED);
@@ -747,6 +751,15 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             lightHole.setPosition((arrow.pos.x), (arrow.pos.y));
             lightHole.draw(bufferBatch);
         }
+        for (ArrowSource arrowSource : currentLevel.arrowSources) {
+            float animTime = arrowSource.getAnimTimer();
+            if (animTime > 0) {
+                lightHole.setColor(new Color(0.3f, 0.8f, 0.6f, (animTime / 0.8f)));
+                lightHole.setRegion(tr);
+                lightHole.setPosition((arrowSource.pos.x), (arrowSource.pos.y));
+                lightHole.draw(bufferBatch);
+            }
+        }
         for (Explosion explosion : explosions) {
             lightHole.setColor(explosion.color);
             lightHole.setAlpha(1 - explosion.getAlpha() * 0.8f);
@@ -893,6 +906,25 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                         drawEnemy((Enemy) blockLike, height);
                     }
                 }
+            }
+            for (ArrowSource arrowSource : currentLevel.arrowSources) {
+                TextureRegion frame = arrowSourceAnim.getKeyFrame(arrowSource.getAnimTimer(), true);
+                arrowSourceSprite.setPosition(arrowSource.pos.x, arrowSource.pos.y - 16);
+                arrowSourceSprite.setRegion(frame);
+                arrowSourceSprite.setRotation(0);
+                if (arrowSource.dir.x < 0) {
+                    arrowSourceSprite.setRotation(270);
+                    arrowSourceSprite.setPosition(arrowSource.pos.x - 68, arrowSource.pos.y - 16 - 24);
+                }
+                if (arrowSource.dir.x > 0) {
+                    arrowSourceSprite.setRotation(90);
+                    arrowSourceSprite.setPosition(arrowSource.pos.x - 28, arrowSource.pos.y - 16 + 72);
+                }
+                if (arrowSource.dir.y > 0) {
+                    arrowSourceSprite.setRotation(180);
+                    arrowSourceSprite.setPosition(arrowSource.pos.x - 94, arrowSource.pos.y - 16 + 40);
+                }
+                arrowSourceSprite.draw(batch);
             }
             for (Arrow arrow : arrows) {
                 if (arrow.isArrow) {
