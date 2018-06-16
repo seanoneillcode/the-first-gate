@@ -177,6 +177,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private Animation<TextureRegion> platformAnim;
     private Animation<TextureRegion> arrowSourceAnim;
     private List<MyEffect> effects;
+    private Animation<TextureRegion> walkUp, walkDown;
 
     @Override
 	public void create () {
@@ -271,6 +272,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("character/pro-simple-shoot.png", Texture.class);
         assetManager.load("character/pro-simple-idle.png", Texture.class);
         assetManager.load("character/pro-simple-walk.png", Texture.class);
+        assetManager.load("character/pro-simple-walk-down.png", Texture.class);
+        assetManager.load("character/pro-simple-walk-up.png", Texture.class);
         assetManager.load("character/ant-idle.png", Texture.class);
         assetManager.load("character/ant-walk.png", Texture.class);
         assetManager.load("character/player-shadow.png", Texture.class);
@@ -458,6 +461,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         antWalk = loadAnimation(assetManager.get("character/ant-walk.png"), 4, 0.165f);
         antIdle = loadAnimation(assetManager.get("character/ant-idle.png"), 2, 0.5f);
         walkRight = loadAnimation(assetManager.get("character/pro-simple-walk.png"), 4, 0.16f); // 0.165
+        walkUp = loadAnimation(assetManager.get("character/pro-simple-walk-up.png"), 4, 0.16f); // 0.165
+        walkDown = loadAnimation(assetManager.get("character/pro-simple-walk-down.png"), 4, 0.16f); // 0.165
         fireDeath = loadAnimation(assetManager.get("character/pro-simple-fire-death.png"), 8, 0.085f);
         fallDeath = loadAnimation(assetManager.get("character/pro-simple-fall-death.png"), 5, 0.08f);
         playerShoot = loadAnimation(assetManager.get("character/pro-simple-shoot.png"), 6, 0.07f);
@@ -982,7 +987,15 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 if (playerIsPushing || playerWasPushing) {
                     currentFrame = pushBlock.getKeyFrame(walkAnimDelta, true);
                 } else {
+
                     currentFrame = walkRight.getKeyFrame(walkAnimDelta, true);
+
+                    if (playerDir.y > 0) {
+                        currentFrame = walkUp.getKeyFrame(walkAnimDelta, true);
+                    }
+                    if (playerDir.y < 0) {
+                        currentFrame = walkDown.getKeyFrame(walkAnimDelta, true);
+                    }
                 }
             } else {
                 if (playerIsDead) {
