@@ -177,7 +177,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private Animation<TextureRegion> platformAnim;
     private Animation<TextureRegion> arrowSourceAnim;
     private List<MyEffect> effects;
-    private Animation<TextureRegion> walkUp, walkDown, enemyIdle, enemyShoot;
+    private Sprite menuSprite;
+    private Animation<TextureRegion> walkUp, walkDown, enemyIdle, enemyShoot, menuSpriteAnim;
 
     @Override
 	public void create () {
@@ -295,6 +296,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("posters/stone-0.png", Texture.class);
         assetManager.load("posters/stone-1.png", Texture.class);
         assetManager.load("posters/stone-2.png", Texture.class);
+        assetManager.load("posters/menu-sprites.png", Texture.class);
 
         assetManager.load("dialog-bottom.png", Texture.class);
         assetManager.load("dialog-top.png", Texture.class);
@@ -375,6 +377,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         enemySprite.setSize(40, 40);
         arrowSourceSprite = new Sprite((Texture) assetManager.get("entity/arrow-source.png"));
         arrowSourceSprite.setSize(32, 48);
+        menuSprite = new Sprite((Texture) assetManager.get("posters/menu-sprites.png"));
+        menuSprite.setSize(800, 400);
         playerSprite = new Sprite();
         playerSprite.setSize(32,32);
         antSprite = new Sprite();
@@ -485,6 +489,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         platformAnim = loadAnimation(assetManager.get("entity/platform-anim.png"), 8, 0.1f);
         arrowSourceAnim = loadAnimation(assetManager.get("entity/arrow-source.png"), 8, 0.1f);
         openingScene = loadAnimation(assetManager.get("player-large.png"), 8, 0.3f);
+        menuSpriteAnim = loadAnimation(assetManager.get("posters/menu-sprites.png"), 12, 0.15f);
         doorCloseAnim.setPlayMode(Animation.PlayMode.REVERSED);
         pressureOffAnim.setPlayMode(Animation.PlayMode.REVERSED);
         guffImages = new HashMap<>();
@@ -1106,6 +1111,10 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         if (isMenu() && !isViewDirty && !isPlayingOpeningScene) {
             batch.setProjectionMatrix(camera.combined);
             batch.begin();
+            TextureRegion frame = menuSpriteAnim.getKeyFrame(animationDelta, true);
+            menuSprite.setRegion(frame);
+            menuSprite.setPosition(-180,0);
+            menuSprite.draw(batch);
             titleSprite.setPosition(180, 300);
             titleSprite.draw(batch);
             Vector2 selectedPos = new Vector2(280, 200);
