@@ -137,7 +137,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private boolean isTitleMenu = false, isOptionsMenu = false, isCreditsMenu = false;
     private int titleSelectionIndex = 0;
     private List<String> titleOptions = Arrays.asList("credits", "options", "new game", "load game");
-    private List<String> optionOptions = Arrays.asList("back",  "brightness", "music volume", "sound volume", "cast key", "down key", "right key", "left key", "up key");
+    private List<String> optionOptions = Arrays.asList("back",  "brightness", "music volume", "sound volume", "cast key", "down key", "right key", "left key", "up key", "reset everything!");
     private List<String> creditOptions = Arrays.asList("Music - Daniel Lacey",  "Quality - Ben Kirimlidis", "Quality - Michalis Kirimlidis", "Code and Art - Sean O'Neill");
     private Sprite titleSelectionSprite;
     private boolean titleLock = false;
@@ -1141,7 +1141,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             if (isOptionsMenu) {
                 menuOptions = optionOptions;
                 selectedPos.x = 140;
-                selectedPos.y = 400;
+                selectedPos.y = 430;
             }
             if (isCreditsMenu) {
                 menuOptions = creditOptions;
@@ -1149,6 +1149,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             }
             for (int index = menuOptions.size() - 1; index > -1; index--) {
                 String option = menuOptions.get(index);
+                float tmpfloat = 0;
                 if (titleSelectionIndex == menuOptions.size() - 1 - index) {
                     font.setColor(fontColorSelectedMain);
                 } else {
@@ -1156,6 +1157,14 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 }
                 if (option.equals("continue") && !hasContinue) {
                     font.setColor(fontGreyedOut);
+                }
+                if (option.equals("reset everything!")) {
+                    tmpfloat = 200;
+                    if (titleSelectionIndex == menuOptions.size() - 1 - index) {
+                        font.setColor(new Color(1.0f, 0.4f, 0.8f, 1.0f));
+                    } else {
+                        font.setColor(new Color(0.5f, 0.2f, 0.4f, 1.0f));
+                    }
                 }
                 if (keyMappings.containsKey(option)) {
                     if (option.equals(pressKeyPlease)) {
@@ -1165,7 +1174,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                     }
                 }
 
-                font.draw(batch, option, selectedPos.x, selectedPos.y, 0f, 1, false);
+                font.draw(batch, option, selectedPos.x + tmpfloat, selectedPos.y, 0f, 1, false);
                 selectedPos.add(0, -40);
             }
             if (isOptionsMenu) {
@@ -1706,7 +1715,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                         isTitleMenu = false;
                         titleLock = true;
                         moveLock = true;
-                        titleSelectionIndex = 0;
+                        titleSelectionIndex = optionOptions.size() - 1;
                     }
                     if (titleSelectionIndex == 3) {
                         // show credits
@@ -1754,6 +1763,17 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                                 if (inputVector.x < 0) {
                                     soundPlayer.decreaseMusicVolume();
                                 }
+                            }
+                            if (optionOptions.get(tempIndex).equals("reset everything!")) {
+                                Preferences prefs = Gdx.app.getPreferences("caen-preferences");
+                                prefs.clear();
+                                prefs.flush();
+                                isTitleMenu = true;
+                                isOptionsMenu = false;
+                                titleLock = true;
+                                moveLock = true;
+                                titleSelectionIndex = 2;
+                                loadEverything();
                             }
                             if (optionOptions.get(tempIndex).equals("brightness")) {
                                 // brightness
