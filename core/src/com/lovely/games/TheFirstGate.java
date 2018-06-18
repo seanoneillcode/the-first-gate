@@ -1,6 +1,7 @@
 package com.lovely.games;
 
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import com.badlogic.gdx.ApplicationAdapter;
@@ -515,11 +516,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         stonePrizeScene = new StonePrizeScene(assetManager);
         newGameScene = new NewGameScene(openingScene);
         keyMappings = new HashMap<>();
-        keyMappings.put("up key", 19);
-        keyMappings.put("right key", 22);
-        keyMappings.put("down key", 20);
-        keyMappings.put("left key", 21);
-        keyMappings.put("cast key", 62);
+
 
         font = loadFonts("fonts/kells.fnt");
 
@@ -555,6 +552,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         prefs.putFloat("music-level", soundPlayer.getMusicVolume());
         prefs.putFloat("brightness-level", gamma);
         prefs.putString("current-spell", currentSpell);
+        keyMappings.forEach(prefs::putInteger);
         prefs.flush();
         hasContinue = true;
     }
@@ -564,6 +562,12 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         soundPlayer.setSoundVolume(prefs.getFloat("sound-level", DEFAULT_SOUND_LEVEL));
         soundPlayer.setSoundVolume(prefs.getFloat("music-level", DEFAULT_MUSIC_LEVEL));
         gamma = prefs.getFloat("brightness-level", DEFAULT_GAMMA);
+        keyMappings.put("up key", prefs.getInteger("up key", 19));
+        keyMappings.put("right key", prefs.getInteger("right key", 22));
+        keyMappings.put("down key", prefs.getInteger("down key", 20));
+        keyMappings.put("left key", prefs.getInteger("left key", 21));
+        keyMappings.put("cast key", prefs.getInteger("cast key", 62));
+
         if (prefs.contains("current-spell")) {
             currentSpell = prefs.getString("current-spell");
         } else {
