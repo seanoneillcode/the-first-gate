@@ -136,7 +136,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private boolean isTitleMenu = false, isOptionsMenu = false, isCreditsMenu = false;
     private int titleSelectionIndex = 0;
     private List<String> titleOptions = Arrays.asList("credits", "options", "new game", "load game");
-    private List<String> optionOptions = Arrays.asList("back",  "brightness", "music volume", "sound volume");
+    private List<String> optionOptions = Arrays.asList("back",  "brightness", "music volume", "sound volume", "cast key", "down key", "right key", "left key", "up key");
     private List<String> creditOptions = Arrays.asList("Music - Daniel Lacey",  "Quality - Ben Kirimlidis", "Quality - Michalis Kirimlidis", "Code and Art - Sean O'Neill");
     private Sprite titleSelectionSprite;
     private boolean titleLock = false;
@@ -179,9 +179,13 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private List<MyEffect> effects;
     private Sprite menuSprite;
     private Animation<TextureRegion> walkUp, walkDown, enemyIdle, enemyShoot, menuSpriteAnim;
+    private Map<String, Integer> keyMappings;
+    private String pressKeyPlease;
+    MyInputProcessor inputProcessor = new MyInputProcessor();
 
     @Override
 	public void create () {
+        Gdx.input.setInputProcessor(inputProcessor);
         assetManager = new AssetManager();
         FileHandleResolver fileHandleResolver = new InternalFileHandleResolver();
         assetManager.setLoader(TiledMap.class, new TmxMapLoader(fileHandleResolver));
@@ -510,6 +514,12 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         effects = new ArrayList<>();
         stonePrizeScene = new StonePrizeScene(assetManager);
         newGameScene = new NewGameScene(openingScene);
+        keyMappings = new HashMap<>();
+        keyMappings.put("up key", 19);
+        keyMappings.put("right key", 22);
+        keyMappings.put("down key", 20);
+        keyMappings.put("left key", 21);
+        keyMappings.put("cast key", 62);
 
         font = loadFonts("fonts/kells.fnt");
 
@@ -1114,17 +1124,20 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         if (isMenu() && !isViewDirty && !isPlayingOpeningScene) {
             batch.setProjectionMatrix(camera.combined);
             batch.begin();
-            TextureRegion frame = menuSpriteAnim.getKeyFrame(animationDelta, true);
-            menuSprite.setRegion(frame);
-            menuSprite.setPosition(-180,0);
-            menuSprite.draw(batch);
-            titleSprite.setPosition(180, 300);
-            titleSprite.draw(batch);
+            if (isTitleMenu) {
+                TextureRegion frame = menuSpriteAnim.getKeyFrame(animationDelta, true);
+                menuSprite.setRegion(frame);
+                menuSprite.setPosition(-180,0);
+                menuSprite.draw(batch);
+                titleSprite.setPosition(180, 300);
+                titleSprite.draw(batch);
+            }
             Vector2 selectedPos = new Vector2(280, 200);
             List<String> menuOptions = titleOptions;
             if (isOptionsMenu) {
                 menuOptions = optionOptions;
                 selectedPos.x = 140;
+                selectedPos.y = 400;
             }
             if (isCreditsMenu) {
                 menuOptions = creditOptions;
@@ -1140,6 +1153,14 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 if (option.equals("continue") && !hasContinue) {
                     font.setColor(fontGreyedOut);
                 }
+                if (keyMappings.containsKey(option)) {
+                    if (option.equals(pressKeyPlease)) {
+                        font.draw(batch, "press key", selectedPos.x + 240, selectedPos.y, 0f, 1, false);
+                    } else {
+                        font.draw(batch, Input.Keys.toString(keyMappings.get(option)), selectedPos.x + 240, selectedPos.y, 0f, 1, false);
+                    }
+                }
+
                 font.draw(batch, option, selectedPos.x, selectedPos.y, 0f, 1, false);
                 selectedPos.add(0, -40);
             }
@@ -1599,10 +1620,10 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     }
 
 	private void getInput() {
-        boolean isLeftPressed = Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A);
-        boolean isRightPressed = Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D);
-        boolean isUpPressed = Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W);
-        boolean isDownPressed = Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S);
+        boolean isLeftPressed = Gdx.input.isKeyPressed(keyMappings.get("left key"));
+        boolean isRightPressed = Gdx.input.isKeyPressed(keyMappings.get("right key"));
+        boolean isUpPressed = Gdx.input.isKeyPressed(keyMappings.get("up key"));
+        boolean isDownPressed = Gdx.input.isKeyPressed(keyMappings.get("down key"));
 
         if (isLeftPressed) {
             inputVector.x = inputVector.x - 1;
@@ -1619,6 +1640,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
         if (isMenu() && !titleLock && !showSaveWarning) {
             int oldTitleIndex = titleSelectionIndex;
+            if (pressKeyPlease != null) {
+                inputVector.y = 0;
+            }
             titleSelectionIndex = titleSelectionIndex - (int) inputVector.y;
             if (inputVector.y != 0) {
                 titleLock = true;
@@ -1646,6 +1670,13 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             }
             if (oldTitleIndex != titleSelectionIndex) {
                 soundPlayer.playSound("sound/select-2.ogg", playerPos);
+            }
+            if (pressKeyPlease != null && inputProcessor.hasInput) {
+                setNewKey(pressKeyPlease);
+                titleLock = true;
+                inputVector.x = 0;
+                pressKeyPlease = null;
+                return;
             }
             if (inputVector.x != 0 || Gdx.input.isKeyPressed(Input.Keys.SPACE) || Gdx.input.isKeyPressed(Input.Keys.ENTER)) {
                 soundPlayer.playSound(BLIP_SELECT_ITEM_SOUND_ID, "sound/select-3.ogg", playerPos, false);
@@ -1690,7 +1721,19 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                         titleSelectionIndex = 3;
                     } else {
                         if (isOptionsMenu) {
-                            if (titleSelectionIndex == 0) {
+                            int tempIndex = optionOptions.size() - 1 - titleSelectionIndex;
+                            if (keyMappings.containsKey(optionOptions.get(tempIndex))) {
+                                if (inputVector.x > 0) {
+                                    titleLock = true;
+                                    if (pressKeyPlease == null) {
+                                        pressKeyPlease = optionOptions.get(tempIndex);
+                                        inputProcessor.acceptInput();
+                                    } else {
+                                        pressKeyPlease = null;
+                                    }
+                                }
+                            }
+                            if (optionOptions.get(tempIndex).equals("sound volume")) {
                                 // sound volume
                                 if (inputVector.x > 0) {
                                     soundPlayer.increaseSoundVolume();
@@ -1699,7 +1742,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                                     soundPlayer.decreaseSoundVolume();
                                 }
                             }
-                            if (titleSelectionIndex == 1) {
+                            if (optionOptions.get(tempIndex).equals("music volume")) {
                                 // music volume
                                 if (inputVector.x > 0) {
                                     soundPlayer.increaseMusicVolume();
@@ -1708,7 +1751,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                                     soundPlayer.decreaseMusicVolume();
                                 }
                             }
-                            if (titleSelectionIndex == 2) {
+                            if (optionOptions.get(tempIndex).equals("brightness")) {
                                 // brightness
 
                                 if (inputVector.x > 0) {
@@ -1719,7 +1762,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                                 }
                                 gamma = MathUtils.clamp(gamma, 0, 1.0f);
                             }
-                            if (titleSelectionIndex == 3) {
+                            if (optionOptions.get(tempIndex).equals("back")) {
                                 // go back
                                 isTitleMenu = true;
                                 isOptionsMenu = false;
@@ -1907,6 +1950,11 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         }
     }
 
+    private void setNewKey(String pressKeyPlease) {
+        int lastKey = inputProcessor.lastKeyCode;
+        keyMappings.put(pressKeyPlease, lastKey);
+    }
+
     private void castCurrentSpell() {
 //        currentSpell = "arrow";
         if (castCooldown > 0) {
@@ -2064,7 +2112,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     }
 
     boolean isBrightnessOption() {
-        return isOptionsMenu && titleSelectionIndex == 2;
+        int tempIndex = optionOptions.size() - 1 - titleSelectionIndex;
+        return isOptionsMenu && optionOptions.get(tempIndex).equals("brightness");
     }
 
     public boolean isArrowBlocking(Vector2 checkPos) {
