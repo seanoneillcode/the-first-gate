@@ -22,8 +22,9 @@ public class ArrowSource implements Switchable {
     boolean isRandom;
     float goal;
     float speed;
+    boolean isHidden;
 
-    public ArrowSource(Vector2 pos, Vector2 dir, float offset, float delay, boolean isActive, String switchId, boolean isRandom, float speed, boolean isRed) {
+    public ArrowSource(Vector2 pos, Vector2 dir, float offset, float delay, boolean isActive, String switchId, boolean isRandom, float speed, boolean isRed, boolean isHidden) {
         this.pos = pos;
         this.dir = dir;
         this.offset = offset;
@@ -35,6 +36,7 @@ public class ArrowSource implements Switchable {
         this.speed = speed;
         this.isRandom = isRandom;
         this.isRed = isRed;
+        this.isHidden = isHidden;
     }
 
     public void start() {

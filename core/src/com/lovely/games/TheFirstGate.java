@@ -767,7 +767,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         }
         for (ArrowSource arrowSource : currentLevel.arrowSources) {
             float animTime = arrowSource.getAnimTimer();
-            if (animTime > 0) {
+            if (animTime > 0 && !arrowSource.isHidden) {
                 lightHole.setColor(new Color(0.3f, 0.8f, 0.6f, (animTime / 0.8f)));
                 lightHole.setRegion(tr);
                 lightHole.setPosition((arrowSource.pos.x), (arrowSource.pos.y));
@@ -922,6 +922,9 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 }
             }
             for (ArrowSource arrowSource : currentLevel.arrowSources) {
+                if (arrowSource.isHidden) {
+                    continue;
+                }
                 TextureRegion frame = arrowSourceAnim.getKeyFrame(arrowSource.getAnimTimer(), true);
                 arrowSourceSprite.setPosition(arrowSource.pos.x, arrowSource.pos.y - 16);
                 arrowSourceSprite.setRegion(frame);

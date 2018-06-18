@@ -318,8 +318,8 @@ class Level {
             return this;
         }
 
-        Builder addArrowSource(Vector2 dir, Vector2 pos, float offset, float delay, boolean isActive, String switchId, boolean isRandom, float speed, boolean isRed) {
-            ArrowSource arrowSource = new ArrowSource(pos, dir, offset, delay, isActive, switchId, isRandom, speed, isRed);
+        Builder addArrowSource(Vector2 dir, Vector2 pos, float offset, float delay, boolean isActive, String switchId, boolean isRandom, float speed, boolean isRed, boolean isHidden) {
+            ArrowSource arrowSource = new ArrowSource(pos, dir, offset, delay, isActive, switchId, isRandom, speed, isRed, isHidden);
             if (switchId != null) {
                 trunk.addListener(arrowSource);
             }
@@ -488,6 +488,10 @@ class Level {
                 if (properties.containsKey("isRed")) {
                     isRed = Boolean.parseBoolean(properties.get("isRed").toString());
                 }
+                boolean isHidden = false;
+                if (properties.containsKey("isHidden")) {
+                    isHidden = Boolean.parseBoolean(properties.get("isHidden").toString());
+                }
                 boolean isActive = true;
                 if (properties.containsKey("isActive")) {
                     isActive = Boolean.parseBoolean(properties.get("isActive").toString());
@@ -497,7 +501,7 @@ class Level {
                     switchId = properties.get("switch").toString();
                 }
                 Vector2 midPos = new Vector2(rectObj.getRectangle().x, rectObj.getRectangle().y);
-                builder.addArrowSource(dir, midPos, offset, delay, isActive, switchId, isRandom, speed, isRed);
+                builder.addArrowSource(dir, midPos, offset, delay, isActive, switchId, isRandom, speed, isRed, isHidden);
             }
             if (properties.containsKey("type") && properties.get("type").equals("platform")) {
                 RectangleMapObject rectObj = (RectangleMapObject) obj;
