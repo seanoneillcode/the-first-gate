@@ -14,7 +14,6 @@ public class MyInputProcessor implements InputProcessor {
 
     public boolean keyDown (int keycode) {
         hasInput = true;
-        System.out.println(keycode);
         lastKeyCode = keycode;
         return false;
     }

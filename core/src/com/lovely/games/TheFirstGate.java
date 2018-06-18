@@ -137,7 +137,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private boolean isTitleMenu = false, isOptionsMenu = false, isCreditsMenu = false;
     private int titleSelectionIndex = 0;
     private List<String> titleOptions = Arrays.asList("credits", "options", "new game", "load game");
-    private List<String> optionOptions = Arrays.asList("back",  "brightness", "music volume", "sound volume", "cast key", "down key", "right key", "left key", "up key", "reset everything!");
+    private List<String> optionOptions = Arrays.asList("back", "music", "sound", "brightness", "cast key", "down key", "right key", "left key", "up key", "reset everything!");
     private List<String> creditOptions = Arrays.asList("Music - Daniel Lacey",  "Quality - Ben Kirimlidis", "Quality - Michalis Kirimlidis", "Code and Art - Sean O'Neill");
     private Sprite titleSelectionSprite;
     private boolean titleLock = false;
@@ -183,6 +183,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private Map<String, Integer> keyMappings;
     private String pressKeyPlease;
     MyInputProcessor inputProcessor = new MyInputProcessor();
+    private Sprite selectArrowSprite;
 
     @Override
 	public void create () {
@@ -318,6 +319,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("volume-level-on.png", Texture.class);
         assetManager.load("volume-level-off.png", Texture.class);
         assetManager.load("player-large.png", Texture.class);
+        assetManager.load("select-arrow.png", Texture.class);
 
         assetManager.load("sound/arrow-source.ogg", Music.class);
         assetManager.load("sound/blast-0.ogg", Music.class);
@@ -380,6 +382,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         posterSprite.setBounds(0,0,VIEWPORT_WIDTH,VIEWPORT_HEIGHT);
         enemySprite = new Sprite((Texture) assetManager.get("entity/enemy.png"));
         enemySprite.setSize(40, 40);
+        selectArrowSprite = new Sprite((Texture) assetManager.get("select-arrow.png"));
+        selectArrowSprite.setSize(24, 24);
         arrowSourceSprite = new Sprite((Texture) assetManager.get("entity/arrow-source.png"));
         arrowSourceSprite.setSize(32, 48);
         menuSprite = new Sprite((Texture) assetManager.get("posters/menu-sprites.png"));
@@ -494,7 +498,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         platformAnim = loadAnimation(assetManager.get("entity/platform-anim.png"), 8, 0.1f);
         arrowSourceAnim = loadAnimation(assetManager.get("entity/arrow-source.png"), 8, 0.1f);
         openingScene = loadAnimation(assetManager.get("player-large.png"), 8, 0.3f);
-        menuSpriteAnim = loadAnimation(assetManager.get("posters/menu-sprites.png"), 12, 0.15f);
+        menuSpriteAnim = loadAnimation(assetManager.get("posters/menu-sprites.png"), 12, 0.2f);
         doorCloseAnim.setPlayMode(Animation.PlayMode.REVERSED);
         pressureOffAnim.setPlayMode(Animation.PlayMode.REVERSED);
         guffImages = new HashMap<>();
@@ -1152,6 +1156,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 float tmpfloat = 0;
                 if (titleSelectionIndex == menuOptions.size() - 1 - index) {
                     font.setColor(fontColorSelectedMain);
+                    selectArrowSprite.setPosition(selectedPos.x + 80, selectedPos.y - 15);
+                    selectArrowSprite.draw(batch);
                 } else {
                     font.setColor(fontColorMain);
                 }
@@ -1178,13 +1184,17 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 selectedPos.add(0, -40);
             }
             if (isOptionsMenu) {
-                drawVolumeLine(new Vector2(260, 188), soundPlayer.getSoundVolume());
-                drawVolumeLine(new Vector2(260, 148), soundPlayer.getMusicVolume());
-                drawVolumeLine(new Vector2(260, 108), gamma);
+                drawVolumeLine(new Vector2(260, 178), gamma);
+                drawVolumeLine(new Vector2(260, 138), soundPlayer.getSoundVolume());
+                drawVolumeLine(new Vector2(260, 98), soundPlayer.getMusicVolume());
             }
             if (showSaveWarning && conversation != null) {
                 conversation.update();
                 dialogContainer.render(batch, new Vector2(camera.position.x - (VIEWPORT_WIDTH / 2.0f), camera.position.y - (VIEWPORT_HEIGHT / 2.0f)), conversation, soundPlayer);
+                if (conversation.getCurrentDialog().isFinished()) {
+                    selectArrowSprite.setPosition(dialogContainer.lastPos.x + 8, dialogContainer.lastPos.y + 12);
+                    selectArrowSprite.draw(batch);
+                }
             }
             batch.end();
         }
@@ -1746,7 +1756,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                                     }
                                 }
                             }
-                            if (optionOptions.get(tempIndex).equals("sound volume")) {
+                            if (optionOptions.get(tempIndex).equals("sound")) {
                                 // sound volume
                                 if (inputVector.x > 0) {
                                     soundPlayer.increaseSoundVolume();
@@ -1755,7 +1765,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                                     soundPlayer.decreaseSoundVolume();
                                 }
                             }
-                            if (optionOptions.get(tempIndex).equals("music volume")) {
+                            if (optionOptions.get(tempIndex).equals("music")) {
                                 // music volume
                                 if (inputVector.x > 0) {
                                     soundPlayer.increaseMusicVolume();

@@ -26,6 +26,7 @@ public class DialogContainer {
     String info = "info";
     private Sprite leftPortrait, rightPortrait;
     private String lastAntMood;
+    protected Vector2 lastPos = new Vector2();
 
     {
         dialogs.put("1", Arrays.asList(
@@ -433,9 +434,10 @@ public class DialogContainer {
             }
         }
 
+        float offsetx = 0;
         for (String line : lines) {
             String chosenOption = dialogLine.getCurrentOption();
-            float offsetx = dialogLine instanceof DialogOption ? 16 : 0;
+            offsetx = dialogLine instanceof DialogOption ? 16 : 0;
             if (chosenOption != null && line.equals(chosenOption)) {
                 optionPointer.setPosition(dialogPos.x + 6, dialogPos.y - 2 + ypos + startHeight - 14);
                 optionPointer.draw(batch);
@@ -452,6 +454,9 @@ public class DialogContainer {
 
             ypos = ypos - 32;
         }
+
+        lastPos.x = dialogPos.x + 10 + offsetx + (lines.get(lines.size() - 1).length() * 10);
+        lastPos.y = dialogPos.y + ypos + startHeight - 2;
 
         String lastLine = lines.get(lines.size() - 1);
         if (!lastLine.isEmpty()) {
@@ -479,5 +484,9 @@ public class DialogContainer {
 
     public void reset() {
         lastMood = "pro-listening";
+    }
+
+    public boolean isAtEndOfSentence() {
+        return false;
     }
 }
