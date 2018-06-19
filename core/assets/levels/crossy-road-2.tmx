@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="1.1.5" orientation="orthogonal" renderorder="right-down" width="21" height="22" tilewidth="32" tileheight="32" infinite="0" nextobjectid="56">
+<map version="1.0" tiledversion="1.0.3" orientation="orthogonal" renderorder="right-down" width="21" height="22" tilewidth="32" tileheight="32" nextobjectid="56">
+ <properties>
+  <property name="number" value="47"/>
+ </properties>
  <tileset firstgid="1" source="brown.tsx"/>
  <layer name="ground" width="21" height="22">
   <data encoding="csv">

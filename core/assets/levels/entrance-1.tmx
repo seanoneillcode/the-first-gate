@@ -2,6 +2,7 @@
 <map version="1.0" tiledversion="1.0.3" orientation="orthogonal" renderorder="right-down" width="20" height="16" tilewidth="32" tileheight="32" nextobjectid="55">
  <properties>
   <property name="isWind" value="true"/>
+  <property name="number" value="1"/>
  </properties>
  <tileset firstgid="1" source="tower-tileset.tsx"/>
  <layer name="walls" width="20" height="16">

@@ -184,6 +184,10 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private String pressKeyPlease;
     MyInputProcessor inputProcessor = new MyInputProcessor();
     private Sprite selectArrowSprite;
+    private StatisticsManager statisticsManager;
+    private int pid;
+    private int numberOfLevelSteps = 0;
+    private int bestLevelSoFar = 0;
 
     @Override
 	public void create () {
@@ -355,7 +359,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 
         fadeColor = Color.BLACK;
         inputVector = new Vector2();
-
+        statisticsManager = new StatisticsManager(pid);
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
@@ -556,9 +560,14 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         prefs.putFloat("music-level", soundPlayer.getMusicVolume());
         prefs.putFloat("brightness-level", gamma);
         prefs.putString("current-spell", currentSpell);
+        prefs.putInteger("pid", pid);
         keyMappings.forEach(prefs::putInteger);
         prefs.flush();
         hasContinue = true;
+    }
+
+    private int generatePid() {
+        return String.valueOf(System.currentTimeMillis()).hashCode();
     }
 
     private void loadEverything() {
@@ -571,7 +580,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         keyMappings.put("down key", prefs.getInteger("down key", 20));
         keyMappings.put("left key", prefs.getInteger("left key", 21));
         keyMappings.put("cast key", prefs.getInteger("cast key", 62));
-
+        pid = prefs.getInteger("pid", generatePid());
+        statisticsManager.pid = pid;
         if (prefs.contains("current-spell")) {
             currentSpell = prefs.getString("current-spell");
         } else {
@@ -703,6 +713,10 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         soundPlayer.startLevel();
         if (currentLevel.isWind) {
             soundPlayer.playMusic(WIND_BGR_SOUND_ID, "sound/wind-background.ogg", true);
+        }
+        if (Integer.valueOf(currentLevel.number) > bestLevelSoFar) {
+            bestLevelSoFar = Integer.valueOf(currentLevel.number);
+            statisticsManager.addGameEvent(statisticsManager.startLevelEvent(level));
         }
     }
 
@@ -1298,6 +1312,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
 	}
 
 	private void update() {
+        statisticsManager.update();
         soundPlayer.update(playerPos);
         boolean blocksDirty = false;
         if (playerWasPushing) {
@@ -1420,6 +1435,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                     playerIsDead = true;
                     animationDelta = 0;
                     isFallDeath = true;
+                    statisticsManager.addGameEvent(statisticsManager.playerDeathEvent("fall", currentLevel));
                 }
                 if (block != null && block.isGround()) {
                     currentImageHeight = block;
@@ -1534,6 +1550,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 soundPlayer.playSound("sound/flame-0.ogg", arrow.pos);
                 animationDelta = 0;
                 isFallDeath = false;
+                statisticsManager.addGameEvent(statisticsManager.playerDeathEvent("arrow", currentLevel));
                 return;
             }
             for (Actor actor : currentLevel.actors) {
@@ -1622,18 +1639,29 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         startLevel(currentLevel, lastConnection);
     }
 
-    private void goToNextLevel() {
-        Connection connection = currentLevel.getPreviousConnection();
-        if (connection != null && connection.to != null && !connection.to.equals("")) {
-            goToConnection(connection.to);
+    private void goToMatchingConnection(String number) {
+        for (Level level : levels) {
+            if (level.number != null && level.number.equals(number)) {
+                for (Connection thisConnection : currentLevel.connections) {
+                    for (Connection connectionOther : level.connections) {
+                        if (thisConnection.to.equals(connectionOther.name)) {
+                            goToConnection(thisConnection.to);
+                            return;
+                        }
+                    }
+                }
+            }
         }
     }
 
+    private void goToNextLevel() {
+        String nextNumber = String.valueOf(Integer.valueOf(currentLevel.number) + 1);
+        goToMatchingConnection(nextNumber);
+    }
+
     private void goToPreviousLevel() {
-        Connection connection = currentLevel.getNextConnection();
-        if (connection != null && connection.to != null && !connection.to.equals("")) {
-            goToConnection(connection.to);
-        }
+        String nextNumber = String.valueOf(Integer.valueOf(currentLevel.number) - 1);
+        goToMatchingConnection(nextNumber);
     }
 
     private Rectangle getPlayerRect() {
@@ -1975,11 +2003,11 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             levelChangeLock = false;
         }
         if (!levelChangeLock && Gdx.input.isKeyPressed(Input.Keys.PERIOD)) {
-            goToPreviousLevel();
+            goToNextLevel();
             levelChangeLock = true;
         }
         if (!levelChangeLock && Gdx.input.isKeyPressed(Input.Keys.COMMA)) {
-            goToNextLevel();
+            goToPreviousLevel();
             levelChangeLock = true;
         }
     }
