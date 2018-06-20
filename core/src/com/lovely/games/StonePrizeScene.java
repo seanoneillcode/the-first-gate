@@ -15,6 +15,7 @@ public class StonePrizeScene {
     Sprite player;
     Sprite light;
     Sprite stone;
+    Sprite faceLight;
 
     float timer;
     private Vector2 playerPos, stonePos;
@@ -29,6 +30,8 @@ public class StonePrizeScene {
         stone.setScale(2.0f);
         light = new Sprite((Texture)assetManager.get("posters/stone-1.png"));
         light.setScale(2.0f);
+        faceLight = new Sprite((Texture)assetManager.get("posters/stone-3.png"));
+        faceLight.setScale(2.0f);
         timer = 0;
         needsReset = true;
     }
@@ -68,6 +71,9 @@ public class StonePrizeScene {
         light.setPosition(pos.x + stonePos.x - 150,pos.y + stonePos.y);
         light.setAlpha(MathUtils.clamp(lightAlpha * alpha, 0, 1f));
         light.draw(batch);
+        faceLight.setPosition(pos.x + playerPos.x, pos.y + playerPos.y);
+        faceLight.setAlpha(MathUtils.clamp(lightAlpha * alpha, 0, 1f));
+        faceLight.draw(batch);
         stone.setAlpha(alpha);
         stone.setPosition(pos.x + stonePos.x,pos.y + stonePos.y);
         stone.draw(batch);

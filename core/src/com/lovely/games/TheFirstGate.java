@@ -306,6 +306,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("posters/stone-0.png", Texture.class);
         assetManager.load("posters/stone-1.png", Texture.class);
         assetManager.load("posters/stone-2.png", Texture.class);
+        assetManager.load("posters/stone-3.png", Texture.class);
         assetManager.load("posters/menu-sprites.png", Texture.class);
 
         assetManager.load("dialog-bottom.png", Texture.class);

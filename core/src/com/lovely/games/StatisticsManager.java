@@ -40,7 +40,7 @@ public class StatisticsManager {
         for (int i = 0; i < NUM_EVENTS_PER_TICK && events.size() > 0; i++) {
             GameEvent event = events.poll();
             // TODO send this event
-            System.out.println(event.asString());
+//            System.out.println(event.asString());
         }
     }
 
