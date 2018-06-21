@@ -188,6 +188,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private int pid;
     private int numberOfLevelSteps = 0;
     private int bestLevelSoFar = 0;
+    private Platform lockedPlatform;
+    private Animation<TextureRegion> switchOnAnim, switchOffAnim;
 
     @Override
 	public void create () {
@@ -278,6 +280,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("entity/dust-air-2.png", Texture.class);
         assetManager.load("entity/door-open.png", Texture.class);
         assetManager.load("entity/pressure-on.png", Texture.class);
+        assetManager.load("entity/switch-on.png", Texture.class);
 
         assetManager.load("character/pro-simple-fall-death.png", Texture.class);
         assetManager.load("character/pro-simple-fire-death.png", Texture.class);
@@ -500,12 +503,15 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         doorCloseAnim = loadAnimation(assetManager.get("entity/door-open.png"), 6, 0.03f);
         pressureOnAnim = loadAnimation(assetManager.get("entity/pressure-on.png"), 4, 0.02f);
         pressureOffAnim = loadAnimation(assetManager.get("entity/pressure-on.png"), 4, 0.02f);
+        switchOnAnim = loadAnimation(assetManager.get("entity/switch-on.png"), 4, 0.02f);
+        switchOffAnim = loadAnimation(assetManager.get("entity/switch-on.png"), 4, 0.02f);
         platformAnim = loadAnimation(assetManager.get("entity/platform-anim.png"), 8, 0.1f);
         arrowSourceAnim = loadAnimation(assetManager.get("entity/arrow-source.png"), 8, 0.1f);
         openingScene = loadAnimation(assetManager.get("player-large.png"), 8, 0.3f);
         menuSpriteAnim = loadAnimation(assetManager.get("posters/menu-sprites.png"), 12, 0.2f);
         doorCloseAnim.setPlayMode(Animation.PlayMode.REVERSED);
         pressureOffAnim.setPlayMode(Animation.PlayMode.REVERSED);
+        switchOffAnim.setPlayMode(Animation.PlayMode.REVERSED);
         guffImages = new HashMap<>();
         guffImages.put("entity/grass-1.png", loadAnimation(assetManager.get("entity/grass-1.png"), 4, 0.515f));
         guffImages.put("entity/grass-2.png", loadAnimation(assetManager.get("entity/grass-2.png"), 4, 0.52f));
@@ -715,7 +721,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         if (currentLevel.isWind) {
             soundPlayer.playMusic(WIND_BGR_SOUND_ID, "sound/wind-background.ogg", true);
         }
-        if (Integer.valueOf(currentLevel.number) > bestLevelSoFar) {
+        if (currentLevel.number != null && Integer.valueOf(currentLevel.number) > bestLevelSoFar) {
             bestLevelSoFar = Integer.valueOf(currentLevel.number);
             statisticsManager.addGameEvent(statisticsManager.startLevelEvent(level));
         }
@@ -918,8 +924,14 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 batch.draw(currentFrame, guff.pos.x, guff.pos.y, guff.size.x, guff.size.y);
             }
             for (PressureTile pressureTile : currentLevel.pressureTiles) {
-                Animation<TextureRegion> animation = pressureTile.isPressure ? pressureOnAnim : pressureOffAnim;
-                TextureRegion frame = animation.getKeyFrame(pressureTile.animTimer, false);
+                TextureRegion frame;
+                if (pressureTile.isSwitch) {
+                    Animation<TextureRegion> animation = pressureTile.isPressure ? switchOnAnim : switchOffAnim;
+                    frame = animation.getKeyFrame(pressureTile.animTimer, false);
+                } else {
+                    Animation<TextureRegion> animation = pressureTile.isPressure ? pressureOnAnim : pressureOffAnim;
+                    frame = animation.getKeyFrame(pressureTile.animTimer, false);
+                }
                 batch.draw(frame, pressureTile.pos.x, pressureTile.pos.y);
             }
             for (Platform platform : currentLevel.getPlatforms()) {
@@ -1425,7 +1437,11 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
             if (platform != null) {
                 currentPlatform = platform;
             } else {
-                currentPlatform = null;
+                if (lockedPlatform != null) {
+                    currentPlatform = lockedPlatform;
+                } else {
+                    currentPlatform = null;
+                }
             }
             currentImageHeight = null;
             if (currentPlatform == null && currentLevel.isDeath(playerPos.cpy().add(HALF_TILE_SIZE,HALF_TILE_SIZE))) {
@@ -1447,6 +1463,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 playerPos.x = MathUtils.round(playerPos.x / TILE_SIZE) * TILE_SIZE;
                 playerPos.y = MathUtils.round(playerPos.y / TILE_SIZE) * TILE_SIZE;
             }
+            lockedPlatform = null;
         }
 
         if (currentPlatform != null && !isMoving) {
@@ -1926,6 +1943,10 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                                 }
                             }
                         }
+                    }
+                    Platform nextPlatform = currentLevel.getPlatform(nextTilePos);
+                    if (nextPlatform != null) {
+                        lockedPlatform = nextPlatform;
                     }
                     if (!blocked) {
                         isMoving = true;

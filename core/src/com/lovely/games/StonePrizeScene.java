@@ -62,9 +62,6 @@ public class StonePrizeScene {
     }
 
     void render(SpriteBatch batch, Vector2 pos, float alpha) {
-//        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-//        player.setTexture(assetManager.get(posterImageName));
-//        player.setAlpha(posterAlpha);
         player.setPosition(pos.x + playerPos.x, pos.y + playerPos.y);
         player.draw(batch);
         player.setAlpha(alpha);

@@ -12,7 +12,7 @@ class PressureTile {
     Trunk trunk;
     private boolean handledAction;
     String switchId;
-    private boolean isSwitch;
+    protected boolean isSwitch;
     Color color;
     float animTimer;
     boolean isPressure;
@@ -48,9 +48,10 @@ class PressureTile {
                 if (trunk != null) {
                     trunk.broadcast(switchId);
                 }
+                isPressure = false;
             }
             animTimer = 0;
-            isPressure = false;
+
         }
         this.handledAction = false;
     }
@@ -59,7 +60,7 @@ class PressureTile {
         if (!handledAction && trunk != null) {
             trunk.broadcast(switchId);
             handledAction = true;
-            isPressure = true;
+            isPressure = !isPressure;
             soundPlayer.playSound("sound/thunk.ogg", pos);
             animTimer = 0;
         }
