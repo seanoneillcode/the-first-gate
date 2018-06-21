@@ -600,7 +600,11 @@ class Level {
                 if (properties.containsKey("isOpen")) {
                     isOpen = Boolean.parseBoolean(properties.get("isOpen").toString());
                 }
-                builder.addDoor(new Door(pos, isOpen, switchId, soundPlayer));
+                boolean across = false;
+                if (properties.containsKey("across")) {
+                    across = Boolean.parseBoolean(properties.get("across").toString());
+                }
+                builder.addDoor(new Door(pos, isOpen, switchId, soundPlayer, across));
             }
             if (properties.containsKey("type") && properties.get("type").equals("light")) {
                 RectangleMapObject rectObj = (RectangleMapObject) obj;

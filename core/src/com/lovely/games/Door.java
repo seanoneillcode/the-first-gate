@@ -18,16 +18,18 @@ public class Door implements Switchable {
     SoundPlayer soundPlayer;
     int soundId;
     float animTimer;
+    boolean isAcross;
 
-    public Door(Vector2 pos, boolean isOpen, String switchId, SoundPlayer soundPlayer) {
+    public Door(Vector2 pos, boolean isOpen, String switchId, SoundPlayer soundPlayer, boolean isAcross) {
         this.pos = pos;
         this.isOpen = isOpen;
         this.originalIsOpen = isOpen;
         this.switchId = switchId;
-        this.color = new Color(random(0.8f, 0.9f), random(0.2f, 0.3f), random(0.8f, 0.9f), 1.0f);
+        this.color = new Color(random(0.8f, 0.9f), random(0.3f, 0.4f), random(0.7f, 0.8f), 1.0f);
         this.soundPlayer = soundPlayer;
         this.soundId = MathUtils.random(RANDOM_SOUND_ID_RANGE);
         animTimer = 0;
+        this.isAcross = isAcross;
     }
 
     public void start() {

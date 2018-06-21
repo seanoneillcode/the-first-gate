@@ -190,6 +190,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private int bestLevelSoFar = 0;
     private Platform lockedPlatform;
     private Animation<TextureRegion> switchOnAnim, switchOffAnim;
+    private Animation<TextureRegion> doorAcrossOpenAnim, doorAcrossCloseAnim;
+    private Sprite doorSprite;
 
     @Override
 	public void create () {
@@ -279,6 +281,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("entity/dust-air.png", Texture.class);
         assetManager.load("entity/dust-air-2.png", Texture.class);
         assetManager.load("entity/door-open.png", Texture.class);
+        assetManager.load("levels/door-horizontal.png", Texture.class);
+        assetManager.load("levels/door-vertical.png", Texture.class);
         assetManager.load("entity/pressure-on.png", Texture.class);
         assetManager.load("entity/switch-on.png", Texture.class);
 
@@ -394,6 +398,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         selectArrowSprite.setSize(24, 24);
         arrowSourceSprite = new Sprite((Texture) assetManager.get("entity/arrow-source.png"));
         arrowSourceSprite.setSize(32, 48);
+        doorSprite = new Sprite();
+        doorSprite.setSize(64, 64);
         menuSprite = new Sprite((Texture) assetManager.get("posters/menu-sprites.png"));
         menuSprite.setSize(800, 400);
         playerSprite = new Sprite();
@@ -499,8 +505,10 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         arrowExplodeAnim = loadAnimation(assetManager.get("entity/arrow-explode.png"), 8, 0.05f);
         torchAnim = loadAnimation(assetManager.get("entity/torch-anim.png"), 8, 0.2f);
         campfireAnim = loadAnimation(assetManager.get("entity/campfire.png"), 8, 0.1f);
-        doorOpenAnim = loadAnimation(assetManager.get("entity/door-open.png"), 6, 0.03f);
-        doorCloseAnim = loadAnimation(assetManager.get("entity/door-open.png"), 6, 0.03f);
+        doorAcrossOpenAnim = loadAnimation(assetManager.get("levels/door-horizontal.png"), 8, 0.03f);
+        doorAcrossCloseAnim = loadAnimation(assetManager.get("levels/door-horizontal.png"), 8, 0.03f);
+        doorOpenAnim = loadAnimation(assetManager.get("levels/door-vertical.png"), 8, 0.03f);
+        doorCloseAnim = loadAnimation(assetManager.get("levels/door-vertical.png"), 8, 0.03f);
         pressureOnAnim = loadAnimation(assetManager.get("entity/pressure-on.png"), 4, 0.02f);
         pressureOffAnim = loadAnimation(assetManager.get("entity/pressure-on.png"), 4, 0.02f);
         switchOnAnim = loadAnimation(assetManager.get("entity/switch-on.png"), 4, 0.02f);
@@ -509,7 +517,8 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         arrowSourceAnim = loadAnimation(assetManager.get("entity/arrow-source.png"), 8, 0.1f);
         openingScene = loadAnimation(assetManager.get("player-large.png"), 8, 0.3f);
         menuSpriteAnim = loadAnimation(assetManager.get("posters/menu-sprites.png"), 12, 0.2f);
-        doorCloseAnim.setPlayMode(Animation.PlayMode.REVERSED);
+        doorOpenAnim.setPlayMode(Animation.PlayMode.REVERSED);
+        doorAcrossCloseAnim.setPlayMode(Animation.PlayMode.REVERSED);
         pressureOffAnim.setPlayMode(Animation.PlayMode.REVERSED);
         switchOffAnim.setPlayMode(Animation.PlayMode.REVERSED);
         guffImages = new HashMap<>();
@@ -1005,13 +1014,20 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 }
             }
             for (Door door : currentLevel.doors) {
-                Animation<TextureRegion> animation = door.isOpen ? doorOpenAnim : doorCloseAnim;
+                Animation<TextureRegion> animation;
+                if (door.isAcross) {
+                    animation = door.isOpen ? doorAcrossOpenAnim : doorAcrossCloseAnim;
+                } else {
+                    animation = door.isOpen ? doorOpenAnim : doorCloseAnim;
+                }
                 TextureRegion frame = animation.getKeyFrame(door.animTimer, false);
+                doorSprite.setRegion(frame);
+                doorSprite.setPosition(door.pos.x, door.pos.y);
                 if (door.isOpen) {
-                    batch.draw(frame, door.pos.x, door.pos.y);
+                    doorSprite.draw(batch);
                 }
                 if (!door.isOpen && door.pos.y >= threeDeeLinePos.y) {
-                    batch.draw(frame, door.pos.x, door.pos.y);
+                    doorSprite.draw(batch);
                 }
             }
             for (Actor actor : currentLevel.actors) {
@@ -1093,10 +1109,17 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 }
             }
             for (Door door : currentLevel.doors) {
-                Animation<TextureRegion> animation = door.isOpen ? doorOpenAnim : doorCloseAnim;
+                Animation<TextureRegion> animation;
+                if (door.isAcross) {
+                    animation = door.isOpen ? doorAcrossOpenAnim : doorAcrossCloseAnim;
+                } else {
+                    animation = door.isOpen ? doorOpenAnim : doorCloseAnim;
+                }
                 TextureRegion frame = animation.getKeyFrame(door.animTimer, false);
+                doorSprite.setRegion(frame);
+                doorSprite.setPosition(door.pos.x, door.pos.y);
                 if (door.pos.y < threeDeeLinePos.y && !door.isOpen) {
-                    batch.draw(frame, door.pos.x, door.pos.y);
+                    doorSprite.draw(batch);
                 }
             }
             for (Torch torch : currentLevel.torches) {
