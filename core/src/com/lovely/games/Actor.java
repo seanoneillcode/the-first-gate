@@ -12,6 +12,7 @@ import static com.lovely.games.TheFirstGate.TILE_SIZE;
 public class Actor {
 
     public static final float SHOOT_TIMER_LIMIT = 0.6f;
+    private static final int WEAKNESS_LIMT = 6;
     Vector2 pos;
     String id;
     boolean isHidden;
@@ -26,6 +27,8 @@ public class Actor {
     private Vector2 newTeleportPos;
     private boolean wasHit = false;
     boolean isDone = false;
+    int weakness = 0;
+
 
     public Actor(Vector2 pos, String id, boolean isHide, boolean isRight, boolean isBoss) {
         this.pos = pos;
@@ -48,7 +51,7 @@ public class Actor {
         this.oldTeleportPos = originalPos.cpy();
         this.newTeleportPos = originalPos.cpy();
         this.shootTimer = 0;
-        this.bossLives = 3;
+        this.bossLives = 2;
         wasHit = false;
         isDone = false;
         isWalking = false;
@@ -61,8 +64,13 @@ public class Actor {
         shootTimer += Gdx.graphics.getDeltaTime();
         if (shootTimer > SHOOT_TIMER_LIMIT) {
             shootTimer = 0;
-            Vector2 arrowPos = pos.cpy().add(0, -24);
-            stage.addArrow(arrowPos, new Vector2(0, -1), PLAYER_ARROW_SPEED, true);
+            weakness = weakness + 1;
+            if (weakness > WEAKNESS_LIMT) {
+                weakness = 0;
+            } else {
+                Vector2 arrowPos = pos.cpy().add(0, -24);
+                stage.addArrow(arrowPos, new Vector2(0, -1), PLAYER_ARROW_SPEED, true);
+            }
         }
         if (wasHit) {
             wasHit = false;
