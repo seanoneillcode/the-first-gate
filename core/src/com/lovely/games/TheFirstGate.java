@@ -192,6 +192,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
     private Animation<TextureRegion> switchOnAnim, switchOffAnim;
     private Animation<TextureRegion> doorAcrossOpenAnim, doorAcrossCloseAnim;
     private Sprite doorSprite;
+    private Animation<TextureRegion> doorDustAnim;
 
     @Override
 	public void create () {
@@ -282,6 +283,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         assetManager.load("entity/dust-air-2.png", Texture.class);
         assetManager.load("entity/door-open.png", Texture.class);
         assetManager.load("levels/door-horizontal.png", Texture.class);
+        assetManager.load("levels/door-dust.png", Texture.class);
         assetManager.load("levels/door-vertical.png", Texture.class);
         assetManager.load("entity/pressure-on.png", Texture.class);
         assetManager.load("entity/switch-on.png", Texture.class);
@@ -508,6 +510,7 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
         doorAcrossOpenAnim = loadAnimation(assetManager.get("levels/door-horizontal.png"), 8, 0.03f);
         doorAcrossCloseAnim = loadAnimation(assetManager.get("levels/door-horizontal.png"), 8, 0.03f);
         doorOpenAnim = loadAnimation(assetManager.get("levels/door-vertical.png"), 8, 0.03f);
+        doorDustAnim = loadAnimation(assetManager.get("levels/door-dust.png"), 8, 0.08f);
         doorCloseAnim = loadAnimation(assetManager.get("levels/door-vertical.png"), 8, 0.03f);
         pressureOnAnim = loadAnimation(assetManager.get("entity/pressure-on.png"), 4, 0.02f);
         pressureOffAnim = loadAnimation(assetManager.get("entity/pressure-on.png"), 4, 0.02f);
@@ -1021,12 +1024,17 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                     animation = door.isOpen ? doorOpenAnim : doorCloseAnim;
                 }
                 TextureRegion frame = animation.getKeyFrame(door.animTimer, false);
+                TextureRegion dustFrame = doorDustAnim.getKeyFrame(door.animTimer, false);
                 doorSprite.setRegion(frame);
                 doorSprite.setPosition(door.pos.x, door.pos.y);
                 if (door.isOpen) {
                     doorSprite.draw(batch);
+                    doorSprite.setRegion(dustFrame);
+                    doorSprite.draw(batch);
                 }
                 if (!door.isOpen && door.pos.y >= threeDeeLinePos.y) {
+                    doorSprite.draw(batch);
+                    doorSprite.setRegion(dustFrame);
                     doorSprite.draw(batch);
                 }
             }
@@ -1115,10 +1123,13 @@ public class TheFirstGate extends ApplicationAdapter implements Stage {
                 } else {
                     animation = door.isOpen ? doorOpenAnim : doorCloseAnim;
                 }
+                TextureRegion dustFrame = doorDustAnim.getKeyFrame(door.animTimer, false);
                 TextureRegion frame = animation.getKeyFrame(door.animTimer, false);
                 doorSprite.setRegion(frame);
                 doorSprite.setPosition(door.pos.x, door.pos.y);
                 if (door.pos.y < threeDeeLinePos.y && !door.isOpen) {
+                    doorSprite.draw(batch);
+                    doorSprite.setRegion(dustFrame);
                     doorSprite.draw(batch);
                 }
             }
