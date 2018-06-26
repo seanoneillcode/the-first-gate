@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="1.0.3" orientation="orthogonal" renderorder="right-down" width="15" height="15" tilewidth="32" tileheight="32" nextobjectid="58">
+<map version="1.0" tiledversion="1.1.5" orientation="orthogonal" renderorder="right-down" width="15" height="15" tilewidth="32" tileheight="32" infinite="0" nextobjectid="58">
  <properties>
   <property name="number" value="40"/>
  </properties>
  <tileset firstgid="1" source="brown.tsx"/>
+ <tileset firstgid="101" source="tower-tileset.tsx"/>
  <layer name="death" width="15" height="15">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -26,8 +27,8 @@
  <layer name="walls" width="15" height="15">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-12,12,12,12,12,12,12,12,12,12,12,12,15,0,0,
+0,0,0,0,0,0,0,203,204,0,0,0,0,0,0,
+12,12,12,12,12,12,12,213,214,12,12,12,15,0,0,
 72,0,0,0,0,0,0,0,0,0,0,0,15,0,0,
 12,12,23,0,12,0,12,0,12,0,12,0,15,0,0,
 0,0,14,0,0,0,0,0,0,0,0,0,15,0,0,

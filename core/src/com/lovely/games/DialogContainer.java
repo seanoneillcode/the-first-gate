@@ -302,6 +302,18 @@ public class DialogContainer {
                 line(info, "'The Third Gate'"),
                 line(pro, "Only one left and I'm safe")
         ));
+        dialogs.put("42", Arrays.asList(
+                line(ant, "If you wish to be a wizard, you must pass through the trials at CAEN"),
+                line(pro, "What kind of trials?", "worried"),
+                line(ant, "The trials of knowing..."),
+                line(ant, "...of doing..."),
+                line(ant, "and of feeling"),
+                line(pro, "that sounds like fun!", "happy"),
+                line(ant, "You'll be lucky to survive", "angry")
+        ));
+        dialogs.put("43", Arrays.asList(
+                line(pro, "oh...", "worried")
+        ));
     }
 
     String currentDialog;

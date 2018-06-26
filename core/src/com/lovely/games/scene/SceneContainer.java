@@ -165,11 +165,11 @@ public class SceneContainer {
                 .build());
 
         scenes.put("25", builder()
-                .verb(new DialogVerb("26"))
+                .verb(new DialogVerb("42"))
                 .verb(new MoveVerb(new Vector2(0, 32 * 2), "ant", true))
                 .verb(new HideShowActorVerb(true, "ant"))
                 .verb(new SendEventVerb("a"))
-                .verb(new DialogVerb("27"))
+                .verb(new DialogVerb("43"))
                 .build());
 
         scenes.put("26", builder()
