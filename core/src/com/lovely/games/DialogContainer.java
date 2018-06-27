@@ -314,6 +314,10 @@ public class DialogContainer {
         dialogs.put("43", Arrays.asList(
                 line(pro, "oh...", "worried")
         ));
+        dialogs.put("44", Arrays.asList(
+                line(pro, "Water! I'm dying of thirst!", "happy"),
+                line(pro, "This might be another trap, I better leave it...", "worried")
+        ));
     }
 
     String currentDialog;

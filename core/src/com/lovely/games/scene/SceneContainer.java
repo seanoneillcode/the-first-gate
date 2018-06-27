@@ -293,6 +293,10 @@ public class SceneContainer {
                 .verb(new PosterVerb("new-game-scene"))
                 .build());
 
+        scenes.put("43", builder()
+                .verb(new DialogVerb("44"))
+                .build());
+
         scenes.put("new-game", builder()
                 .verb(new GameControlVerb("new-game"))
                 .build());
